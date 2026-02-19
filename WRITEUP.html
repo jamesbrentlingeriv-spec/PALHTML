@@ -597,6 +597,15 @@
             </div>
         </div>
 
+        <div id="job-type-section" style="background: var(--table-bg); padding: 8px; border-radius: 4px; border: 1px solid var(--border); margin: 8px 0; font-size: 0.85em;">
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center; justify-content: space-around; font-weight: bold;">
+                <label style="cursor:pointer;"><input type="checkbox" id="job-type-complete" onchange="handleJobTypeChange('complete')"> Complete</label>
+                <label style="cursor:pointer;"><input type="checkbox" id="job-type-frame" onchange="handleJobTypeChange('frame')"> Frame Only</label>
+                <label style="cursor:pointer;"><input type="checkbox" id="job-type-lens" onchange="handleJobTypeChange('lens')"> Lens Only</label>
+            </div>
+        </div>
+
+
         <h3>Plan & Patient</h3>
         <select id="insuranceSelect" onchange="handleInsuranceChange()" style="margin-bottom: 8px">
             <option value="None">Private Pay / None</option>
@@ -727,6 +736,17 @@
             <label><input type="checkbox" id="color-Transitions" onchange="handleColorChoice('Transitions')" />
                 Transitions</label>
             <input type="hidden" id="chosen-color-text" />
+        </div>
+
+        <h3>Time Promised</h3>
+        <div id="time-promised-section" style="background: var(--table-bg); padding: 8px; border-radius: 4px; border: 1px solid var(--border); margin-bottom: 8px; font-size: 0.85em;">
+            <div style="display: flex; flex-wrap: wrap; gap: 15px; align-items: center;">
+                <label><input type="checkbox" id="promise-call" onchange="updateSlip()"> Call</label>
+                <label><input type="checkbox" id="promise-text" onchange="updateSlip()"> Text</label>
+                <label><input type="checkbox" id="promise-mail" onchange="updateSlip()"> Mail</label>
+                <label><input type="checkbox" id="promise-time" onchange="toggleTimeInput()"> Time</label>
+                <input type="text" id="promise-time-input" style="display: none; width: 120px; padding: 4px; font-size: 0.9em;" placeholder="e.g. 5:00 PM" oninput="updateSlip()">
+            </div>
         </div>
 
         <h3>Billing Table</h3>
@@ -1108,6 +1128,10 @@
             <span class="label">Name</span>
             <div class="underline out-name"></div>
         </div>
+        <div class="slip-row out-remake-row" style="display: none;">
+            <span class="label" style="color: red; font-weight: bold;">REMAKE</span>
+            <div class="underline out-remake-reason" style="color: red; font-weight: bold;"></div>
+        </div>
 
         <div class="slip-row">
             <span class="label">Frame</span>
@@ -1182,6 +1206,11 @@
         <div class="slip-row">
             <span class="label">PLAN</span>
             <div class="underline out-ins-full"></div>
+        </div>
+
+        <div class="slip-row">
+            <span class="label">PROMISED</span>
+            <div class="underline out-promised"></div>
         </div>
 
         <div class="slip-row" style="
@@ -1858,6 +1887,7 @@
             });
 
             handleInsuranceChange();
+            if (typeof handleJobTypeChange === 'function') handleJobTypeChange('complete');
             updateSlip();
         };
 
@@ -1940,12 +1970,15 @@
         function handleSegHeightNo() {
             document.getElementById("seght-warning").style.display = "block";
         }
-
         function handleRemakeClick() {
             const remakeCheckbox = document.getElementById("waiver-remake");
             if (remakeCheckbox.checked) {
                 document.getElementById("remakeModal").style.display = "flex";
                 document.getElementById("remake-reason").focus();
+            } else {
+                // If unchecked, clear the reason and update the slip to hide the section
+                document.getElementById('remake-reason').value = '';
+                updateSlip();
             }
         }
 
@@ -1953,6 +1986,7 @@
             document.getElementById("remakeModal").style.display = "none";
             document.getElementById("waiver-remake").checked = false;
             document.getElementById("remake-reason").value = "";
+            updateSlip();
         }
 
         function saveRemakeReason() {
@@ -2278,15 +2312,6 @@
                         `Allowance Plan Active. $${globalAllowance} will be deducted from the Retail cost of the glasses.`,
                     );
                 } else {
-                    // 2. IF NOT ALLOWANCE, ASK JOB TYPE
-                    let typeInput = prompt(
-                        "Choose Job Type:\n1. Frame Only\n2. Lens Only\n3. Both",
-                        "3",
-                    );
-                    if (typeInput === "1") jobType = "Frame Only";
-                    else if (typeInput === "2") jobType = "Lens Only";
-                    else jobType = "Both";
-
                     // CHECK FOR 20% DISCOUNT CONDITION
                     const isVspOrEyemed =
                         currentInsurance.toUpperCase().includes("VSP") ||
@@ -2319,6 +2344,15 @@
             document.getElementById("card-types").style.display = isChecked
                 ? "grid"
                 : "none";
+            updateSlip();
+        }
+
+        function toggleTimeInput() {
+            const isChecked = document.getElementById('promise-time').checked;
+            document.getElementById('promise-time-input').style.display = isChecked ? 'inline-block' : 'none';
+            if (!isChecked) {
+                document.getElementById('promise-time-input').value = '';
+            }
             updateSlip();
         }
 
@@ -2389,10 +2423,32 @@
         }
 
         function applyCopay(itemName, itemPrice, cat) {
-            let row = "lens";
-            if (cat.includes("Coat") || cat.includes("Tint")) row = "coat";
-            const uiRow = document.querySelector(`tr[data-row="${row}"]`);
+            const miscCategories = ["Tints and Coatings", "Overpower/Oversize", "Miscellaneous"];
+            let uiRow;
+            let isMisc = miscCategories.includes(cat);
 
+            if (isMisc) {
+                // Find the first available misc row
+                for (const rowId of ['m1', 'm2', 'm3']) {
+                    const row = document.querySelector(`tr[data-row="${rowId}"]`);
+                    const descInput = row.querySelector('.m-desc');
+                    if (descInput && descInput.value.trim() === '') {
+                        uiRow = row;
+                        descInput.value = itemName; // Set the description
+                        break;
+                    }
+                }
+                if (!uiRow) {
+                    alert("All miscellaneous fields are full. Cannot add item.");
+                    return;
+                }
+            } else {
+                // It's a lens
+                uiRow = document.querySelector('tr[data-row="lens"]');
+                selectedLensName = itemName;
+            }
+
+            // The rest of the logic is mostly the same, but it operates on uiRow
             if (
                 currentInsurance === "MEDICAID" ||
                 currentInsurance === "SCHOOL LETTER"
@@ -2403,46 +2459,35 @@
             } else if (currentInsurance !== "None") {
                 if (isAllowancePlan) {
                     // ALLOWANCE PLAN: Prompt for allowance and subtract from taxed total
-                    let allowanceStr = prompt(
-                        `What is the insurance allowance for ${itemName}?`,
-                        "0",
-                    );
-                    if (allowanceStr === null) return;
+                    let allowanceStr = prompt(`What is the insurance allowance for ${itemName}?`, "0");
+                    if (allowanceStr === null) {
+                        if (isMisc) uiRow.querySelector('.m-desc').value = ''; // Clear if cancelled
+                        return;
+                    }
                     let allowance = parseFloat(allowanceStr) || 0;
 
                     uiRow.querySelector(".ret").value = itemPrice;
                     let taxedAmount = itemPrice * 1.06;
                     uiRow.querySelector(".tax").textContent = taxedAmount.toFixed(2);
-                    uiRow.querySelector(".owe").textContent = Math.max(
-                        0,
-                        taxedAmount - allowance,
-                    ).toFixed(2);
-                    if (row === "lens") selectedLensName = itemName;
+                    uiRow.querySelector(".owe").textContent = Math.max(0, taxedAmount - allowance).toFixed(2);
                 } else {
                     // STANDARD COMMERCIAL: Prompt for Copay
                     let val = prompt(`What is the copay for ${itemName}?`, "0");
-                    if (val === null) return;
+                    if (val === null) {
+                        if (isMisc) uiRow.querySelector('.m-desc').value = ''; // Clear if cancelled
+                        return;
+                    }
                     let copay = parseFloat(val) || 0;
 
                     uiRow.querySelector(".ret").value = itemPrice;
-                    uiRow.querySelector(".tax").textContent = (
-                        itemPrice * 1.06
-                    ).toFixed(2);
+                    uiRow.querySelector(".tax").textContent = (itemPrice * 1.06).toFixed(2);
                     uiRow.querySelector(".owe").textContent = (copay * 1.06).toFixed(2);
-
-                    if (row === "lens") selectedLensName = itemName;
                 }
             } else {
                 // Private Pay Logic
                 uiRow.querySelector(".ret").value = itemPrice;
-                uiRow.querySelector(".tax").textContent = (itemPrice * 1.06).toFixed(
-                    2,
-                );
-                uiRow.querySelector(".owe").textContent = (itemPrice * 1.06).toFixed(
-                    2,
-                );
-
-                if (row === "lens") selectedLensName = itemName;
+                uiRow.querySelector(".tax").textContent = (itemPrice * 1.06).toFixed(2);
+                uiRow.querySelector(".owe").textContent = (itemPrice * 1.06).toFixed(2);
             }
             updateSlip();
         }
@@ -2542,6 +2587,23 @@
                 insDisplay = `SCHOOL: ${sName || "N/A"}`;
             }
 
+            let promisedText = [];
+            if (document.getElementById('promise-call').checked) promisedText.push('Call');
+            if (document.getElementById('promise-text').checked) promisedText.push('Text');
+            if (document.getElementById('promise-mail').checked) promisedText.push('Mail');
+            if (document.getElementById('promise-time').checked) {
+                const timeVal = document.getElementById('promise-time-input').value;
+                if (timeVal) {
+                    promisedText.push(`Time: ${timeVal}`);
+                } else {
+                    promisedText.push('Time');
+                }
+            }
+            const promisedString = promisedText.join(', ');
+
+            const isRemake = document.getElementById('waiver-remake').checked;
+            const remakeReason = document.getElementById('remake-reason').value;
+
             // --- LIVE CALCULATION LOOP ---
             let runningTotal = 0;
             let totalRetail = 0; // For Allowance Calc
@@ -2616,6 +2678,19 @@
                 s.querySelectorAll(".out-ins-full").forEach(
                     (el) => (el.innerHTML = insDisplay),
                 );
+                s.querySelectorAll(".out-promised").forEach(
+                    (el) => (el.textContent = promisedString),
+                );
+                const remakeRow = s.querySelector('.out-remake-row');
+                if (remakeRow) {
+                    if (isRemake && remakeReason.trim() !== "") {
+                        remakeRow.style.display = 'flex';
+                        const reasonEl = remakeRow.querySelector('.out-remake-reason');
+                        if (reasonEl) reasonEl.textContent = remakeReason;
+                    } else {
+                        remakeRow.style.display = 'none';
+                    }
+                }
                 s.querySelectorAll(".out-color").forEach(
                     (el) =>
                     (el.textContent =
@@ -2789,10 +2864,6 @@
 
                         d.innerHTML = `<b>${i.name}</b><br>${priceDisplay}`;
                         d.onclick = () => {
-                            let row = "lens";
-                            if (cat.includes("Coat") || cat.includes("Tint")) row = "coat";
-                            else if (cat.includes("Misc")) row = "m1";
-
                             applyCopay(i.name, i.price, cat);
                         };
                         c.appendChild(d);
@@ -2822,97 +2893,47 @@
         document
             .getElementById("searchInput")
             .addEventListener("input", (e) => renderItems(e.target.value));
-
-        // --- PRINT BUTTON VALIDATION ---
+        
+        // --- PRINT BUTTON VALIDATION (UPDATED) ---
         function validateForm() {
             const printBtn = document.getElementById("printBtn");
             const validationMsg = document.getElementById("validationMessage");
 
-            // Get required field values
-            const patientName = document.getElementById("in-name")
-                ? document.getElementById("in-name").value.trim()
-                : "";
-            const frameName = document.getElementById("in-frame")
-                ? document.getElementById("in-frame").value.trim()
-                : "";
-            const pd = document.getElementById("in-pd")
-                ? document.getElementById("in-pd").value.trim()
-                : "";
-            const doctor = document.getElementById("in-dr")
-                ? document.getElementById("in-dr").value.trim()
-                : "";
-            const ptPhone = document.getElementById("pt-phone")
-                ? document.getElementById("pt-phone").value.trim()
-                : "";
+            // Check job type
+            const isFrameOnly = document.getElementById('job-type-frame').checked;
+            const isLensOnly = document.getElementById('job-type-lens').checked;
 
-            // Check if lens is selected (has a price/value in the billing table)
-            const lensRow = document.querySelector('tr[data-row="lens"]');
-            const lensRet = lensRow ? lensRow.querySelector(".ret").value : "";
-
-            // Get RX values
-            const rxOdSph = document.getElementById("rx-od-sph")
-                ? document.getElementById("rx-od-sph").value.trim()
-                : "";
-            const rxOdCyl = document.getElementById("rx-od-cyl")
-                ? document.getElementById("rx-od-cyl").value.trim()
-                : "";
-            const rxOdAxis = document.getElementById("rx-od-axis")
-                ? document.getElementById("rx-od-axis").value.trim()
-                : "";
-            const rxOsSph = document.getElementById("rx-os-sph")
-                ? document.getElementById("rx-os-sph").value.trim()
-                : "";
-            const rxOsCyl = document.getElementById("rx-os-cyl")
-                ? document.getElementById("rx-os-cyl").value.trim()
-                : "";
-            const rxOsAxis = document.getElementById("rx-os-axis")
-                ? document.getElementById("rx-os-axis").value.trim()
-                : "";
-
-            // Check if Seg Height is required
-            const rxOdAdd = document.getElementById("rx-od-add")
-                ? document.getElementById("rx-od-add").value.trim()
-                : "";
-            const rxOsAdd = document.getElementById("rx-os-add")
-                ? document.getElementById("rx-os-add").value.trim()
-                : "";
-            const isDvo = document.getElementById("rx-dvo")
-                ? document.getElementById("rx-dvo").checked
-                : false;
-            const isNvo = document.getElementById("rx-nvo")
-                ? document.getElementById("rx-nvo").checked
-                : false;
-            const isIvo = document.getElementById("rx-ivo")
-                ? document.getElementById("rx-ivo").checked
-                : false;
-            const segHeight = document.getElementById("in-seght")
-                ? document.getElementById("in-seght").value.trim()
-                : "";
-
-            // Seg Height is required only if ADD is filled AND none of DVO/NVO/IVO are checked
-            const hasAddPower =
-                (rxOdAdd && rxOdAdd !== "") || (rxOsAdd && rxOsAdd !== "");
-            const isNoLine = isDvo || isNvo || isIvo;
-            const segHeightRequired = hasAddPower && !isNoLine;
-
-            // Build validation message
             let missingFields = [];
 
-            if (!patientName) missingFields.push("Patient Name");
-            if (!frameName) missingFields.push("Frame");
-            if (!lensRet || lensRet === "0")
-                missingFields.push("Lens (select from catalog)");
-            if (!pd) missingFields.push("P.D.");
-            if (!doctor) missingFields.push("Doctor");
-            if (!ptPhone) missingFields.push("Patient Phone");
-            if (!rxOdSph) missingFields.push("RX OD SPH");
-            if (!rxOdCyl) missingFields.push("RX OD CYL");
-            if (!rxOdAxis) missingFields.push("RX OD AXIS");
-            if (!rxOsSph) missingFields.push("RX OS SPH");
-            if (!rxOsCyl) missingFields.push("RX OS CYL");
-            if (!rxOsAxis) missingFields.push("RX OS AXIS");
-            if (segHeightRequired && !segHeight)
-                missingFields.push("Seg Height (required for bifocals)");
+            // Fields always required
+            if (!document.getElementById("in-name").value.trim()) missingFields.push("Patient Name");
+            if (!document.getElementById("pt-phone").value.trim()) missingFields.push("Patient Phone");
+
+            // Frame-related fields (Required for Complete and Frame Only)
+            if (!isLensOnly) {
+                if (!document.getElementById("in-frame").value.trim()) missingFields.push("Frame");
+            }
+
+            // Lens/RX-related fields (Required for Complete and Lens Only)
+            if (!isFrameOnly) {
+                const lensRet = document.querySelector('tr[data-row="lens"] .ret').value;
+                if (!lensRet || lensRet === "0") missingFields.push("Lens (select from catalog)");
+                if (!document.getElementById("in-pd").value.trim()) missingFields.push("P.D.");
+                if (!document.getElementById("in-dr").value.trim()) missingFields.push("Doctor");
+                if (!document.getElementById("rx-od-sph").value.trim()) missingFields.push("RX OD SPH");
+                if (!document.getElementById("rx-od-cyl").value.trim()) missingFields.push("RX OD CYL");
+                if (!document.getElementById("rx-od-axis").value.trim()) missingFields.push("RX OD AXIS");
+                if (!document.getElementById("rx-os-sph").value.trim()) missingFields.push("RX OS SPH");
+                if (!document.getElementById("rx-os-cyl").value.trim()) missingFields.push("RX OS CYL");
+                if (!document.getElementById("rx-os-axis").value.trim()) missingFields.push("RX OS AXIS");
+
+                const hasAddPower = document.getElementById("rx-od-add").value.trim() || document.getElementById("rx-os-add").value.trim();
+                const isNoLine = document.getElementById("rx-dvo").checked || document.getElementById("rx-nvo").checked || document.getElementById("rx-ivo").checked;
+                const segHeightRequired = hasAddPower && !isNoLine;
+                if (segHeightRequired && !document.getElementById("in-seght").value.trim()) {
+                    missingFields.push("Seg Height (required for bifocals)");
+                }
+            }
 
             if (missingFields.length > 0) {
                 // Disable the print button
@@ -2925,6 +2946,12 @@
                 printBtn.disabled = false;
                 validationMsg.classList.remove("visible");
                 return true;
+            }
+        }
+
+        function resetForm() {
+            if (confirm("Are you sure you want to reset the form? All unsaved data will be lost.")) {
+                location.reload();
             }
         }
 
