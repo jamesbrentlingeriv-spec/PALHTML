@@ -167,6 +167,11 @@
             });
         };
     </script>
+    <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/PALHTML/sw.js');
+  }
+</script>
 </head>
 <body>
     <div class="container">
@@ -232,4 +237,5 @@
 </body>
 
 </html>
+
 
