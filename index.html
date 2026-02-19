@@ -1,10 +1,17 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="manifest" href="manifest.json">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pal Optical Master App</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PalTools">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#ffffff" id="meta-theme-color">
+
     <style>
         :root {
             --bg-color: #ffffff;
@@ -26,49 +33,13 @@
             --shadow: rgba(255,255,255,0.1);
         }
 
-        /* Theme Toggle */
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        input:checked + .slider {
-            background-color: #2196F3;
-        }
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
             padding: 20px;
+            transition: background-color 0.3s ease;
         }
 
         .container {
@@ -82,17 +53,46 @@
             position: relative;
         }
 
+        /* Theme Toggle UI */
         .theme-toggle {
             position: absolute;
             top: 20px;
             right: 20px;
         }
 
-        h1 {
-            color: var(--text-color);
-            text-align: center;
-            margin-bottom: 40px;
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
         }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px; width: 26px;
+            left: 4px; bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: #2196F3; }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        h1 { text-align: center; margin-bottom: 10px; }
+        .welcome-text { text-align: center; margin-bottom: 30px; opacity: 0.8; }
 
         .app-grid {
             display: grid;
@@ -114,16 +114,8 @@
             box-shadow: 0 5px 15px var(--shadow);
         }
 
-        .app-card h3 {
-            color: var(--text-color);
-            margin-bottom: 10px;
-        }
-
-        .app-card p {
-            font-size: 0.9em;
-            margin-bottom: 15px;
-            color: var(--text-color);
-        }
+        .app-card h3 { margin-bottom: 10px; }
+        .app-card p { font-size: 0.9em; margin-bottom: 15px; }
 
         .app-link {
             display: inline-block;
@@ -137,95 +129,112 @@
         }
 
         .app-link:hover {
-            background-color: var(--text-color);
-            color: var(--bg-color);
+            background-color: #2196F3;
+            color: #ffffff;
         }
 
         .footer {
             text-align: center;
             margin-top: 40px;
             font-size: 0.8em;
-            color: var(--text-color);
+            opacity: 0.7;
         }
     </style>
+
     <script>
         window.onload = () => {
             const themeToggle = document.getElementById('theme-toggle');
+            const metaTheme = document.getElementById('meta-theme-color');
             const currentTheme = localStorage.getItem('theme') || 'light';
+
+            // Apply saved theme on load
             if (currentTheme === 'dark') {
                 document.documentElement.setAttribute('data-theme', 'dark');
                 themeToggle.checked = true;
+                metaTheme.setAttribute('content', '#000000');
             }
+
+            // Theme Toggle Listener
             themeToggle.addEventListener('change', () => {
                 if (themeToggle.checked) {
                     document.documentElement.setAttribute('data-theme', 'dark');
                     localStorage.setItem('theme', 'dark');
+                    metaTheme.setAttribute('content', '#000000');
                 } else {
                     document.documentElement.removeAttribute('data-theme');
                     localStorage.setItem('theme', 'light');
+                    metaTheme.setAttribute('content', '#ffffff');
                 }
             });
+
+            // Service Worker Registration for PWA Installation
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/PALHTML/sw.js')
+                    .then(() => console.log("Pal Optical PWA: Active"))
+                    .catch(err => console.log("PWA Registration Failed", err));
+            }
         };
     </script>
-    <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/PALHTML/sw.js');
-  }
-</script>
 </head>
 <body>
+
     <div class="container">
-        <label class="switch theme-toggle">
-            <input type="checkbox" id="theme-toggle">
-            <span class="slider"></span>
-        </label>
+        <div class="theme-toggle">
+            <label class="switch">
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+
         <h1>Pal Optical Master Application</h1>
-        <p style="text-align: center; margin-bottom: 30px;">Welcome to the Pal Optical suite of tools. Select an application below to get started.</p>
+        <p class="welcome-text">Select an application below to get started in the lab or on the floor.</p>
 
         <div class="app-grid">
             <div class="app-card">
                 <h3>P.O.S.T. Write-Ups</h3>
-                <p>The new way to do write-ups for Pal Optical</p>
-                <a href="WRITEUP.html" class="app-link">Open App</a>           
+                <p>New digital write-up system for store efficiency.</p>
+                <a href="WRITEUP.html" class="app-link">Open App</a>            
             </div>
+
             <div class="app-card">
                 <h3>Contact Lens Orders</h3>
-                <p>Manage and track contact lens orders for patients.</p>
+                <p>Manage and track patient contact lens orders.</p>
                 <a href="contact.html" class="app-link">Open App</a>
             </div>
 
             <div class="app-card"> 
                 <h3>Detailed Receipt</h3>
-                <p>Generate detailed itemized receipts for services.</p>
+                <p>Generate itemized receipts for optical services.</p>
                 <a href="PAL OPTICAL RECEIPT.HTML" class="app-link">Open App</a>
             </div>
 
             <div class="app-card">
                 <h3>Lab FSV Order Sheet</h3>
-                <p>The labs sheet to order Vision Ease FSV lenses.</p>
+                <p>Order Vision Ease FSV lenses directly.</p>
                 <a href="LABLENS.HTML" class="app-link">Open App</a>
             </div>
 
             <div class="app-card">
                 <h3>Lens Availability</h3>
-                <p>RX Ranges for the Progessives and Multifocals we carry.</p>
+                <p>RX Ranges for Progressives and Multifocals.</p>
                 <a href="lensavail.html" class="app-link">Open App</a>
             </div>
 
             <div class="app-card">
                 <h3>Quote Tool</h3>
-                <p>Generate quotes for lenses and frames. Use this if patient is unsure about purchasing.</p>
+                <p>Estimates for lenses and frames.</p>
                 <a href="PALQUOTE (1).HTML" class="app-link">Open App</a>
             </div>
 
             <div class="app-card">
                 <h3>Frame Inventory</h3>
-                <p>A frame inventory manager.</p>
+                <p>Full-service frame inventory management.</p>
                 <a href="TracyFrameInventory.html" class="app-link">Open App</a>
             </div>
+
             <div class="app-card">
                 <h3>DR Itemized Receipt</h3>
-                <p>Detailed receipt for doctor services.</p>
+                <p>Professional receipts for doctor services.</p>
                 <a href="DRITEMIZEDRECPT.HTML" class="app-link">Open App</a>
             </div>
         </div>
@@ -234,8 +243,6 @@
             Pal Optical Master App - James Brentlinger™
         </div>
     </div>
+
 </body>
-
 </html>
-
-
