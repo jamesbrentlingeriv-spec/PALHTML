@@ -1,7 +1,7 @@
 {
   "name": "Pal Optical Tools",
   "short_name": "PalTools",
-  "start_url": "/PALHTML/",
+  "start_url": "/PALHTML/index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#0055aa",
