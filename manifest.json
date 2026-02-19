@@ -5,7 +5,7 @@
   "start_url": "/PALHTML/index.html",
   "scope": "/PALHTML/",
   "display": "standalone",
-  "orientation": "landscape",
+  "orientation": "any",
   "background_color": "#ffffff",
   "theme_color": "#0055aa",
   "icons": [
