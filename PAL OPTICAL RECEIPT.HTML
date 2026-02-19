@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt - Dr. Klecker & Dr. Robbins</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef2f5;
+            padding: 20px;
+            color: #333;
+        }
+        .controls {
+            max-width: 850px;
+            margin: 0 auto 20px auto;
+            text-align: right;
+        }
+        .btn {
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+        .btn:hover { background-color: #1f6391; }
+        .btn-green { background-color: #27ae60; }
+        .btn-red { background-color: #c0392b; padding: 5px 10px; font-size: 12px; }
+        
+        .receipt-container {
+            max-width: 850px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            padding: 40px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid #ddd;
+        }
+
+        /* Input Styling */
+        input:not([type="checkbox"]) {
+            border: 1px solid #ddd; 
+            padding: 5px;
+            font-family: inherit;
+            font-size: inherit;
+            width: 100%;
+            box-sizing: border-box;
+            background: #fff;
+            color: #333;
+            border-radius: 3px;
+        }
+        input:not([type="checkbox"]):focus {
+            border-color: #2980b9;
+            outline: none;
+            background-color: #f0f8ff;
+        }
+        
+        /* Layout Sections */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        .clinic-info { width: 60%; }
+        .clinic-info input.large {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        .receipt-details { text-align: right; width: 35%; }
+        
+        .patient-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .info-col { width: 48%; }
+        .info-col h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            color: #7f8c8d;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 10px;
+        }
+        .field-group {
+            display: flex;
+            margin-bottom: 5px;
+            align-items: center;
+        }
+        .field-group label {
+            width: 80px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th {
+            background-color: #2c3e50;
+            color: white;
+            padding: 10px;
+            text-align: left;
+            font-size: 14px;
+        }
+        td { padding: 8px; border-bottom: 1px solid #eee; }
+        
+        .items-table input.qty { width: 50px; text-align: center; }
+        .items-table input.price { width: 90px; text-align: right; }
+        .items-table .total-display { text-align: right; font-weight: bold; padding-right: 15px; }
+        .items-table .action-col { text-align: center; width: 40px; }
+
+        .rx-table th { background-color: #ecf0f1; color: #333; border-bottom: 1px solid #ccc; }
+        .rx-table input { text-align: center; }
+
+        /* Totals Section */
+        .totals-section {
+            width: 380px;
+            margin-left: auto;
+        }
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+        }
+        .total-row input.money {
+            width: 100px;
+            text-align: right;
+        }
+        
+        /* Checkbox Grid */
+        .payment-options {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            background-color: #fafafa;
+        }
+        .payment-check {
+            width: 33%; /* 3 columns */
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .payment-check input {
+            width: auto;
+            margin-right: 5px;
+        }
+        
+        .final-row {
+            border-top: 2px solid #333;
+            margin-top: 10px;
+            padding-top: 10px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        /* PRINT STYLES */
+        @media print {
+            body { background: white; padding: 0; }
+            .controls, .action-col, .add-row-btn { display: none !important; }
+            .receipt-container { 
+                box-shadow: none; 
+                border: none; 
+                padding: 0; 
+                width: 100%;
+                max-width: 100%;
+            }
+            input:not([type="checkbox"]) { 
+                border: none; 
+                background: transparent; 
+                padding: 0; 
+                width: auto; 
+            }
+            input[type="text"], input[type="number"] { width: 100%; }
+            input::placeholder { color: transparent; }
+            .items-table input.price { text-align: right; }
+            .totals-section input.money { text-align: right; }
+            .payment-options { border: none; background: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="controls">
+    <button class="btn btn-green" onclick="addItemRow()">+ Add Item</button>
+    <button class="btn" onclick="window.print()">Print Receipt</button>
+</div>
+
+<div class="receipt-container">
+    <div class="header">
+        <div class="clinic-info">
+            <input type="text" class="large" value="Pal Optical">
+            <input type="text" value="1555 E New Circle Rd, Suite 146">
+            <input type="text" value="Lexington, KY 40509">
+            <input type="text" value="Phone: (859) 266-3003">
+            <input type="text" value="Fax: (859) 266-9504">
+            <input type="text" placeholder="NPI Number (Optional)">
+        </div>
+        <div class="receipt-details">
+            <h2 style="color:#7f8c8d; margin:0 0 10px 0;">RECEIPT</h2>
+            <div class="field-group" style="justify-content: flex-end;">
+                <label>Date:</label>
+                <input type="text" id="date-field" style="width: 120px; text-align:right;">
+            </div>
+            <div class="field-group" style="justify-content: flex-end;">
+                <label>Rcpt #:</label>
+                <input type="text" value="001" style="width: 120px; text-align:right;">
+            </div>
+        </div>
+    </div>
+
+    <div class="patient-row">
+        <div class="info-col">
+            <h3>Patient Information</h3>
+            <div class="field-group"><label>Name:</label><input type="text" placeholder="Patient Name"></div>
+            <div class="field-group"><label>Address:</label><input type="text" placeholder="Patient Address"></div>
+            <div class="field-group"><label>Phone:</label><input type="text" placeholder="Patient Phone"></div>
+        </div>
+        <div class="info-col">
+            <h3>Insurance / Reference</h3>
+            <div class="field-group"><label>Ins Plan:</label><input type="text" placeholder="VSP / EyeMed"></div>
+            <div class="field-group"><label>Member ID:</label><input type="text" placeholder="ID Number"></div>
+            <div class="field-group"><label>Auth #:</label><input type="text" placeholder="Auth Number"></div>
+        </div>
+    </div>
+
+
+
+    <table class="items-table" id="itemsTable">
+        <thead>
+            <tr>
+                <th style="width: 10%;">Code</th>
+                <th style="width: 45%;">Description</th>
+                <th style="width: 10%; text-align:center;">Qty</th>
+                <th style="width: 15%; text-align: right;">Unit Price</th>
+                <th style="width: 15%; text-align: right;">Total</th>
+                <th class="action-col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            </tbody>
+    </table>
+    
+    <div class="add-row-btn" style="text-align: left; margin-bottom: 20px;">
+        <button onclick="addItemRow()" style="background:none; border:none; color:#2980b9; cursor:pointer; font-weight:bold; padding:0;">+ Add Line Item</button>
+    </div>
+
+    <div class="totals-section">
+        <div class="total-row">
+            <span>Subtotal:</span>
+            <span id="subtotalDisplay">$0.00</span>
+        </div>
+
+        <div class="total-row" style="color: #c0392b;">
+            <span>Insurance Adj (-):</span>
+            <input type="number" class="money" id="insInput" value="0.00" oninput="calcTotals()" step="0.01">
+        </div>
+
+        <div class="payment-options">
+            <label class="payment-check"><input type="checkbox"> VISA</label>
+            <label class="payment-check"><input type="checkbox"> MC</label>
+            <label class="payment-check"><input type="checkbox"> AmEx</label>
+            <label class="payment-check"><input type="checkbox"> Discover</label>
+            <label class="payment-check"><input type="checkbox"> Check</label>
+            <label class="payment-check"><input type="checkbox"> Cash</label>
+        </div>
+
+        <div class="total-row" style="color: #27ae60; font-weight:bold;">
+            <span>Amount Paid (-):</span>
+            <input type="number" class="money" id="amountPaidInput" value="0.00" oninput="calcTotals()" step="0.01">
+        </div>
+        
+        <div class="total-row final">
+            <span>Balance Due:</span>
+            <span id="finalBalance">$0.00</span>
+        </div>
+    </div>
+
+    <div style="margin-top: 50px; text-align: center; font-size: 12px; color: #777; border-top: 1px solid #eee; padding-top: 20px;">
+        <input type="text" value="Thank you for trusting us with your vision care!" style="text-align: center; width: 100%;">
+        <input type="text" value="Returns subject to restocking fee. Exams are non-refundable." style="text-align: center; width: 100%;">
+    </div>
+</div>
+
+<script>
+    document.getElementById('date-field').value = new Date().toLocaleDateString();
+
+    window.onload = function() {
+        addItemRow(); 
+        addItemRow(); 
+    };
+
+    function addItemRow() {
+        const table = document.getElementById('itemsTable').getElementsByTagName('tbody')[0];
+        const newRow = table.insertRow();
+        
+        newRow.innerHTML = `
+            <td><input type="text" placeholder="Code"></td>
+            <td><input type="text" placeholder="Description"></td>
+            <td><input type="number" class="qty" value="1" min="1" oninput="calcTotals()"></td>
+            <td><input type="number" class="price" value="0.00" step="0.01" oninput="calcTotals()"></td>
+            <td class="total-display">$0.00</td>
+            <td class="action-col"><button class="btn-red" onclick="removeRow(this)">X</button></td>
+        `;
+        calcTotals();
+    }
+
+    function removeRow(btn) {
+        const row = btn.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+        calcTotals();
+    }
+
+    function calcTotals() {
+        const table = document.getElementById('itemsTable');
+        const rows = table.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        let subtotal = 0;
+
+        // Calculate Items
+        for (let i = 0; i < rows.length; i++) {
+            const qtyInput = rows[i].querySelector('.qty');
+            const priceInput = rows[i].querySelector('.price');
+            const totalDisplay = rows[i].querySelector('.total-display');
+
+            const qty = parseFloat(qtyInput.value) || 0;
+            const price = parseFloat(priceInput.value) || 0;
+            const lineTotal = qty * price;
+
+            subtotal += lineTotal;
+            totalDisplay.innerText = '$' + lineTotal.toFixed(2);
+        }
+
+        document.getElementById('subtotalDisplay').innerText = '$' + subtotal.toFixed(2);
+
+        // Get Adjustments
+        const insurance = parseFloat(document.getElementById('insInput').value) || 0;
+
+        // Get Amount Paid (replaces old copay)
+        const amountPaid = parseFloat(document.getElementById('amountPaidInput').value) || 0;
+
+        // Formula: Subtotal - Insurance - AmountPaid
+        const finalTotal = subtotal - insurance - amountPaid;
+        
+        document.getElementById('finalBalance').innerText = '$' + finalTotal.toFixed(2);
+    }
+</script>
+
+</body>
+</html>

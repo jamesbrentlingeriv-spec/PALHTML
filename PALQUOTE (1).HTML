@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pal Optical - Quote Tool</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --light: #ecf0f1;
+            --success: #27ae60;
+            --border: #ddd;
+            --warning: #e67e22;
+            --danger: #e74c3c;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            background-color: #f4f7f6;
+        }
+
+        .catalog-container {
+            flex: 2;
+            padding: 20px;
+            overflow-y: auto;
+            border-right: 1px solid var(--border);
+        }
+
+        header {
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 10px;
+        }
+
+        h1 { color: var(--primary); margin: 0; }
+        .subtitle { color: #7f8c8d; font-size: 0.9em; }
+
+        .search-box {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        .category-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .cat-btn {
+            background: white;
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+
+        .cat-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .lens-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .lens-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.1s;
+            border-left: 4px solid transparent;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .lens-card:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .cat-plastic { border-left-color: #e67e22; }
+        .cat-poly { border-left-color: #9b59b6; }
+        
+        .lens-name { font-weight: 600; color: #333; margin-bottom: 5px; }
+        .lens-price { color: var(--success); font-weight: bold; font-size: 1.1em; margin-bottom: 10px; }
+
+        .copay-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 6px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .sidebar {
+            flex: 1;
+            background: white;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.05);
+            min-width: 400px;
+            max-width: 550px;
+            overflow-x: hidden;
+        }
+
+        .section-title {
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+            color: var(--primary);
+        }
+
+        .input-group { display: flex; gap: 5px; margin-bottom: 10px; }
+        .input-group input, select, textarea {
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        #notesArea { resize: vertical; min-height: 60px; font-size: 0.9em; }
+
+        .cart-header {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+            border-bottom: 2px solid var(--primary);
+            padding-bottom: 5px;
+        }
+
+        .info-badge {
+            font-size: 0.9em;
+            color: var(--accent);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .cart-items { flex-grow: 1; overflow-y: auto; }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95em;
+            gap: 15px;
+        }
+
+        .price-col {
+            text-align: right;
+            min-width: 90px;
+            padding-right: 5px;
+        }
+
+        .item-remove { color: var(--danger); cursor: pointer; margin-right: 8px; font-weight: bold; }
+
+        .total-section { margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--primary); }
+        
+        .total-row { 
+            display: flex; 
+            justify-content: space-between; 
+            font-size: 1.6em; 
+            font-weight: bold; 
+            color: var(--primary); 
+            padding-right: 5px;
+        }
+
+        .action-btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 6px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        #printNotes { display: none; margin-top: 20px; padding-top: 10px; border-top: 1px dashed #333; }
+
+        @media print {
+            .catalog-container, .insurance-section, .frame-input-section, .notes-section, .action-btn, .item-remove, hr, #copayContainer, #patientInputGroup, #medicaidSubmenu, #opticianInputGroup, #taxBtn { display: none !important; }
+            body { background: white; display: block; }
+            .sidebar { width: 100%; max-width: 100%; box-shadow: none; padding: 0; }
+            #printNotes { display: block; white-space: pre-wrap; margin-bottom: 30px; }
+            .sidebar::before {
+                content: "Pal Optical - Job Quote";
+                font-size: 28px; font-weight: bold; display: block; text-align: center; margin-bottom: 10px;
+            }
+            .total-row { font-size: 2em; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="catalog-container">
+        <header>
+            <h1>Pal Optical</h1>
+            <span class="subtitle">Lens Price List & Estimator | James Brentlinger ABOC, NCLEC</span>
+        </header>
+
+        <input type="text" class="search-box" id="searchInput" placeholder="Search lenses or materials...">
+
+        <div class="category-buttons" id="categoryNav"></div>
+        <div id="lensContainer" class="lens-grid"></div>
+    </div>
+
+    <div class="sidebar">
+        <div id="patientInputGroup">
+            <h3 class="section-title">Patient Information</h3>
+            <div class="input-group">
+                <input type="text" id="patientName" placeholder="Patient Full Name" oninput="syncNotes()">
+            </div>
+        </div>
+
+        <div id="opticianInputGroup">
+            <h3 class="section-title">Optician</h3>
+            <div class="input-group">
+                <select id="opticianSelect" onchange="syncNotes()">
+                    <option value="">Select Optician</option>
+                    <option value="April">April</option>
+                    <option value="Bobbi">Bobbi</option>
+                    <option value="Carribyan">Carribyan</option>
+                    <option value="James">James</option>
+                    <option value="Linda">Linda</option>
+                    <option value="Tracy">Tracy</option>
+                    <option value="Sabrina">Sabrina</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="insurance-section">
+            <h3 class="section-title">Insurance Plan</h3>
+            <select id="insuranceSelect" onchange="handleInsuranceChange()">
+                <option value="None">Private Pay / None</option>
+                <option value="EYE-MED">EYE-MED</option>
+                <option value="VSP">VSP</option>
+                <option value="SPECTERA">SPECTERA</option>
+                <option value="EYESYNERGY">EYESYNERGY</option>
+                <option value="PREMIER VISION">PREMIER VISION</option>
+                <option value="NVA">NVA</option>
+                <option value="UNUM">UNUM</option>
+                <option value="MEDICAID">MEDICAID</option>
+            </select>
+
+            <div id="medicaidSubmenu" style="display:none; margin-top:10px; background: #f0f4f8; padding: 10px; border-radius: 4px;">
+                <label style="font-size: 0.8em; color: #555; font-weight: bold;">Medicaid Provider:</label>
+                <select id="medicaidProvider" onchange="handleInsuranceChange()">
+                    <option value="AETNA">AETNA</option>
+                    <option value="HUMANA/EQ">HUMANA/EQ</option>
+                    <option value="WELLCARE">WELLCARE</option>
+                </select>
+            </div>
+
+            <div id="copayContainer" style="display:none; margin-top:10px; flex-direction: column; gap:5px; background: #f9f9f9; padding: 10px; border-radius: 4px; border: 1px solid #eee;">
+                <label style="font-size: 0.8em; font-weight: bold; color: var(--success);">Item Copay Amount:</label>
+                <input type="number" id="copayAmount" placeholder="$ Copay" step="0.01">
+            </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+
+        <div class="frame-input-section">
+            <h3 class="section-title">Add Frame</h3>
+            
+            <div id="standardFrameInputs">
+                <div class="input-group">
+                    <input type="text" id="frameName" placeholder="Model/Brand Name">
+                    <input type="number" id="framePrice" placeholder="Retail $" style="width:100px;">
+                </div>
+                <div id="frameInsuranceGroup" style="display:none; gap:5px; margin-bottom:10px;">
+                    <input type="number" id="frameAllowance" placeholder="Allowance $" style="width:50%;">
+                    <input type="number" id="frameDiscountFlat" placeholder="Extra Disc $" style="width:50%;">
+                </div>
+            </div>
+
+            <div id="medicaidFrameInputs" style="display:none;">
+                <div class="input-group">
+                    <select id="medicaidCollection">
+                        <option value="MODERN">MODERN</option>
+                        <option value="GOTHAM">GOTHAM</option>
+                        <option value="BROADWAY">BROADWAY</option>
+                        <option value="TRENDSPOTTER">TRENDSPOTTER</option>
+                        <option value="POF">POF</option>
+                    </select>
+                    <input type="text" id="medicaidModel" placeholder="Frame Model">
+                </div>
+            </div>
+            
+            <button class="action-btn" onclick="addFrame()" style="background:#7f8c8d; margin-top:0;">+ Add Frame</button>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+
+        <div class="notes-section">
+            <h3 class="section-title">Job Notes</h3>
+            <textarea id="notesArea" placeholder="Enter lab instructions..." oninput="syncNotes()"></textarea>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 15px 0;">
+
+        <div class="cart-header">Job Estimation</div>
+        <div id="displayPatient" style="font-weight: bold; margin-bottom: 2px; font-size: 1.1em;"></div>
+        <div id="displayOptician" class="info-badge"></div>
+        <div id="displayInsurance" class="info-badge">Plan: Private Pay</div>
+
+        <div class="cart-items" id="cartItems">
+            <div style="text-align:center; color:#ccc; margin-top:20px;">No items selected</div>
+        </div>
+
+        <div id="printNotes"></div> 
+        <div class="total-section">
+            <div style="display:flex; justify-content:space-between; margin-bottom:8px; color:#7f8c8d; padding-right:5px;">
+                <span>Subtotal</span>
+                <span id="subtotalDisplay">$0.00</span>
+            </div>
+            <div id="taxRow" style="display:none; justify-content:space-between; margin-bottom:15px; color:var(--warning); padding-right:5px;">
+                <span>Tax (6%)</span>
+                <span id="taxDisplay">$0.00</span>
+            </div>
+            <div class="total-row">
+                <span>Total</span>
+                <span id="totalDisplay">$0.00</span>
+            </div>
+            <button class="action-btn" id="taxBtn" onclick="toggleTax()" style="background:var(--warning);">Add Tax (6%)</button>
+            <button class="action-btn" onclick="clearCart()" style="background:#95a5a6;">Reset Quote</button>
+            <button class="action-btn" onclick="window.print()">Print Quote</button>
+        </div>
+    </div>
+
+<script>
+    const priceList = {
+        "Plastic (CR-39)": [
+            { name: "Plano", price: 35.00 },
+            { name: "Single Vision Plastic", price: 50.00 },
+            { name: "Eyezen (+0-+4)", price: 125.00 },
+            { name: "Flat Top 28 Bifocal", price: 140.00 },
+            { name: "Flat Top 35 Bifocal", price: 145.00 },
+            { name: "Trifocal 7x28", price: 165.00 },
+            { name: "RD-22 Round Seg", price: 50.00 },
+            { name: "Franklin Seg", price: 500.00 },
+            { name: "Essilor Natural", price: 295.00 },
+            { name: "Essilor Ovation", price: 350.00 },
+            { name: "Varilux Comfort DRx", price: 365.00 },
+            { name: "Varilux Physio DRx", price: 390.00 },
+            { name: "Varilux X", price: 530.00 },
+            { name: "Shamir Autograph III", price: 465.00 },
+            { name: "VSP Unity ETHOS", price: 325.00 },
+            { name: "VSP Unity VIA", price: 350.00 },
+            { name: "VSP Unity VIA Elite", price: 425.00 },
+            { name: "Younger Image", price: 255.00 }
+        ],
+        "Polycarbonate": [
+            { name: "Single Vision POLY", price: 115.00 },
+            { name: "Eyezen (+0-+4) POLY", price: 180.00 },
+            { name: "Flat Top 28 Bifocal POLY", price: 180.00 },
+            { name: "Flat Top 35 Bifocal POLY", price: 240.00 },
+            { name: "Trifocal 7x28 POLY", price: 205.00 },
+            { name: "Essilor Natural ", price: 335.00 },
+            { name: "Essilor Ovation POLY", price: 390.00 },
+            { name: "Varilux Comfort DRx POLY", price: 405.00 },
+            { name: "Varilux Physio DRx POLY", price: 430.00 },
+            { name: "Varilux X POLY", price: 570.00 },
+            { name: "Shamir Autograph III POLY", price: 505.00 },
+            { name: "VSP Unity ETHOS POLY", price: 365.00 },
+            { name: "VSP Unity VIA POLY", price: 410.00 },
+            { name: "VSP Unity VIA Elite POLY", price: 465.00 },
+            { name: "Younger Image POLY", price: 295.00 }
+        ],
+        "Trivex": [
+            { name: "Single Vision TRIVEX ", price: 150.00 },
+            { name: "Eyezen (+0-+4)", price: 195.00 },
+            { name: "Flat Top 28 Bifocal TRIVEX", price: 205.00 },
+            { name: "Trifocal 7x28 TRIVEX", price: 245.00 },
+            { name: "Essilor Ovation TRIVEX", price: 315.00 },
+            { name: "Varilux Comfort DRx TRIVEX", price: 415.00 },
+            { name: "Varilux X TRIVEX", price: 630.00 },
+            { name: "Freefocus HD(Luzerne) TRIVEX", price: 305.00 },
+            { name: "Younger Image TRIVEX", price: 315.00 }
+        ],
+        "High-Index": [
+            { name: "Single Vision 1.67", price: 365.00 },
+            { name: "Single Vision 1.74", price: 400.00 },
+            { name: "Eyezen 1.67 (+0-+4)", price: 415.00 },
+            { name: "Flat Top 28 Bifocal 1.67", price: 420.00 },
+            { name: "Flat Top 35 Bifocal 1.67", price: 450.00 },
+            { name: "RD-22 Round Seg 1.67", price: 550.00 },
+            { name: "Franklin Seg 1.67", price: 1050.00 },
+            { name: "Essilor Natural Digital 1.67", price: 500.00 },
+            { name: "Essilor Ovation Digital 1.67", price: 500.00 },
+            { name: "Varilux Physio 1.67", price: 625.00 },
+            { name: "Varilux X 1.67", price: 825.00 },
+            { name: "Shamir Autograph III 1.67", price: 625.00 },
+            { name: "VSP Unity V3 1.67", price: 525.00 },
+            { name: "VSP Unity Elite 1.67", price: 695.00 },
+            { name: "Younger Image 1.67", price: 520.00 }
+        ],
+        "Glass": [
+            { name: "Single Vision GLASS", price: 175.00 },
+            { name: "FT-28 GLASS", price: 285.00 },
+            { name: "7x-28 GLASS", price: 345.00 },
+            { name: "Freefocus HD GLASS", price: 500.00 },
+            { name: "X-Ray Glass SV GLASS", price: 400.00 },
+            { name: "X-Ray Glass FT-28 GLASS", price: 450.00 },
+            { name: "X-Ray Glass Prog GLASS", price: 575.00 }
+        ],
+        "Office/Computer Progressives": [
+            { name: "Freefocus PC13/20 PLASTIC", price: 205.00 },
+            { name: "Shamir Workspace PLASTIC", price: 245.00 },
+            { name: "Zeiss Officelens PLASTIC", price: 225.00 }
+        ],
+        "Transitions Plastic": [
+            { name: "Single Vision TRANS", price: 235.00 },
+            { name: "FT-28 TRANS", price: 250.00 },
+            { name: "RD-22 TRANS", price: 360.00 },
+            { name: "7x28 TRANS", price: 275.00 },
+            { name: "Essilor Natural Digital TRANS", price: 415.00 },
+            { name: "Varilux Comfort TRANS", price: 475.00 },
+            { name: "Varilux Physio TRANS", price: 510.00 },
+            { name: "Varilux X TRANS", price: 640.00 },
+            { name: "Shamir Auto III TRANS", price: 575.00 },
+            { name: "VSP Unity V3 TRANS", price: 435.00 },
+            { name: "VSP Unity Elite TRANS", price: 535.00 },
+            { name: "Younger Image TRANS", price: 365.00 }
+        ],
+        "Transitions Poly": [
+            { name: "Single Vision TRANS POLY", price: 275.00 },
+            { name: "FT-28 TRANS POLY", price: 290.00 },
+            { name: "RD-22 TRANS POLY", price: 395.00 },
+            { name: "7x28 TRANS POLY", price: 315.00 },
+            { name: "Essilor Natural Digital TRANS POLY", price: 455.00 },
+            { name: "Varilux Comfort TRANS POLY", price: 505.00 },
+            { name: "Varilux Physio TRANS POLY", price: 550.00 },
+            { name: "Varilux X TRANS POLY", price: 690.00 },
+            { name: "Shamir Auto III TRANS POLY", price: 615.00 },
+            { name: "VSP Unity V3 TRANS POLY", price: 475.00 },
+            { name: "VSP Unity Elite TRANS POLY", price: 575.00 },
+            { name: "Younger Image TRANS POLY", price: 405.00 }
+        ],
+        "Transitions Trivex": [
+            { name: "Single Vision TRANS TRIVEX", price: 275.00 },
+            { name: "FT-28 TRANS TRIVEX", price: 300.00 },
+            { name: "7x28 TRANS TRIVEX", price: 350.00 },
+            { name: "Younger Image TRANS TRIVEX", price: 455.00 },
+            { name: "Essilor Ovation Digital TRANS TRIVEX ", price: 570.00 },
+            { name: "Varilux Comfort TRANS TRIVEX", price: 650.00 },
+            { name: "Varilux X TRANS TRIVEX", price: 790.00 },
+            { name: "Freefocus HD TRANS TRIVEX", price: 405.00 },
+            { name: "VSP Unity V3 TRANS TRIVEX", price: 590.00 }
+        ],
+        "Transitions High-Index": [
+            { name: "Single Vision 1.67 TRANS", price: 465.00 },
+            { name: "Single Vision 1.74 TRANS", price: 650.00 },
+            { name: "FT-28 1.67(V Dyna) TRANS", price: 470.00 },
+            { name: "RD-22 1.67 TRANS", price: 600.00 },
+            { name: "Essilor Natural Digital 1.67 TRANS", price: 650.00 },
+            { name: "Varilux Comfort 1.67 TRANS", price: 720.00 },
+            { name: "Varilux Physio 1.67 TRANS", price: 750.00 },
+            { name: "Varilux X 1.67 TRANS", price: 900.00 },
+            { name: "Shamir Auto III 1.67 TRANS", price: 720.00 },
+            { name: "VSP Unity V3 1.67 TRANS", price: 650.00 },
+            { name: "VSP Unity Elite 1.67 TRANS", price: 800.00 }
+        ],
+        "PGX/PBX Glass": [
+            { name: "Single Vision GLASS PGX/PBX", price: 300.00 },
+            { name: "FT-28 GLASS PGX/PBX", price: 410.00 },
+            { name: "7x28 GLASS PGX/PBX", price: 475.00 },
+            { name: "Freefocus HD GLASS PGX/PBX", price: 590.00 }
+        ],
+        "Transitions XtraActive Polar(POLY)": [
+            { name: "Single Vision TRANS XTRA POLAR", price: 375.00 },
+            { name: "Ovation Digital TRANS XTRA POLAR", price: 575.00 },
+            { name: "Varilux Comfort DRx TRANS XTRA POLAR", price: 650.00 },
+            { name: "Younger Image TRANS XTRA POLAR", price: 525.00 }
+        ],
+        "Drivewear": [
+            { name: "Single Vision DRIVEWEAR", price: 360.00 },
+            { name: "Younger Image DRIVEWEAR", price: 500.00 }
+        ],
+        "Polarized Plastic": [
+            { name: "Single Vision POLARIZED", price: 175.00 },
+            { name: "KBCO Single Vision POLARIZED", price: 250.00 },
+            { name: "FT-28 POLARIZED", price: 225.00 },
+            { name: "KBCO FT-28 POLARIZED", price: 300.00 },
+            { name: "7x28 POLARIZED", price: 270.00 },
+            { name: "KBCO 7x28 POLARIZED", price: 350.00 },
+            { name: "Essilor Natural POLARIZED", price: 450.00 },
+            { name: "KBCO IRx Pro POLARIZED", price: 475.00 },
+            { name: "Younger Image POLARIZED", price: 400.00 }
+        ],
+        "Polarized Poly": [
+            { name: "Single Vision POLARIZED POLY", price: 220.00 },
+            { name: "FT-28 POLARIZED POLY", price: 300.00 },
+            { name: "7x28 POLARIZED POLY", price: 315.00 },
+            { name: "Essilor Natural POLARIZED POLY", price: 515.00 },
+            { name: "KBCO IRx Pro POLARIZED POLY", price: 535.00 },
+            { name: "Younger Image POLARIZED POLY", price: 495.00 },
+        ],
+        "Avalux Migraine": [
+            { name: "Single Vision AVALUX MIGRAINE", price: 850.00 },
+            { name: "Progressive AVALUX MIGRAINE", price: 975.00 }
+        ],
+        "Ray-Ban Single Vision": [
+            { name: "Plastic RAY-BAN", price: 150.00 },
+            { name: "Plastic w/ Blue Light RAY-BAN", price: 180.00 },
+            { name: "Plastic Transitions RAY-BAN", price: 260.00 },
+            { name: "Poly RAY-BAN", price: 190.00 },
+            { name: "Poly w/ Blue Light RAY-BAN", price: 220.00 },
+            { name: "Poly Transitions RAY-BAN", price: 300.00 },
+            { name: "1.67 High-Index RAY-BAN", price: 375.00 },
+            { name: "1.67 w/ Blue Light RAY-BAN", price: 405.00 },
+            { name: "1.67 Transitions RAY-BAN", price: 485.00 }
+        ],
+        "Ray-Ban Progressive": [
+            { name: "Plastic RAY-BAN PROG", price: 340.00 },
+            { name: "Plastic w/ Blue Light RAY-BAN PROG", price: 370.00 },
+            { name: "Plastic Transitions RAY-BAN PROG", price: 450.00 },
+            { name: "Poly RAY-BAN PROG", price: 380.00 },
+            { name: "Poly w/ Blue Light RAY-BAN PROG", price: 410.00 },
+            { name: "Poly Transitions RAY-BAN PROG", price: 490.00 },
+            { name: "1.67 High-Index RAY-BAN PROG", price: 500.00 },
+            { name: "1.67 w/ Blue Light RAY-BAN PROG", price: 530.00 },
+            { name: "1.67 Transitions RAY-BAN PROG", price: 610.00 }
+        ],
+        "Ray-Ban Sun": [
+            { name: "Non-Polar RAY-BAN SUN", price: 350.00 },
+            { name: "Polar RAY-BAN SUN", price: 390.00 },
+            { name: "Polar BSAR RAY-BAN SUN", price: 440.00 },
+            { name: "Polar Gradient BSAR RAY-BAN SUN", price: 450.00 },
+            { name: "Polar Mirror BSAR RAY-BAN SUN", price: 475.00 }
+        ],
+        "Tints and Coatings": [
+            { name: "Tint", price: 20.00 },
+            { name: "Specialty Tint", price: 70.00 },
+            { name: "Scratch Coat", price: 20.00 },
+            { name: "U/V Coat", price: 20.00 },
+            { name: "Standard A/R", price: 85.00 },
+            { name: "A/R Strip", price: 25.00 },
+            { name: "Crizal Rock", price: 215.00 },
+            { name: "Unity A/R", price: 185.00 },
+            { name: "Mirror Coat", price: 160.00 },
+            { name: "Blue Light", price: 40.00 }
+        ],
+        "Miscellaneous": [
+            { name: "Oakley In-Line", price: 80.00 },
+            { name: "Edge Down", price: 35.00 },
+            { name: "Take PD for NP", price: 25.00 },
+            { name: "Slab Off", price: 185.00 },
+            { name: "Drill Mount", price: 40.00 },
+            { name: "Press-On Prism", price: 75.00 },
+            { name: "Roll and Polish", price: 45.00 },
+            { name: "Safety Fee", price: 30.00 }
+        ]
+    };
+
+    let cart = [];
+    let currentCategory = "All";
+    let isTaxEnabled = false; 
+    let currentInsurance = "None";
+    const TAX_RATE = 0.06;
+    const MEDICAID_ALLOWED = ["Single Vision Plastic", "Single Vision POLY", "Younger Image", "Younger Image POLY"];
+
+    function handleInsuranceChange() {
+        const ins = document.getElementById('insuranceSelect').value;
+        currentInsurance = ins;
+        
+        const medicaidProvider = document.getElementById('medicaidProvider').value;
+        const displayLabel = (ins === "MEDICAID") ? `MEDICAID (${medicaidProvider})` : ins;
+        document.getElementById('displayInsurance').textContent = "Plan: " + (ins === "None" ? "Private Pay" : displayLabel);
+
+        // Show/Hide sections based on selection
+        document.getElementById('medicaidSubmenu').style.display = (ins === "MEDICAID") ? "block" : "none";
+        document.getElementById('medicaidFrameInputs').style.display = (ins === "MEDICAID") ? "block" : "none";
+        document.getElementById('standardFrameInputs').style.display = (ins === "MEDICAID") ? "none" : "block";
+        
+        document.getElementById('copayContainer').style.display = (ins !== "MEDICAID" && ins !== "None") ? "flex" : "none";
+        document.getElementById('frameInsuranceGroup').style.display = (ins !== "None" && ins !== "MEDICAID") ? "flex" : "none";
+        
+        renderLenses(document.getElementById('searchInput').value);
+    }
+
+    function renderLenses(searchTerm = "") {
+        const container = document.getElementById('lensContainer');
+        container.innerHTML = "";
+        const term = searchTerm.toLowerCase();
+
+        Object.keys(priceList).forEach(cat => {
+            if (currentCategory !== "All" && currentCategory !== cat) return;
+            let items = priceList[cat].filter(item => item.name.toLowerCase().includes(term) || cat.toLowerCase().includes(term));
+            
+            if (currentInsurance === "MEDICAID") items = items.filter(item => MEDICAID_ALLOWED.includes(item.name.trim()));
+
+            if (items.length > 0) {
+                const h3 = document.createElement('h3');
+                h3.textContent = cat; h3.style = "grid-column:1/-1; margin-top:20px; color:#7f8c8d; border-bottom:1px solid #ddd;";
+                container.appendChild(h3);
+
+                items.forEach(item => {
+                    const retailPrice = item.price;
+                    const card = document.createElement('div');
+                    card.className = "lens-card";
+                    if(cat.includes('Plastic')) card.classList.add('cat-plastic');
+                    else if(cat.includes('Poly')) card.classList.add('cat-poly');
+
+                    const isMedicaid = (currentInsurance === "MEDICAID");
+                    const showInsBtn = (currentInsurance !== "None");
+
+                    card.innerHTML = `
+                        <div class="lens-name">${item.name}</div>
+                        <div class="lens-price">$${retailPrice.toFixed(2)}</div>
+                        ${showInsBtn ? `<button class="copay-btn" onclick="addWithInsurance(event, '${item.name}', ${retailPrice})">${isMedicaid ? '+ Covered' : '+ Add w/ Copay'}</button>` : ''}
+                    `;
+                    card.onclick = (e) => { if (e.target.tagName !== 'BUTTON') addToCart({...item, price: retailPrice}); };
+                    container.appendChild(card);
+                });
+            }
+        });
+    }
+
+    function addWithInsurance(event, itemName, retailPrice) {
+        event.stopPropagation();
+        
+        if (currentInsurance === "MEDICAID") {
+            // Medicaid lenses are zeroed out
+            addToCart({ name: `${itemName} (Covered)`, price: 0.00 });
+        } else {
+            const copayVal = parseFloat(document.getElementById('copayAmount').value);
+            if (isNaN(copayVal)) { alert("Enter a Copay amount first!"); return; }
+            addToCart({ name: `${itemName} (Retail)`, price: retailPrice });
+            addToCart({ name: `   ↳ Insurance Benefit`, price: -retailPrice });
+            addToCart({ name: `   ↳ Copay: ${itemName}`, price: copayVal });
+        }
+    }
+
+    function addFrame() {
+        if (currentInsurance === "MEDICAID") {
+            const collection = document.getElementById('medicaidCollection').value;
+            const model = document.getElementById('medicaidModel').value || "Unknown Model";
+            // Medicaid Frames are always zero
+            addToCart({ name: `Frame: [${collection}] ${model}`, price: 0.00 });
+            document.getElementById('medicaidModel').value = "";
+        } else {
+            const name = document.getElementById('frameName').value || "Frame";
+            const retail = parseFloat(document.getElementById('framePrice').value);
+            
+            if (isNaN(retail)) { alert("Enter frame retail price!"); return; }
+
+            if (currentInsurance === "None") {
+                addToCart({ name: `Frame: ${name}`, price: retail });
+            } else {
+                const allowance = parseFloat(document.getElementById('frameAllowance').value) || 0;
+                const discountFlat = parseFloat(document.getElementById('frameDiscountFlat').value) || 0;
+                addToCart({ name: `Frame: ${name} (Retail)`, price: retail });
+                if (allowance > 0) addToCart({ name: `   ↳ Insurance Allowance`, price: -Math.min(allowance, retail) });
+                if (discountFlat > 0) addToCart({ name: `   ↳ Plan Discount`, price: -discountFlat });
+            }
+            ['frameName', 'framePrice', 'frameAllowance', 'frameDiscountFlat'].forEach(id => document.getElementById(id).value = "");
+        }
+    }
+
+    function addToCart(item) { cart.push(item); updateCart(); }
+    function removeFromCart(index) { cart.splice(index, 1); updateCart(); }
+    
+    function clearCart() { 
+        cart = []; 
+        document.getElementById('notesArea').value = "";
+        document.getElementById('patientName').value = "";
+        document.getElementById('opticianSelect').value = "";
+        syncNotes();
+        updateCart(); 
+    }
+
+    function updateCart() {
+        const div = document.getElementById('cartItems');
+        div.innerHTML = "";
+        let sub = 0;
+        if (cart.length === 0) {
+            div.innerHTML = `<div style="text-align:center; color:#ccc; margin-top:20px;">No items selected</div>`;
+        } else {
+            cart.forEach((item, i) => {
+                sub += item.price;
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'cart-item';
+                const isNegative = item.price < 0;
+                itemDiv.innerHTML = `
+                    <div style="flex:1;"><span class="item-remove" onclick="removeFromCart(${i})">×</span>${item.name}</div>
+                    <div class="price-col" style="color: ${isNegative ? 'var(--danger)' : 'inherit'}">$${item.price.toFixed(2)}</div>
+                `;
+                div.appendChild(itemDiv);
+            });
+        }
+        const tax = isTaxEnabled ? Math.max(0, sub) * TAX_RATE : 0;
+        document.getElementById('taxRow').style.display = isTaxEnabled ? 'flex' : 'none';
+        document.getElementById('taxDisplay').textContent = `$${tax.toFixed(2)}`;
+        document.getElementById('subtotalDisplay').textContent = `$${sub.toFixed(2)}`;
+        document.getElementById('totalDisplay').textContent = `$${(sub + tax).toFixed(2)}`;
+    }
+
+    function syncNotes() { 
+        const pName = document.getElementById('patientName').value;
+        const optician = document.getElementById('opticianSelect').value;
+        document.getElementById('displayPatient').textContent = pName ? "Patient: " + pName : "";
+        document.getElementById('displayOptician').textContent = optician ? "Optician: " + optician : "";
+        document.getElementById('printNotes').innerHTML = document.getElementById('notesArea').value ? `<strong>Notes:</strong><br>${document.getElementById('notesArea').value}` : ""; 
+    }
+
+    function filterCat(cat, btn) {
+        currentCategory = cat;
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderLenses(document.getElementById('searchInput').value);
+    }
+
+    function toggleTax() {
+        isTaxEnabled = !isTaxEnabled;
+        document.getElementById('taxBtn').textContent = isTaxEnabled ? "Remove Tax" : "Add Tax (6%)";
+        updateCart();
+    }
+
+    document.getElementById('searchInput').addEventListener('input', (e) => renderLenses(e.target.value));
+    
+    (function init() {
+        const nav = document.getElementById('categoryNav');
+        nav.innerHTML = `<button class="cat-btn active" onclick="filterCat('All', this)">All</button>`;
+        Object.keys(priceList).forEach(cat => { nav.innerHTML += `<button class="cat-btn" onclick="filterCat('${cat}', this)">${cat}</button>`; });
+        renderLenses();
+    })();
+</script>
+</body>
+</html>

@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pal Optical - Contacts To Order ฅ/ᐠ. ̫ .ᐟ\ฅ</title>
+    <style>
+        :root {
+            --primary-pink: #ffb7c5;
+            --secondary-pink: #ffe4e1;
+            --accent-blue: #b0e0e6;
+            --text-color: #5d5d5d;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #fffafb;
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1150px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(255, 183, 197, 0.3);
+            border: 2px solid var(--primary-pink);
+            position: relative;
+        }
+
+        h1, h2 {
+            color: #ff8da1;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border-radius: 15px;
+            background-color: var(--secondary-pink);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            align-items: end;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .checkbox-group {
+            flex-direction: row;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+        }
+
+        label {
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select, textarea {
+            padding: 10px;
+            border: 1px solid var(--primary-pink);
+            border-radius: 10px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 38px;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary-pink);
+        }
+
+        button {
+            background-color: var(--primary-pink);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.2s, background-color 0.2s;
+            margin-top: 15px;
+        }
+
+        button:hover {
+            background-color: #ff8da1;
+            transform: scale(1.03);
+        }
+
+        .reset-btn {
+            background-color: #ff6961;
+            margin-top: 10px;
+        }
+
+        .reset-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            font-size: 0.85rem;
+        }
+
+        th {
+            background-color: var(--accent-blue);
+            color: #444;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            border-bottom: 1px solid #eee;
+            padding: 10px;
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background-color: #fff5f7;
+        }
+
+        #insuranceNameGroup, #customBoxGroup, #boxDetailGroup {
+            display: none;
+        }
+
+        .ins-badge {
+            background-color: #d1c4e9;
+            padding: 2px 4px;
+            border-radius: 5px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            display: inline-block;
+            margin-right: 5px;
+        }
+        
+        .supply-badge {
+            background-color: #b2dfdb;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #00695c;
+        }
+
+        .pay-warning {
+            color: #d32f2f;
+            font-weight: bold;
+        }
+
+        .notes-text {
+            color: #777;
+            font-style: italic;
+            max-width: 180px;
+            word-wrap: break-word;
+        }
+
+        .export-btn {
+            background-color: #77dd77;
+            width: 100%;
+            font-size: 1.1rem;
+            margin-top: 20px;
+        }
+
+        .footer-trademark {
+            text-align: center;
+            font-size: 0.65rem;
+            color: #bfa8ad;
+            margin-top: 20px;
+            letter-spacing: 1px;
+        }
+
+        @media print {
+            body { background-color: white; padding: 0; }
+            .container { width: 100%; max-width: 100%; box-shadow: none; border: none; padding: 0; }
+            .section:first-of-type, button, .export-btn, th:last-child, td:last-child { display: none !important; }
+            .section { background-color: transparent !important; padding: 0; }
+            h1 { font-size: 1.5rem; margin-bottom: 10px; }
+            table { font-size: 0.75rem; width: 100%; }
+            th { background-color: #f0f0f0 !important; border-bottom: 1px solid #ccc; }
+            td { border-bottom: 1px solid #eee; }
+            @page { margin: 0.5cm; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Contact Lens Order Sheet (✿◠‿◠)</h1>
+
+    <div class="section">
+        <h2>Add New Order</h2>
+        <div class="form-grid">
+            <div class="input-group">
+                <label>Patient Name</label>
+                <input type="text" id="ptName">
+            </div>
+            <div class="input-group">
+                <label>Phone Number</label>
+                <input type="text" id="ptPhone">
+            </div>
+            <div class="input-group">
+                <label>Supply Size</label>
+                <select id="supplyType" onchange="toggleBoxField()">
+                    <option value="Annual Supply">Annual Supply</option>
+                    <option value="6-Month Supply">6-Month Supply</option>
+                    <option value="Custom Box Count">Custom Box Count</option>
+                </select>
+            </div>
+            <div class="input-group" id="customBoxGroup">
+                <label>Boxes</label>
+                <input type="number" id="boxCount" value="0" min="0">
+            </div>
+            <div class="input-group checkbox-group" id="boxDetailGroup">
+                <input type="checkbox" id="isPerEye">
+                <label for="isPerEye">Per Eye? (Else: Total)</label>
+            </div>
+            <div class="input-group checkbox-group">
+                <input type="checkbox" id="usingIns" onchange="toggleInsuranceField()">
+                <label for="usingIns">Using Insurance?</label>
+            </div>
+            <div class="input-group" id="insuranceNameGroup">
+                <label>Insurance Name</label>
+                <input type="text" id="insName" placeholder="e.g. VSP">
+            </div>
+            <div class="input-group">
+                <label>Payment Status</label>
+                <select id="payMethod">
+                    <option value="N/A">Select...</option>
+                    <option value="Cash">Cash</option>
+                    <option value="Card">Card</option>
+                    <option value="Check">Check</option>
+                    <option value="Insurance Benefit">Insurance Benefit</option>
+                    <option value="Pay When It Comes In">Pay When It Comes In ⏳</option>
+                </select>
+            </div>
+            <div class="input-group" style="grid-column: span 2;">
+                <label>Additional Notes 📝</label>
+                <textarea id="ptNotes" placeholder="Any special instructions?"></textarea>
+            </div>
+        </div>
+        <button onclick="addPatient()">Add to Order List ✨</button>
+    </div>
+
+    <div class="section" style="background-color: #e1f5fe;">
+        <h2>Contacts That Need To Be Ordered (｡•́︿•̀｡)</h2>
+        <div style="overflow-x: auto;">
+            <table id="pendingTable">
+                <thead>
+                    <tr>
+                        <th>Patient</th>
+                        <th>Phone</th>
+                        <th>Supply/Boxes</th>
+                        <th>Insurance</th>
+                        <th>Payment Status</th>
+                        <th>Notes</th>
+                        <th>Date Added</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+        <button class="export-btn" onclick="exportToExcel()">Export Alphabetized List to Excel 💾</button>
+        <button class="export-btn" style="background-color: #90caf9;" onclick="window.print()">Print List 🖨️</button>
+        <button class="export-btn reset-btn" onclick="resetFullList()">Reset Full List (Clear Browser Memory) 🗑️</button>
+    </div>
+
+    <div class="footer-trademark">
+        James Brentlinger™
+    </div>
+</div>
+
+<script>
+    let patients = [];
+
+    // ✨ LOAD DATA FROM BROWSER STORAGE ON START ✨
+    window.onload = function() {
+        const savedData = localStorage.getItem('palOpticalOrders');
+        if (savedData) {
+            patients = JSON.parse(savedData);
+            renderTable();
+        }
+    };
+
+    function saveData() {
+        localStorage.setItem('palOpticalOrders', JSON.stringify(patients));
+    }
+
+    function toggleInsuranceField() {
+        const isChecked = document.getElementById('usingIns').checked;
+        const group = document.getElementById('insuranceNameGroup');
+        group.style.display = isChecked ? 'flex' : 'none';
+    }
+
+    function toggleBoxField() {
+        const type = document.getElementById('supplyType').value;
+        const group = document.getElementById('customBoxGroup');
+        const detailGroup = document.getElementById('boxDetailGroup');
+        const isCustom = type === "Custom Box Count";
+        group.style.display = isCustom ? 'flex' : 'none';
+        detailGroup.style.display = isCustom ? 'flex' : 'none';
+    }
+
+    function addPatient() {
+        const name = document.getElementById('ptName').value;
+        const phone = document.getElementById('ptPhone').value;
+        const supply = document.getElementById('supplyType').value;
+        const boxes = document.getElementById('boxCount').value;
+        const perEye = document.getElementById('isPerEye').checked;
+        const hasIns = document.getElementById('usingIns').checked;
+        const insName = hasIns ? document.getElementById('insName').value : "No";
+        const pay = document.getElementById('payMethod').value;
+        const notes = document.getElementById('ptNotes').value;
+
+        if(!name) { alert("Please enter a patient name, senpai!"); return; }
+
+        const newPt = {
+            id: Date.now(),
+            name, phone, supply, boxes, perEye, hasIns, insName, pay, notes,
+            dateAdded: new Date().toLocaleDateString()
+        };
+
+        patients.push(newPt);
+        saveData(); // Save to Browser
+        renderTable();
+        clearForm();
+    }
+
+    function clearForm() {
+        document.getElementById('ptName').value = '';
+        document.getElementById('ptPhone').value = '';
+        document.getElementById('supplyType').selectedIndex = 0;
+        document.getElementById('boxCount').value = '0';
+        document.getElementById('isPerEye').checked = false;
+        document.getElementById('usingIns').checked = false;
+        document.getElementById('insName').value = '';
+        document.getElementById('payMethod').value = 'N/A';
+        document.getElementById('ptNotes').value = '';
+        toggleInsuranceField();
+        toggleBoxField();
+    }
+
+    function removePatient(id) {
+        patients = patients.filter(p => p.id !== id);
+        saveData(); // Save change to Browser
+        renderTable();
+    }
+
+    function resetFullList() {
+        if(confirm("Are you sure you want to clear the entire list from the browser? This cannot be undone!")) {
+            patients = [];
+            localStorage.removeItem('palOpticalOrders');
+            renderTable();
+        }
+    }
+
+    function renderTable() {
+        const body = document.querySelector('#pendingTable tbody');
+        body.innerHTML = '';
+        patients.forEach(pt => {
+            const insDisplay = pt.hasIns ? `<span class="ins-badge">INS</span><span class="ins-name-display">${pt.insName}</span>` : 'No';
+            const payDisplay = pt.pay === "Pay When It Comes In" ? `<span class="pay-warning">${pt.pay}</span>` : pt.pay;
+            let supplyDisplay = pt.supply === "Custom Box Count" ? `${pt.boxes} Boxes (${pt.perEye ? 'Per Eye' : 'Total'})` : `<span class="supply-badge">${pt.supply}</span>`;
+            body.innerHTML += `
+                <tr>
+                    <td><strong>${pt.name}</strong></td>
+                    <td>${pt.phone}</td>
+                    <td>${supplyDisplay}</td>
+                    <td>${insDisplay}</td>
+                    <td>${payDisplay}</td>
+                    <td class="notes-text">${pt.notes || '-'}</td>
+                    <td>${pt.dateAdded}</td>
+                    <td><button style="background-color:#ff6961; padding:5px 10px;" onclick="removePatient(${pt.id})">X</button></td>
+                </tr>
+            `;
+        });
+    }
+
+    function exportToExcel() {
+        if(patients.length === 0) { alert("The list is empty, senpai! ヾ(｡ꏿ﹏ꏿ)ﾉ"); return; }
+        const sortedPatients = [...patients].sort((a, b) => a.name.localeCompare(b.name));
+
+        let xml = '<?xml version="1.0"?><?mso-application progid="Excel.Sheet"?>';
+        xml += '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet" xmlns:html="http://www.w3.org/TR/REC-html40">';
+        xml += '<Styles><Style ss:ID="sHeader"><Font ss:Bold="1"/><Alignment ss:Vertical="Center"/></Style></Styles>';
+        xml += '<Worksheet ss:Name="Orders"><Table>';
+        
+        xml += '<Column ss:Width="120"/>'; 
+        xml += '<Column ss:Width="100"/>'; 
+        xml += '<Column ss:Width="140"/>'; 
+        xml += '<Column ss:Width="100"/>'; 
+        xml += '<Column ss:Width="120"/>'; 
+        xml += '<Column ss:Width="200"/>'; 
+
+        xml += '<Row ss:StyleID="sHeader">';
+        ['Patient Name', 'Phone Number', 'Supply/Boxes', 'Insurance', 'Payment Status', 'Notes'].forEach(h => {
+            xml += `<Cell><Data ss:Type="String">${h}</Data></Cell>`;
+        });
+        xml += '</Row>';
+
+        sortedPatients.forEach(pt => {
+            let supplyText = pt.supply === "Custom Box Count" ? `${pt.boxes} Boxes (${pt.perEye ? 'Per Eye' : 'Total'})` : pt.supply;
+            xml += '<Row>';
+            xml += `<Cell><Data ss:Type="String">${pt.name}</Data></Cell>`;
+            xml += `<Cell><Data ss:Type="String">${pt.phone}</Data></Cell>`;
+            xml += `<Cell><Data ss:Type="String">${supplyText}</Data></Cell>`;
+            xml += `<Cell><Data ss:Type="String">${pt.hasIns ? pt.insName : "None"}</Data></Cell>`;
+            xml += `<Cell><Data ss:Type="String">${pt.pay}</Data></Cell>`;
+            xml += `<Cell><Data ss:Type="String">${pt.notes || ''}</Data></Cell>`;
+            xml += '</Row>';
+        });
+
+        xml += '</Table></Worksheet></Workbook>';
+        const blob = new Blob([xml], { type: 'application/vnd.ms-excel' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('href', url);
+        a.setAttribute('download', 'Pal_Optical_Orders.xls');
+        a.click();
+    }
+</script>
+
+</body>
+</html>

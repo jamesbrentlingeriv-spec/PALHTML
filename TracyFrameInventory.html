@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pal Optical Frame Inventory Tool</title>
+    <style>
+        :root {
+            --primary-color: #000000;
+            --secondary-color: #FFFFFF;
+            --soft-bg: #F5F5F5;
+            --text-color: #333333;
+            --card-bg: #FFFFFF;
+            --border-color: #CCCCCC;
+            --accent-color: #000000;
+        }
+
+        [data-theme="dark"] {
+            --primary-color: #FFFFFF;
+            --secondary-color: #000000;
+            --soft-bg: #1A1A1A;
+            --text-color: #CCCCCC;
+            --card-bg: #2A2A2A;
+            --border-color: #555555;
+            --accent-color: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--soft-bg);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 750px;
+            border: 2px solid var(--border-color);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        h1 { text-align: center; color: var(--accent-color); margin-bottom: 5px; font-weight: 800; }
+        .subtitle { text-align: center; font-size: 11px; margin-bottom: 20px; color: #888; }
+
+        .form-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .form-group { margin-bottom: 12px; }
+        label { display: block; font-weight: bold; font-size: 13px; margin-bottom: 4px; }
+        select, input {
+            width: 100%; padding: 10px; border: 1px solid var(--border-color);
+            border-radius: 10px; box-sizing: border-box; outline: none;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            transition: border-color 0.3s, background-color 0.3s, color 0.3s;
+        }
+
+        .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        
+        .price-grid {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+            margin-top: 10px; background: var(--soft-bg); padding: 10px; border-radius: 10px;
+            transition: background-color 0.3s;
+        }
+
+        .btn-group { display: flex; gap: 10px; margin-top: 15px; }
+        button {
+            flex: 1; padding: 12px; border-radius: 10px; font-weight: bold;
+            cursor: pointer; border: none; transition: 0.2s;
+        }
+        .btn-add { background-color: var(--accent-color); color: var(--secondary-color); }
+        .btn-connect { background-color: #4CAF50; color: white; }
+        button:hover { opacity: 0.9; transform: translateY(-2px); }
+
+        .inventory-list { max-height: 400px; overflow-y: auto; margin-top: 10px; }
+        .item-card {
+            background: var(--card-bg); padding: 12px; border-radius: 8px;
+            margin-bottom: 8px; font-size: 12px; border: 1px solid var(--border-color);
+            border-left: 5px solid var(--accent-color);
+            display: flex; justify-content: space-between; align-items: center;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .session-badge {
+            background: var(--soft-bg); color: var(--text-color);
+            padding: 5px 12px; border-radius: 20px; font-size: 11px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .theme-toggle:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
+    <h1>Pal Optical Frame Inventory Tool</h1>
+    <p class="subtitle">James Brentlinger 2026™</p>
+    
+    <div class="form-section">
+        <div class="grid">
+            <div class="form-group">
+                <label>Manufacturer</label>
+                <select id="manufacturer" onchange="updateBrands()">
+                    <option value="">-- Select --</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Brand</label>
+                <select id="brand"><option value="">-- Choose Mfg --</option></select>
+            </div>
+            <div class="form-group">
+                <label>Model #</label>
+                <input type="text" id="model">
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="form-group"><label>Color</label><input type="text" id="colorName"></div>
+            <div class="form-group"><label>Color Code</label><input type="text" id="colorCode"></div>
+            <div class="form-group"><label>Qty</label><input type="number" id="qty" value="1"></div>
+        </div>
+
+        <div class="grid">
+            <div class="form-group"><label>Eye</label><input type="number" id="eye"></div>
+            <div class="form-group"><label>Bridge</label><input type="number" id="bridge"></div>
+            <div class="form-group"><label>Temple</label><input type="number" id="temple"></div>
+        </div>
+
+        <div class="price-grid">
+            <div class="form-group"><label>Wholesale ($)</label><input type="number" id="wholesale" step="0.01"></div>
+            <div class="form-group"><label>Retail ($)</label><input type="number" id="retail" step="0.01"></div>
+            <div style="font-size: 10px; display: flex; align-items: center; color: var(--accent-color);">
+                Connect your master file to start importing!
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-connect" id="connectBtn" onclick="setupFileHandle()">🔗 Connect Master CSV</button>
+            <button class="btn-add" onclick="saveFrame()">Import to Master 📥</button>
+        </div>
+    </div>
+
+    <div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h3>Current Session Items <span id="countBadge" class="session-badge">0 New</span></h3>
+        </div>
+        <div class="inventory-list" id="stockContainer"></div>
+    </div>
+</div>
+
+<script>
+    let fileHandle;
+    let sessionItems = []; // Only items added during THIS page load
+    const brandsList = {
+        "Luxottica": ["Ray-Ban", "Michael Kors"],
+        "Altair": ["Anne Klein", "McAllister", "Bebe", "Altair", "Genesis", "Calvin Klein Jeans"],
+        "Marchon Eye-envy": ["Nike", "Longchamp", "Lacoste"],
+        "Modern Optical": ["Modern", "Modern Art", "Modz", "GVX", "ModzFlex", "B.M.E.C.", "GB+", "Genevieve Boutique", "Fashiontabulous", "UROCK", "Modz Sunz", "Genevieve", "Giovani di Venezia", "Modz Titanium", "Modz Kids", "Modern Times"],
+        "Smilen": ["Smilen Elite", "Times Square", "A-List RC", "NYC4U", "Optimist", "Gotham Flex", "Broadway Flex", "Gotham Stainless", "Trendspotter", "Gotham", "Broadway", "2000 and Beyond"],
+        "Clearvision": ["Advantage CVO", "CVO Eyewear", "Ellen Tracy", "Jessica McClintock", "OP"],
+        "New York Eye": ["Ernest Hemingway", "Marie Claire", "Joan Collins", "Scott & Zelda", "Valerie Spencer", "Lumax", "Enhance"],
+        "Visual Eyes": ["Tots"],
+        "Zyloware": ["Daisy Fuentes", "Gloria by GV", "Gloria Vanderbuilt", "Halston", "Leon Max", "Randy Jackson", "Shaquille O'Neal Eyewear", "Shaq Gear", "Sophia Loren", "Stetson", "Stetson Off Road", "Via Spiga"] 
+    };
+
+    function populateManufacturers() {
+        const mfgSelect = document.getElementById("manufacturer");
+        const sortedMfgs = Object.keys(brandsList).sort();
+        sortedMfgs.forEach(mfg => {
+            const opt = document.createElement("option");
+            opt.value = mfg; opt.innerHTML = mfg;
+            mfgSelect.appendChild(opt);
+        });
+    }
+
+    populateManufacturers();
+
+    // Cordova-specific file handling
+    const masterFileName = 'Pal_Optical_Inventory.csv';
+    let fileEntry;
+
+    document.addEventListener('deviceready', onDeviceReady, false);
+
+    function onDeviceReady() {
+        // The device is ready, we can now use Cordova plugins
+        console.log('Cordova device is ready.');
+        setupFileHandle();
+    }
+
+    function setupFileHandle() {
+        // Use the external data directory, which is persistent and private to the app
+        window.resolveLocalFileSystemURL(cordova.file.externalDataDirectory, function (dirEntry) {
+            dirEntry.getFile(masterFileName, { create: true, exclusive: false }, function (entry) {
+                fileEntry = entry; // Save the file entry for later use
+                document.getElementById("connectBtn").innerText = "✅ Master Connected";
+                document.getElementById("connectBtn").style.backgroundColor = "#888";
+                document.getElementById("connectBtn").onclick = null; // Disable further clicks
+                alert("Master File Connected! The file is stored at: " + fileEntry.nativeURL);
+            }, onFileError);
+        }, onFileError);
+    }
+
+    function onFileError(err) {
+        console.error("File Error: ", err);
+        let msg = 'File Error: ';
+        if (err.code) {
+            msg += `Code ${err.code}`;
+        }
+        alert(msg);
+    }
+
+
+    function updateBrands() {
+        const mfg = document.getElementById("manufacturer").value;
+        const brandSelect = document.getElementById("brand");
+        brandSelect.innerHTML = '<option value="">-- Select Brand --</option>';
+        if (mfg && brandsList[mfg]) {
+            const sortedBrands = brandsList[mfg].sort();
+            sortedBrands.forEach(brand => {
+                const opt = document.createElement("option");
+                opt.value = brand; opt.innerHTML = brand;
+                brandSelect.appendChild(opt);
+            });
+        }
+    }
+
+    async function saveFrame() {
+        if(!fileEntry) {
+            alert("Please connect your Master CSV first! ૮꒰ ˶• ༝ •˶꒱ა");
+            return;
+        }
+
+        const mfg = document.getElementById("manufacturer").value;
+        const brand = document.getElementById("brand").value;
+        const model = document.getElementById("model").value;
+        const wholesale = document.getElementById("wholesale").value;
+        const retail = document.getElementById("retail").value;
+
+        if(!mfg || !brand || !model || !wholesale || !retail) { alert("Missing info! ૮꒰ ˶• ༝ •˶꒱ა"); return; }
+
+        const newFrame = {
+            mfg, brand, model,
+            color: document.getElementById("colorName").value || "N/A",
+            code: document.getElementById("colorCode").value || "N/A",
+            qty: document.getElementById("qty").value,
+            eye: document.getElementById("eye").value || "0",
+            bridge: document.getElementById("bridge").value || "0",
+            temple: document.getElementById("temple").value || "0",
+            wholesale: parseFloat(wholesale).toFixed(2),
+            retail: parseFloat(retail).toFixed(2),
+            dateAdded: new Date().toLocaleString()
+        };
+
+        // Add to UI list
+        sessionItems.push(newFrame);
+        renderStock();
+        
+        // Update the Master File
+        await appendToMaster(newFrame);
+
+        // Reset inputs
+        document.getElementById("model").value = "";
+    }
+
+    async function appendToMaster(newFrame) {
+        if (!fileEntry) return;
+
+        // 1. Read existing content using FileReader
+        fileEntry.file(function (file) {
+            const reader = new FileReader();
+            reader.onloadend = function() {
+                const text = this.result;
+                let rows = [];
+                const header = "Date,Manufacturer,Brand,Model,Color,ColorCode,Eye,Bridge,Temple,Wholesale,Retail,Qty";
+
+                if (text.length > 0) {
+                    const lines = text.split('\n');
+                    for(let i = 1; i < lines.length; i++) {
+                        if(lines[i].trim() === "") continue;
+                        const parts = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+                        if (parts.length < 12) continue; // Skip malformed rows
+                        rows.push({
+                            dateAdded: parts[0].replace(/"/g, ''), mfg: parts[1].replace(/"/g, ''),
+                            brand: parts[2].replace(/"/g, ''), model: parts[3].replace(/"/g, ''),
+                            color: parts[4].replace(/"/g, ''), code: parts[5].replace(/"/g, ''),
+                            eye: parts[6], bridge: parts[7], temple: parts[8],
+                            wholesale: parts[9], retail: parts[10], qty: parts[11]
+                        });
+                    }
+                }
+
+                rows.push(newFrame);
+                rows.sort((a, b) => (a.mfg + a.brand).localeCompare(b.mfg + b.brand));
+
+                let csvContent = header + "\n";
+                rows.forEach(item => {
+                    csvContent += [`"${item.dateAdded}"`, `"${item.mfg}"`, `"${item.brand}"`, `"${item.model}"`, `"${item.color}"`, `"${item.code}"`, item.eye, item.bridge, item.temple, item.wholesale, item.retail, item.qty].join(",") + "\n";
+                });
+
+                // 6. Write back to file
+                fileEntry.createWriter(function (fileWriter) {
+                    fileWriter.onwriteend = function() { console.log("Successful file write."); };
+                    fileWriter.onerror = onFileError;
+                    const blob = new Blob([csvContent], { type: 'text/csv' });
+                    fileWriter.write(blob);
+                });
+            };
+            reader.readAsText(file);
+        }, onFileError);
+    }
+
+    function renderStock() {
+        const container = document.getElementById("stockContainer");
+        const badge = document.getElementById("countBadge");
+        container.innerHTML = "";
+        badge.innerText = `${sessionItems.length} New`;
+        sessionItems.slice().reverse().forEach((item) => {
+            container.innerHTML += `<div class="item-card"><div><strong>${item.brand} ${item.model}</strong><br><small>${item.mfg} | ${item.color}</small></div><div style="text-align: right;"><span style="color:#2e7d32; font-weight:bold;">$${item.retail}</span><br><small>Qty: ${item.qty}</small></div></div>`;
+        });
+    }
+
+    function toggleTheme() {
+        const body = document.body;
+        const toggleBtn = document.getElementById("themeToggle");
+        if (body.getAttribute("data-theme") === "dark") {
+            body.removeAttribute("data-theme");
+            toggleBtn.innerText = "🌙";
+        } else {
+            body.setAttribute("data-theme", "dark");
+            toggleBtn.innerText = "☀️";
+        }
+    }
+
+    // If not in a Cordova environment, fall back to the web-based file picker
+    if (typeof cordova === 'undefined') {
+        document.getElementById('connectBtn').onclick = async function() {
+            try { fileHandle = await window.showSaveFilePicker({ suggestedName: masterFileName, types: [{ description: 'CSV File', accept: {'text/csv': ['.csv']} }] }); document.getElementById("connectBtn").innerText = "✅ Master Connected"; document.getElementById("connectBtn").style.backgroundColor = "#888"; alert("Master File Connected!"); } catch (err) { console.error(err); }
+        };
+    }
+</script>
+</body>
+</html>

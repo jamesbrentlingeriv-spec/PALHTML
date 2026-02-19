@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pal Optical // Lens Tally System</title>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            /* Default to Dark Mode */
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --text-muted: #aaaaaa;
+            --border-color: #444444;
+            --highlight: #333333;
+            --active-cell: #ffffff; 
+            --active-text: #000000;
+            --input-bg: #2c2c2c;
+            --btn-bg: #ffffff;
+            --btn-text: #000000;
+        }
+
+        /* Light Mode Overrides */
+        body.light-mode {
+            --bg-color: #f4f4f4;
+            --card-bg: #ffffff;
+            --text-main: #000000;
+            --text-muted: #555555;
+            --border-color: #cccccc;
+            --highlight: #eeeeee;
+            --active-cell: #000000;
+            --active-text: #ffffff;
+            --input-bg: #ffffff;
+            --btn-bg: #000000;
+            --btn-text: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif; /* Professional Font */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* --- SCREEN ONLY STYLES --- */
+        @media screen {
+            .print-only {
+                display: none !important;
+            }
+
+            header {
+                width: 100%;
+                max-width: 1200px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                border-bottom: 2px solid var(--text-main);
+                padding-bottom: 15px;
+            }
+
+            h1 {
+                margin: 0;
+                font-size: 1.5rem;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                font-weight: 800;
+            }
+
+            .header-right {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            /* Theme Toggle */
+            .theme-toggle {
+                background: transparent;
+                border: 1px solid var(--text-main);
+                color: var(--text-main);
+                padding: 5px 10px;
+                cursor: pointer;
+                font-size: 0.8rem;
+                text-transform: uppercase;
+            }
+
+            .stats-bar {
+                display: flex;
+                gap: 20px;
+                align-items: center;
+                margin-top: 10px;
+                width: 100%;
+                max-width: 1200px;
+                justify-content: space-between;
+            }
+
+            /* MATERIAL SELECTOR */
+            .material-select {
+                background: var(--input-bg);
+                color: var(--text-main);
+                border: 1px solid var(--border-color);
+                padding: 10px;
+                font-size: 1rem;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+                width: 200px;
+            }
+
+            .stat-box {
+                background: var(--card-bg);
+                padding: 10px 20px;
+                border: 1px solid var(--border-color);
+                text-align: center;
+                min-width: 150px;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+                font-weight: bold;
+            }
+
+            .controls {
+                width: 100%;
+                max-width: 1200px;
+                display: flex;
+                gap: 10px;
+                margin: 20px 0;
+                justify-content: flex-end;
+                flex-wrap: wrap;
+            }
+
+            button {
+                padding: 10px 20px;
+                font-weight: bold;
+                cursor: pointer;
+                border-radius: 4px;
+                text-transform: uppercase;
+                font-size: 0.8rem;
+                letter-spacing: 0.5px;
+            }
+
+            button.btn-main {
+                background: var(--btn-bg);
+                color: var(--btn-text);
+                border: 1px solid var(--btn-bg);
+            }
+
+            button.btn-secondary {
+                background: transparent;
+                color: var(--text-main);
+                border: 1px solid var(--border-color);
+            }
+            
+            button:hover {
+                opacity: 0.8;
+            }
+
+            /* Scanner Camera Box */
+            #reader {
+                width: 100%;
+                max-width: 500px;
+                display: none;
+                margin: 20px auto;
+                border: 2px solid var(--text-main);
+            }
+
+            /* INPUT AREA */
+            .manual-input {
+                margin: 0 0 20px 0;
+                width: 100%;
+                max-width: 1200px;
+            }
+            
+            input[type="text"] {
+                width: 100%;
+                background: var(--input-bg);
+                border: 1px solid var(--border-color);
+                color: var(--text-main);
+                padding: 15px;
+                border-radius: 4px;
+                font-size: 1.1rem;
+                font-family: 'Courier New', monospace;
+            }
+            
+            input[type="text"]:focus {
+                outline: 2px solid var(--text-main);
+            }
+
+            /* GRID */
+            .grid-container {
+                width: 100%;
+                max-width: 1200px;
+                overflow-x: auto;
+                background: var(--card-bg);
+                border: 1px solid var(--border-color);
+                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            }
+
+            table.matrix {
+                border-collapse: collapse;
+                width: 100%;
+                min-width: 800px;
+            }
+
+            th, td {
+                border: 1px solid var(--border-color);
+                text-align: center;
+                padding: 5px;
+                position: relative;
+                font-family: 'Courier New', monospace;
+            }
+
+            thead th {
+                position: sticky;
+                top: 0;
+                background: var(--highlight);
+                z-index: 10;
+                font-size: 0.9rem;
+                padding: 10px;
+            }
+
+            tbody th {
+                position: sticky;
+                left: 0;
+                background: var(--highlight);
+                z-index: 5;
+                font-weight: bold;
+                min-width: 80px;
+            }
+
+            td.cell {
+                cursor: pointer;
+                user-select: none;
+                height: 45px; 
+                vertical-align: middle;
+                transition: background 0.1s;
+            }
+
+            td.cell:hover {
+                background-color: var(--highlight);
+            }
+
+            .count-display {
+                font-size: 1.1rem;
+                font-weight: bold;
+                display: block;
+            }
+
+            /* Active Cell Style */
+            .count-display.active {
+                color: var(--text-main);
+            }
+            
+            /* High Contrast for active cells */
+            td.cell.has-data {
+                background-color: var(--active-cell) !important;
+            }
+            td.cell.has-data .count-display {
+                color: var(--active-text) !important;
+            }
+
+            footer {
+                margin-top: 40px;
+                color: var(--text-muted);
+                font-size: 0.8rem;
+                text-align: center;
+            }
+        }
+
+        /* --- PRINT STYLES (Always Black & White) --- */
+        @media print {
+            @page { margin: 0.5cm; }
+            body {
+                background: white;
+                color: black;
+                padding: 0;
+                margin: 0;
+                display: block;
+                font-family: Arial, sans-serif;
+                font-size: 10px;
+            }
+
+            .screen-only {
+                display: none !important;
+            }
+
+            .print-only {
+                display: block !important;
+                width: 100%;
+            }
+
+            .print-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                border-bottom: 2px solid black;
+                padding-bottom: 10px;
+                margin-bottom: 10px;
+            }
+
+            .print-header-left {
+                font-size: 11px;
+                line-height: 1.4;
+                width: 40%;
+            }
+
+            .print-header-center {
+                width: 25%;
+                text-align: center;
+                border: 2px solid black;
+                padding: 5px;
+                font-weight: bold;
+                font-size: 12px;
+            }
+
+            .print-header-right {
+                text-align: right;
+                font-size: 11px;
+                width: 30%;
+            }
+
+            .print-title {
+                border: 2px solid black;
+                padding: 5px;
+                width: 100%;
+                max-width: 200px;
+                text-align: center;
+                font-weight: bold;
+                margin-top: 10px;
+                font-size: 12px;
+                text-transform: uppercase;
+            }
+            
+            .print-date-input {
+                border: none;
+                border-bottom: 1px solid black;
+                text-align: center;
+                font-family: inherit;
+                font-size: inherit;
+                font-weight: bold;
+                width: 100px;
+            }
+
+            .print-grid {
+                column-count: 4;
+                column-gap: 20px;
+            }
+
+            .print-item {
+                display: flex;
+                justify-content: space-between;
+                border-bottom: 1px solid #ccc;
+                padding: 2px 0;
+                break-inside: avoid;
+            }
+            
+            .print-item.new-group {
+                margin-top: 15px;
+                border-top: 2px solid #000;
+            }
+            
+            .print-label {
+                font-weight: bold;
+                font-size: 11px;
+            }
+
+            .print-value {
+                padding-right: 5px;
+                font-weight: bold;
+                min-width: 30px;
+                text-align: right;
+                font-family: 'Courier New', monospace; 
+                letter-spacing: 2px;
+            }
+            
+            .print-value::after {
+                content: "___";
+                color: transparent;
+                border-bottom: 1px solid #000;
+                margin-left: 5px;
+            }
+            
+            .print-value.has-count {
+                font-size: 12px;
+            }
+            .print-value.has-count::after {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="screen-only">
+        <header>
+            <h1>Pal Optical <span>// Tally System</span></h1>
+            <div class="header-right">
+                <button class="theme-toggle" onclick="toggleTheme()">🌗 Dark/Light Mode</button>
+            </div>
+        </header>
+        
+        <div class="stats-bar">
+            <select id="material-select" class="material-select" onchange="switchMaterial()">
+                <option value="poly">POLYCARBONATE</option>
+                <option value="plastic">PLASTIC (CR-39)</option>
+            </select>
+
+            <div class="stat-box">
+                <span class="stat-label">Total Lenses</span>
+                <span class="stat-value" id="total-count">0</span>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn-main" onclick="toggleCamera()">📷 Camera Scan</button>
+            <button class="btn-secondary" onclick="resetGrid()">Clear Sheet</button>
+            <button class="btn-secondary" onclick="window.print()">Print Receipt</button>
+            <button class="btn-main" onclick="exportCSV()">Export CSV</button>
+        </div>
+
+        <div id="reader"></div>
+
+        <div class="manual-input">
+            <input type="text" id="quick-add" placeholder="Scan Barcode or Type Lens (e.g. -200 -125)" autofocus>
+        </div>
+
+        <div class="grid-container">
+            <table class="matrix" id="lens-grid">
+                </table>
+        </div>
+
+        <footer>
+            Pal Optical Internal Tool // 2026
+        </footer>
+    </div>
+
+    <div class="print-only">
+        <div class="print-header">
+            <div class="print-header-left">
+                CASAK, Inc.<br>
+                Pal Optical<br>
+                1555 East New Circle Road<br>
+                Suite 146<br>
+                Lexington, Kentucky 40509<br>
+                Business Line: 859-266-3003<br>
+                Fax Line: 859-266-9504<br>
+                
+                <div class="print-title">
+                    <span id="print-material-title">POLYCARB</span><br>
+                    FINISHED SV<br>
+                    LENS ORDER<br>
+                    <div id="print-poly-warning" style="margin-top: 6px; font-size: 10px; font-weight: normal;">
+                        ALL LENSES MUST BE<br>
+                        <strong>CONTINUA POLY</strong>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="print-header-center">
+                Vision Ease Acc# 103440<br>
+                Date: <input type="text" id="date-input" class="print-date-input">
+            </div>
+
+            <div class="print-header-right"></div>
+        </div>
+        
+        <div id="print-content" class="print-grid">
+            </div>
+    </div>
+
+<script>
+    /** CONFIGURATION */
+    const CONFIG = { sphMax: 4.00, sphMin: -8.00, cylMax: 0.00, cylMin: -2.75, step: 0.25 };
+    
+    // STATE
+    let sheets = { poly: {}, plastic: {} };
+    let currentMaterial = 'poly'; 
+    let barcodeDb = JSON.parse(localStorage.getItem('palOpticalBarcodes')) || {}; 
+
+    // --- SOUND ---
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    function playBeep() {
+        if (audioContext.state === 'suspended') audioContext.resume();
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.1);
+    }
+
+    // --- THEME LOGIC ---
+    function toggleTheme() {
+        document.body.classList.toggle('light-mode');
+    }
+
+    // --- HELPERS ---
+    function formatDiopter(num) {
+        if (num === 0) return "PL"; 
+        let s = num.toFixed(2);
+        return num > 0 ? "+" + s : s;
+    }
+    function formatOpticalShort(num) {
+        if (num === 0) return "PL";
+        let val = Math.round(num * 100);
+        return (val > 0 ? "+" + val : val);
+    }
+    function getKey(sph, cyl) { return `${formatDiopter(sph)} ${formatDiopter(cyl)}`; }
+
+    // --- MAIN APP LOGIC ---
+    function switchMaterial() {
+        currentMaterial = document.getElementById('material-select').value;
+        initGrid(); 
+    }
+
+    function initGrid() {
+        // Init Date
+        const today = new Date();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        const yyyy = today.getFullYear();
+        document.getElementById('date-input').value = `${mm}/${dd}/${yyyy}`;
+
+        const table = document.getElementById('lens-grid');
+        let html = '';
+
+        // Header
+        html += '<thead><tr><th>Sph \\ Cyl</th>';
+        for (let c = CONFIG.cylMax; c >= CONFIG.cylMin; c -= CONFIG.step) {
+            html += `<th>${formatDiopter(c)}</th>`;
+        }
+        html += '</tr></thead>';
+
+        // Body - REPLACED "tbody" text with <tbody> tag
+        html += '<tbody>';
+        for (let s = CONFIG.sphMax; s >= CONFIG.sphMin; s -= CONFIG.step) {
+            html += `<tr><th>${formatDiopter(s)}</th>`; 
+            for (let c = CONFIG.cylMax; c >= CONFIG.cylMin; c -= CONFIG.step) {
+                const key = getKey(s, c);
+                const count = sheets[currentMaterial][key] || 0;
+                
+                const activeClass = count > 0 ? 'active' : '';
+                const cellClass = count > 0 ? 'cell has-data' : 'cell';
+                
+                html += `<td class="${cellClass}" onclick="handleCellClick('${key}', this)" oncontextmenu="handleRightClick(event, '${key}', this)">
+                        <span class="count-display ${activeClass}" id="count-${key.replace(/\s/g, '_')}">${count > 0 ? count : '-'}</span>
+                    </td>`;
+            }
+            html += '</tr>';
+        }
+        html += '</tbody>';
+        table.innerHTML = html;
+        updateTotals();
+        updatePrintView(); 
+        document.getElementById('quick-add').focus();
+    }
+
+    function handleCellClick(key, cellElement) {
+        if (!sheets[currentMaterial][key]) sheets[currentMaterial][key] = 0;
+        sheets[currentMaterial][key]++;
+        refreshCell(key, cellElement);
+        updateTotals();
+        updatePrintView();
+    }
+
+    function handleRightClick(e, key, cellElement) {
+        e.preventDefault();
+        if (sheets[currentMaterial][key] && sheets[currentMaterial][key] > 0) {
+            sheets[currentMaterial][key]--;
+            if (sheets[currentMaterial][key] === 0) delete sheets[currentMaterial][key];
+            refreshCell(key, cellElement);
+            updateTotals();
+            updatePrintView();
+        }
+    }
+
+    function refreshCell(key, cellElement) {
+        const countSpan = document.getElementById(`count-${key.replace(/\s/g, '_')}`);
+        const count = sheets[currentMaterial][key] || 0;
+        
+        if (count > 0) {
+            countSpan.textContent = count;
+            countSpan.classList.add('active');
+            cellElement.classList.add('has-data');
+        } else {
+            countSpan.textContent = "-";
+            countSpan.classList.remove('active');
+            cellElement.classList.remove('has-data');
+        }
+    }
+
+    function updateTotals() {
+        let totalCount = 0;
+        for (const [key, count] of Object.entries(sheets[currentMaterial])) {
+            totalCount += count;
+        }
+        document.getElementById('total-count').innerText = totalCount;
+    }
+
+    // --- PRINT VIEW ---
+    function updatePrintView() {
+        const container = document.getElementById('print-content');
+        const titleEl = document.getElementById('print-material-title');
+        const warnEl = document.getElementById('print-poly-warning');
+        
+        if (currentMaterial === 'poly') {
+            titleEl.innerText = "POLYCARB";
+            warnEl.style.display = "block";
+        } else {
+            titleEl.innerText = "PLASTIC (CR-39)";
+            warnEl.style.display = "none";
+        }
+
+        let html = '';
+        const makeTallies = (num) => "|".repeat(num);
+
+        const renderRow = (s, c, isFirstInGroup, labelOverride = null) => {
+            const key = getKey(s, c);
+            const count = sheets[currentMaterial][key] || 0;
+            
+            let label = labelOverride ? labelOverride : `${formatOpticalShort(s)} ${formatOpticalShort(c)}`;
+            const groupClass = isFirstInGroup ? 'new-group' : '';
+            const valClass = count > 0 ? 'has-count' : '';
+            const valDisplay = count > 0 ? makeTallies(count) : '';
+            return `<div class="print-item ${groupClass}"><span class="print-label">${label}</span><span class="print-value ${valClass}">${valDisplay}</span></div>`;
+        };
+
+        // Render Blocks
+        let firstSph = true;
+        for (let s = CONFIG.sphMin; s <= CONFIG.sphMax; s += CONFIG.step) {
+             html += renderRow(s, 0, firstSph, `${formatOpticalShort(s)} SPH`);
+             firstSph = false;
+        }
+        for (let c = -0.25; c >= CONFIG.cylMin; c -= CONFIG.step) {
+            let firstInGroup = true;
+            for (let s = 0; s >= CONFIG.sphMin; s -= CONFIG.step) {
+                 html += renderRow(s, c, firstInGroup);
+                 firstInGroup = false;
+            }
+        }
+        for (let c = -0.25; c >= CONFIG.cylMin; c -= CONFIG.step) {
+            let firstInGroup = true;
+            for (let s = 0.25; s <= CONFIG.sphMax; s += CONFIG.step) {
+                 html += renderRow(s, c, firstInGroup);
+                 firstInGroup = false;
+            }
+        }
+        container.innerHTML = html;
+    }
+
+    // --- INPUT / SCANNER ---
+    document.getElementById('quick-add').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            handleInput(this.value.trim());
+            this.value = '';
+            setTimeout(() => document.getElementById('quick-add').focus(), 10);
+        }
+    });
+
+    function handleInput(val) {
+        if (!val) return;
+        if (barcodeDb[val]) { parseInput(barcodeDb[val]); playBeep(); return; }
+        if (val.includes(' ') || val.toUpperCase().includes('SPH') || val.toUpperCase().includes('PL')) { parseInput(val); return; }
+        if (/^\d+$/.test(val)) {
+            let mapVal = prompt(`New Barcode: ${val}\nMap to what lens? (e.g. -200 -125)`);
+            if (mapVal && parseInput(mapVal)) {
+                barcodeDb[val] = mapVal;
+                localStorage.setItem('palOpticalBarcodes', JSON.stringify(barcodeDb));
+            }
+            setTimeout(() => document.getElementById('quick-add').focus(), 10);
+        }
+    }
+
+    function parseInput(str) {
+        let parts = str.match(/([+-]?\d*\.?\d+|PL|SPHERE|SPH)/gi);
+        if (!parts || parts.length < 1) return false;
+        let p1 = parts[0]; 
+        let p2 = parts[1] || "SPHERE"; 
+
+        const cleanNum = (val) => {
+            if (typeof val === 'string' && (val.toUpperCase() === 'PL' || val.toUpperCase().includes('SPH'))) return 0;
+            let n = parseFloat(val);
+            if (Math.abs(n) >= 10) return n / 100;
+            return n;
+        };
+
+        const round25 = (num) => (Math.round(num * 4) / 4);
+        let sph = round25(cleanNum(p1));
+        let cyl = round25(cleanNum(p2));
+        let key = getKey(sph, cyl);
+
+        if (sph > CONFIG.sphMax || sph < CONFIG.sphMin || cyl > CONFIG.cylMax || cyl < CONFIG.cylMin) {
+            alert(`Out of bounds: ${key}`);
+            return false;
+        }
+
+        if (!sheets[currentMaterial][key]) sheets[currentMaterial][key] = 0;
+        sheets[currentMaterial][key]++;
+        
+        const countSpan = document.getElementById(`count-${key.replace(/\s/g, '_')}`);
+        if (countSpan) {
+            refreshCell(key, countSpan.parentElement);
+        }
+        
+        updateTotals();
+        updatePrintView();
+        return true;
+    }
+
+    function exportCSV() {
+        let data = sheets[currentMaterial];
+        if (Object.keys(data).length === 0) { alert("Current sheet empty."); return; }
+        let csvContent = `data:text/csv;charset=utf-8,Material,Sphere,Cylinder,Quantity\n`;
+        for (const [key, count] of Object.entries(data)) {
+            let [sph, cyl] = key.split(" ");
+            csvContent += `${currentMaterial.toUpperCase()},${sph},${cyl},${count}\n`;
+        }
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `pal_optical_${currentMaterial}_tally.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    function resetGrid() {
+        if(confirm(`Delete all counts for ${currentMaterial.toUpperCase()}? (Other material is safe)`)) {
+            sheets[currentMaterial] = {};
+            initGrid();
+        }
+    }
+    
+    // SCANNER CAMERA (Optional)
+    let cameraScanner = null;
+    function toggleCamera() {
+        if (cameraScanner) {
+            cameraScanner.clear(); cameraScanner = null; document.getElementById('reader').style.display = 'none';
+        } else {
+            document.getElementById('reader').style.display = 'block';
+            cameraScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+            cameraScanner.render((code) => handleInput(code));
+        }
+    }
+
+    window.onload = initGrid;
+
+</script>
+</body>
+</html>

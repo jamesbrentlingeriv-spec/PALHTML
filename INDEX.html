@@ -1,0 +1,232 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pal Optical Master App</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --card-bg: #f8f9fa;
+            --border-color: #cccccc;
+            --link-bg: #000000;
+            --link-color: #ffffff;
+            --shadow: rgba(0,0,0,0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --card-bg: #333333;
+            --border-color: #666666;
+            --link-bg: #ffffff;
+            --link-color: #000000;
+            --shadow: rgba(255,255,255,0.1);
+        }
+
+        /* Theme Toggle */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px var(--shadow);
+            border: 2px solid var(--border-color);
+            position: relative;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        h1 {
+            color: var(--text-color);
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .app-card {
+            background: var(--bg-color);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid var(--border-color);
+        }
+
+        .app-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .app-card h3 {
+            color: var(--text-color);
+            margin-bottom: 10px;
+        }
+
+        .app-card p {
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            color: var(--text-color);
+        }
+
+        .app-link {
+            display: inline-block;
+            background-color: var(--link-bg);
+            color: var(--link-color);
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        .app-link:hover {
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.8em;
+            color: var(--text-color);
+        }
+    </style>
+    <script>
+        window.onload = () => {
+            const themeToggle = document.getElementById('theme-toggle');
+            const currentTheme = localStorage.getItem('theme') || 'light';
+            if (currentTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeToggle.checked = true;
+            }
+            themeToggle.addEventListener('change', () => {
+                if (themeToggle.checked) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <label class="switch theme-toggle">
+            <input type="checkbox" id="theme-toggle">
+            <span class="slider"></span>
+        </label>
+        <h1>Pal Optical Master Application</h1>
+        <p style="text-align: center; margin-bottom: 30px;">Welcome to the Pal Optical suite of tools. Select an application below to get started.</p>
+
+        <div class="app-grid">
+            <div class="app-card">
+                <h3>P.O.S.T. Write-Ups</h3>
+                <p>The new way to do write-ups for Pal Optical</p>
+                <a href="WRITEUP.html" class="app-link">Open App</a>           
+            </div>
+            <div class="app-card">
+                <h3>Contact Lens Orders</h3>
+                <p>Manage and track contact lens orders for patients.</p>
+                <a href="contact.html" class="app-link">Open App</a>
+            </div>
+
+            <div class="app-card"> 
+                <h3>Detailed Receipt</h3>
+                <p>Generate detailed itemized receipts for services.</p>
+                <a href="PAL OPTICAL RECEIPT.HTML" class="app-link">Open App</a>
+            </div>
+
+            <div class="app-card">
+                <h3>Lab FSV Order Sheet</h3>
+                <p>The labs sheet to order Vision Ease FSV lenses.</p>
+                <a href="LABLENS.HTML" class="app-link">Open App</a>
+            </div>
+
+            <div class="app-card">
+                <h3>Lens Availability</h3>
+                <p>RX Ranges for the Progessives and Multifocals we carry.</p>
+                <a href="lensavail.html" class="app-link">Open App</a>
+            </div>
+
+            <div class="app-card">
+                <h3>Quote Tool</h3>
+                <p>Generate quotes for lenses and frames. Use this if patient is unsure about purchasing.</p>
+                <a href="PALQUOTE (1).HTML" class="app-link">Open App</a>
+            </div>
+
+            <div class="app-card">
+                <h3>Frame Inventory</h3>
+                <p>A frame inventory manager.</p>
+                <a href="TracyFrameInventory.html" class="app-link">Open App</a>
+            </div>
+            <div class="app-card">
+                <h3>DR Itemized Receipt</h3>
+                <p>Detailed receipt for doctor services.</p>
+                <a href="DRITEMIZEDRECPT.HTML" class="app-link">Open App</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            Pal Optical Master App - James Brentlinger™
+        </div>
+    </div>
+</body>
+</html>

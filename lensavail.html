@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pal Optical - Advanced Lens Master</title>
+    <style>
+        :root {
+            --primary-blue: #2a52be;
+            --accent-green: #28a745;
+            --soft-gray: #f4f7f6;
+            --dark-text: #333;
+            --border-color: #ddd;
+            --highlight: #fffdf0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-text);
+            background-color: var(--soft-gray);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1350px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 3px solid var(--primary-blue);
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+        }
+
+        .material-nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #eef2f3;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .btn-save { background-color: var(--primary-blue); color: white; }
+        .btn-export { background-color: var(--accent-green); color: white; }
+        .btn-import { background-color: #6f42c1; color: white; }
+        .btn-mat { background-color: white; border: 1px solid var(--primary-blue); color: var(--primary-blue); }
+        .btn-mat.active { background-color: var(--primary-blue); color: white; }
+        
+        .lens-section { margin-bottom: 60px; }
+        .section-header { 
+            background: var(--primary-blue); 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            text-align: left;
+        }
+
+        th { background-color: #e9ecef; text-transform: uppercase; font-size: 0.75rem; }
+
+        td[contenteditable="true"] {
+            background-color: var(--highlight);
+            outline: none;
+        }
+
+        .hidden { display: none; }
+
+        #import-input { display: none; }
+
+        @media print {
+            .controls, .material-nav, .no-print, button { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Master Multi-Focal Catalog</h1>
+        <p>Pal Optical | Lexington, KY Professional Database</p>
+    </header>
+
+    <div class="controls no-print">
+        <button class="btn-save" onclick="saveToLocal()">💾 Save Progress</button>
+        <button class="btn-export" onclick="exportData()">📤 Export JSON</button>
+        <button class="btn-import" onclick="document.getElementById('import-input').click()">📥 Import JSON</button>
+        <input type="file" id="import-input" accept=".json" onchange="importData(event)">
+        <span id="status-msg" style="margin-left:10px; font-style:italic; color:var(--primary-blue); line-height: 3;"></span>
+    </div>
+
+    <div class="material-nav no-print">
+        <strong>Global Material Filter:</strong>
+        <button class="btn-mat active" onclick="filterAll('All', this)">All Materials</button>
+        <button class="btn-mat" onclick="filterAll('Plastic', this)">Plastic</button>
+        <button class="btn-mat" onclick="filterAll('Polycarbonate', this)">Polycarbonate</button>
+        <button class="btn-mat" onclick="filterAll('Mid Index', this)">Mid Index</button>
+        <button class="btn-mat" onclick="filterAll('High Index', this)">High Index</button>
+        <button class="btn-mat" onclick="filterAll('Glass', this)">Glass</button>
+    </div>
+
+    <section class="lens-section">
+        <div class="section-header">
+            <h2>Progressives</h2>
+            <button class="no-print" style="font-size: 0.7rem; padding: 5px;" onclick="addRow('table-pal')">+ Add Progressive</button>
+        </div>
+        <table id="table-pal">
+            <thead>
+                <tr>
+                    <th>Brand / Design</th>
+                    <th>Material</th>
+                    <th>Sph Range</th>
+                    <th>Cyl Range</th>
+                    <th>Add Range</th>
+                    <th>Min Fit Height</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-mat="Polycarbonate"><td contenteditable="true">Varilux® X Series™</td><td>Polycarbonate</td><td contenteditable="true">-10.00 to +6.00</td><td contenteditable="true">to -6.00</td><td contenteditable="true">0.75 to 3.50</td><td contenteditable="true">14mm / 17mm</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section class="lens-section">
+        <div class="section-header">
+            <h2>Multifocals (Bifocal/Trifocal/Task)</h2>
+            <button class="no-print" style="font-size: 0.7rem; padding: 5px;" onclick="addRow('table-multi')">+ Add Multifocal</button>
+        </div>
+        <table id="table-multi">
+            <thead>
+                <tr>
+                    <th>Brand / Design</th>
+                    <th>Type</th>
+                    <th>Material</th>
+                    <th>Sph Range</th>
+                    <th>Cyl Range</th>
+                    <th>Add Range</th>
+                    <th>Seg Size/Notes</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-mat="Polycarbonate"><td contenteditable="true">KBco Xperio 7x28</td><td contenteditable="true">Trifocal</td><td>Polycarbonate</td><td contenteditable="true">-8.00 to +4.00</td><td contenteditable="true">to -4.00</td><td contenteditable="true">1.50 to 3.50</td><td contenteditable="true">Polarized Poly</td></tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+
+<script>
+    function filterAll(material, btn) {
+        document.querySelectorAll('.btn-mat').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const allRows = document.querySelectorAll('tbody tr');
+        allRows.forEach(row => {
+            if (material === 'All' || row.getAttribute('data-mat') === material) {
+                row.classList.remove('hidden');
+            } else {
+                row.classList.add('hidden');
+            }
+        });
+    }
+
+    function addRow(tableId) {
+        const tableBody = document.getElementById(tableId).getElementsByTagName('tbody')[0];
+        const newRow = tableBody.insertRow();
+        const activeMatBtn = document.querySelector('.btn-mat.active').innerText.split(' ')[0];
+        const finalMat = activeMatBtn === 'All' ? 'Plastic' : activeMatBtn;
+        
+        newRow.setAttribute('data-mat', finalMat);
+        const colCount = document.getElementById(tableId).rows[0].cells.length;
+        const matIndex = (tableId === 'table-pal') ? 1 : 2;
+
+        for(let i=0; i<colCount; i++) {
+            const cell = newRow.insertCell(i);
+            if (i === matIndex) {
+                cell.innerText = finalMat;
+                cell.contentEditable = "false";
+            } else {
+                cell.contentEditable = "true";
+            }
+        }
+    }
+
+    function saveToLocal() {
+        const tables = ['table-pal', 'table-multi'];
+        const data = {};
+        tables.forEach(id => {
+            const rows = document.getElementById(id).querySelectorAll('tbody tr');
+            data[id] = Array.from(rows).map(row => ({
+                content: Array.from(row.cells).map(cell => cell.innerText),
+                mat: row.getAttribute('data-mat') || ''
+            }));
+        });
+        localStorage.setItem('palOptical_Global_V5', JSON.stringify(data));
+        showStatus("Database Saved! 🔒");
+    }
+
+    function importData(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                renderTables(data);
+                localStorage.setItem('palOptical_Global_V5', JSON.stringify(data));
+                showStatus("JSON Imported Successfully! ✅");
+            } catch (err) {
+                alert("Error reading JSON file. Make sure it's the correct format.");
+            }
+        };
+        reader.readAsText(file);
+    }
+
+    function renderTables(data) {
+        Object.keys(data).forEach(id => {
+            const tableBody = document.getElementById(id).querySelector('tbody');
+            if(!tableBody) return;
+            tableBody.innerHTML = "";
+            data[id].forEach(rowObj => {
+                const row = tableBody.insertRow();
+                if (rowObj.mat) row.setAttribute('data-mat', rowObj.mat);
+                rowObj.content.forEach((text, index) => {
+                    const cell = row.insertCell();
+                    const matIndex = (id === 'table-pal') ? 1 : 2;
+                    cell.contentEditable = (index === matIndex) ? "false" : "true";
+                    cell.innerText = text;
+                });
+            });
+        });
+    }
+
+    function loadFromLocal() {
+        const savedData = localStorage.getItem('palOptical_Global_V5');
+        if (savedData) renderTables(JSON.parse(savedData));
+    }
+
+    function exportData() {
+        const data = localStorage.getItem('palOptical_Global_V5');
+        if (!data) return alert("Save progress first!");
+        const blob = new Blob([data], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Pal_Optical_Lens_Database.json';
+        a.click();
+    }
+
+    function showStatus(msg) {
+        const status = document.getElementById('status-msg');
+        status.innerText = msg;
+        setTimeout(() => status.innerText = "", 3000);
+    }
+
+    window.onload = loadFromLocal;
+</script>
+
+</body>
+</html>
