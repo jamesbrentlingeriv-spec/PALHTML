@@ -1834,6 +1834,176 @@
         let isAllowancePlan = false;
         let globalAllowance = 0;
         let jobType = "Both"; // "Frame Only", "Lens Only", "Both"
+        const AUTO_OVERSIZE_KEY = "oversize";
+        const AUTO_SPH_4_KEY = "sph_over_4";
+        const AUTO_SPH_8_KEY = "sph_over_8";
+        const AUTO_ADD_3_KEY = "add_over_3";
+        const AUTO_ADD_4_KEY = "add_over_4";
+        const AUTO_OVERSIZE_NAME = "Eyesize over 58mm";
+        const AUTO_SPH_4_NAME = "SV over +/-4.00 SPH";
+        const AUTO_SPH_8_NAME = "SV over +/-8.00 SPH";
+        const AUTO_ADD_3_NAME = "Bifocal Add over +3.00";
+        const AUTO_ADD_4_NAME = "Bifocal Add over +4.00";
+        const AUTO_OVERSIZE_PRICE = 20.0;
+        const AUTO_SPH_4_PRICE = 10.0;
+        const AUTO_SPH_8_PRICE = 20.0;
+        const AUTO_ADD_3_PRICE = 15.0;
+        const AUTO_ADD_4_PRICE = 30.0;
+
+        function parseRxNumber(rawValue) {
+            if (rawValue === null || rawValue === undefined) return NaN;
+            const cleaned = String(rawValue).trim().replace(/[^0-9+.\-]/g, "");
+            return parseFloat(cleaned);
+        }
+
+        function getMiscRow(rowId) {
+            return document.querySelector(`tr[data-row="${rowId}"]`);
+        }
+
+        function clearAutoCharge(chargeKey) {
+            for (const rowId of ["m1", "m2", "m3"]) {
+                const row = getMiscRow(rowId);
+                if (!row) continue;
+                if (row.dataset.autoCharge !== chargeKey) continue;
+
+                const descInput = row.querySelector(".m-desc");
+                const retInput = row.querySelector(".ret");
+                const taxCell = row.querySelector(".tax");
+                const oweCell = row.querySelector(".owe");
+
+                if (descInput) descInput.value = "";
+                if (retInput) retInput.value = "";
+                if (taxCell) taxCell.textContent = "0.00";
+                if (oweCell) oweCell.textContent = "0.00";
+                delete row.dataset.autoCharge;
+            }
+        }
+
+        function getOrAssignAutoChargeRow(chargeKey, preferredRowId = null) {
+            for (const rowId of ["m1", "m2", "m3"]) {
+                const row = getMiscRow(rowId);
+                if (row && row.dataset.autoCharge === chargeKey) return row;
+            }
+
+            if (preferredRowId) {
+                const preferredRow = getMiscRow(preferredRowId);
+                if (preferredRow) return preferredRow;
+            }
+
+            for (const rowId of ["m1", "m2", "m3"]) {
+                const row = getMiscRow(rowId);
+                if (!row) continue;
+                const descInput = row.querySelector(".m-desc");
+                if (descInput && descInput.value.trim() === "") return row;
+            }
+            return null;
+        }
+
+        function setAutoChargeInRow(row, chargeKey, itemName, itemPrice) {
+            if (!row) return;
+            const descInput = row.querySelector(".m-desc");
+            const retInput = row.querySelector(".ret");
+            const taxCell = row.querySelector(".tax");
+            const oweCell = row.querySelector(".owe");
+
+            if (descInput) descInput.value = itemName;
+            if (retInput) {
+                if (
+                    currentInsurance === "MEDICAID" ||
+                    currentInsurance === "SCHOOL LETTER"
+                ) {
+                    retInput.value = 0;
+                } else {
+                    retInput.value = itemPrice;
+                }
+            }
+
+            const retValue = parseFloat(retInput ? retInput.value : 0) || 0;
+            const taxedValue =
+                currentInsurance === "MEDICAID" || currentInsurance === "SCHOOL LETTER"
+                    ? 0
+                    : retValue * 1.06;
+
+            if (taxCell) taxCell.textContent = taxedValue.toFixed(2);
+            if (oweCell) oweCell.textContent = taxedValue.toFixed(2);
+            row.dataset.autoCharge = chargeKey;
+        }
+
+        function syncAutoMiscCharges() {
+            const eyeSize = parseFloat(document.getElementById("in-frame-a").value) || 0;
+            const odSph = parseRxNumber(document.getElementById("rx-od-sph").value);
+            const osSph = parseRxNumber(document.getElementById("rx-os-sph").value);
+            const odAdd = parseRxNumber(document.getElementById("rx-od-add").value);
+            const osAdd = parseRxNumber(document.getElementById("rx-os-add").value);
+
+            const needsOversize = eyeSize >= 58;
+            const maxAbsSph = Math.max(Math.abs(odSph || 0), Math.abs(osSph || 0));
+            const maxAdd = Math.max(odAdd || 0, osAdd || 0);
+            const needsSphOver8 = maxAbsSph >= 8;
+            const needsSphOver4 = maxAbsSph >= 4 && !needsSphOver8;
+            const needsAddOver4 = maxAdd >= 4;
+            const needsAddOver3 = maxAdd >= 3 && !needsAddOver4;
+
+            if (needsOversize) {
+                const oversizeRow = getOrAssignAutoChargeRow(AUTO_OVERSIZE_KEY, "m1");
+                setAutoChargeInRow(
+                    oversizeRow,
+                    AUTO_OVERSIZE_KEY,
+                    AUTO_OVERSIZE_NAME,
+                    AUTO_OVERSIZE_PRICE,
+                );
+            } else {
+                clearAutoCharge(AUTO_OVERSIZE_KEY);
+            }
+
+            if (needsSphOver8) {
+                const sph8Row = getOrAssignAutoChargeRow(AUTO_SPH_8_KEY);
+                setAutoChargeInRow(
+                    sph8Row,
+                    AUTO_SPH_8_KEY,
+                    AUTO_SPH_8_NAME,
+                    AUTO_SPH_8_PRICE,
+                );
+            } else {
+                clearAutoCharge(AUTO_SPH_8_KEY);
+            }
+
+            if (needsSphOver4) {
+                const sph4Row = getOrAssignAutoChargeRow(AUTO_SPH_4_KEY);
+                setAutoChargeInRow(
+                    sph4Row,
+                    AUTO_SPH_4_KEY,
+                    AUTO_SPH_4_NAME,
+                    AUTO_SPH_4_PRICE,
+                );
+            } else {
+                clearAutoCharge(AUTO_SPH_4_KEY);
+            }
+
+            if (needsAddOver4) {
+                const add4Row = getOrAssignAutoChargeRow(AUTO_ADD_4_KEY);
+                setAutoChargeInRow(
+                    add4Row,
+                    AUTO_ADD_4_KEY,
+                    AUTO_ADD_4_NAME,
+                    AUTO_ADD_4_PRICE,
+                );
+            } else {
+                clearAutoCharge(AUTO_ADD_4_KEY);
+            }
+
+            if (needsAddOver3) {
+                const add3Row = getOrAssignAutoChargeRow(AUTO_ADD_3_KEY);
+                setAutoChargeInRow(
+                    add3Row,
+                    AUTO_ADD_3_KEY,
+                    AUTO_ADD_3_NAME,
+                    AUTO_ADD_3_PRICE,
+                );
+            } else {
+                clearAutoCharge(AUTO_ADD_3_KEY);
+            }
+        }
         let allowSegHeightModal = true;
         let programmaticChange = false; // Flag to prevent prompt loop
 
@@ -2566,6 +2736,7 @@
         }
 
         function updateSlip() {
+            syncAutoMiscCharges();
             const temp = document.getElementById("jobSlipTemplate").innerHTML;
             const slots = document.querySelectorAll(".slip-content");
 
@@ -3000,3 +3171,4 @@
 
 
 </html>
+
