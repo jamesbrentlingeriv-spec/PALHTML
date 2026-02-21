@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
 
 <head>
@@ -577,6 +577,12 @@
         <button id="printBtn" class="action-btn" onclick="printJob()">
             PRINT ALL DOCUMENTS & SYNC
         </button>
+        <button class="action-btn" style="background: #34495e; margin-top: 8px" onclick="chooseExportFolder()">
+            SET AUTO-SAVE FOLDER
+        </button>
+        <div id="export-folder-status" style="font-size: 0.75em; margin-top: 6px; color: var(--secondary-text);">
+            Auto-save folder: Not set
+        </div>
         <div id="validationMessage" class="validation-message"></div>
 
         <div class="input-row" style="
@@ -1839,21 +1845,129 @@
         const AUTO_SPH_8_KEY = "sph_over_8";
         const AUTO_ADD_3_KEY = "add_over_3";
         const AUTO_ADD_4_KEY = "add_over_4";
+        const AUTO_PRISM_KEY = "prism";
         const AUTO_OVERSIZE_NAME = "Eyesize over 58mm";
         const AUTO_SPH_4_NAME = "SV over +/-4.00 SPH";
         const AUTO_SPH_8_NAME = "SV over +/-8.00 SPH";
         const AUTO_ADD_3_NAME = "Bifocal Add over +3.00";
         const AUTO_ADD_4_NAME = "Bifocal Add over +4.00";
+        const AUTO_PRISM_NAME = "Prism";
         const AUTO_OVERSIZE_PRICE = 20.0;
         const AUTO_SPH_4_PRICE = 10.0;
         const AUTO_SPH_8_PRICE = 20.0;
         const AUTO_ADD_3_PRICE = 15.0;
         const AUTO_ADD_4_PRICE = 30.0;
+        const AUTO_PRISM_PRICE = 10.0;
+        let exportDirectoryHandle = null;
 
         function parseRxNumber(rawValue) {
             if (rawValue === null || rawValue === undefined) return NaN;
             const cleaned = String(rawValue).trim().replace(/[^0-9+.\-]/g, "");
             return parseFloat(cleaned);
+        }
+
+        function hasPrismValue(rawValue) {
+            const text = String(rawValue || "").trim();
+            if (!text) return false;
+            const numericPart = parseRxNumber(text);
+            if (!Number.isNaN(numericPart)) return Math.abs(numericPart) > 0;
+            return true;
+        }
+
+        function sanitizeFilePart(rawValue) {
+            return String(rawValue || "UNKNOWN")
+                .replace(/[<>:"/\\|?*\x00-\x1F]/g, "")
+                .replace(/\s+/g, "_")
+                .slice(0, 40) || "UNKNOWN";
+        }
+
+        function formatTimestampForFile(dateObj) {
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth() + 1).padStart(2, "0");
+            const d = String(dateObj.getDate()).padStart(2, "0");
+            const hh = String(dateObj.getHours()).padStart(2, "0");
+            const mm = String(dateObj.getMinutes()).padStart(2, "0");
+            const ss = String(dateObj.getSeconds()).padStart(2, "0");
+            return `${y}${m}${d}-${hh}${mm}${ss}`;
+        }
+
+        function updateExportFolderStatus() {
+            const status = document.getElementById("export-folder-status");
+            if (!status) return;
+            if (exportDirectoryHandle && exportDirectoryHandle.name) {
+                status.textContent = `Auto-save folder: ${exportDirectoryHandle.name}`;
+            } else {
+                status.textContent = "Auto-save folder: Not set";
+            }
+        }
+
+        async function ensureWritePermission(handle) {
+            const options = { mode: "readwrite" };
+            if ((await handle.queryPermission(options)) === "granted") return true;
+            if ((await handle.requestPermission(options)) === "granted") return true;
+            return false;
+        }
+
+        async function chooseExportFolder() {
+            if (!window.showDirectoryPicker) {
+                alert("Folder auto-save is not supported in this browser.");
+                return false;
+            }
+
+            try {
+                const picked = await window.showDirectoryPicker({ mode: "readwrite" });
+                const hasPermission = await ensureWritePermission(picked);
+                if (!hasPermission) {
+                    alert("Folder access was denied.");
+                    return false;
+                }
+                exportDirectoryHandle = picked;
+                updateExportFolderStatus();
+                return true;
+            } catch (err) {
+                if (err && err.name !== "AbortError") {
+                    alert("Could not set auto-save folder: " + err.message);
+                }
+                return false;
+            }
+        }
+
+        async function savePrintedCopy(currentNum, patientName) {
+            if (!exportDirectoryHandle) return null;
+            const hasPermission = await ensureWritePermission(exportDirectoryHandle);
+            if (!hasPermission) {
+                throw new Error("No write permission to selected folder.");
+            }
+
+            const printablePage = document.querySelector(".printable-page");
+            if (!printablePage) throw new Error("Printable content not found.");
+
+            const styles = Array.from(document.querySelectorAll("style"))
+                .map((el) => el.outerHTML)
+                .join("\n");
+            const now = new Date();
+            const stamp = formatTimestampForFile(now);
+            const safePatient = sanitizeFilePart(patientName || "No Name");
+            const fileName = `WRITEUP_${currentNum}_${safePatient}_${stamp}.html`;
+            const htmlSnapshot = `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Write-Up ${currentNum}</title>
+${styles}
+</head>
+<body>
+${printablePage.outerHTML}
+</body>
+</html>`;
+
+            const fileHandle = await exportDirectoryHandle.getFileHandle(fileName, {
+                create: true,
+            });
+            const writable = await fileHandle.createWritable();
+            await writable.write(htmlSnapshot);
+            await writable.close();
+            return fileName;
         }
 
         function getMiscRow(rowId) {
@@ -1935,6 +2049,8 @@
             const osSph = parseRxNumber(document.getElementById("rx-os-sph").value);
             const odAdd = parseRxNumber(document.getElementById("rx-od-add").value);
             const osAdd = parseRxNumber(document.getElementById("rx-os-add").value);
+            const odPrismRaw = document.getElementById("rx-od-prism").value;
+            const osPrismRaw = document.getElementById("rx-os-prism").value;
 
             const needsOversize = eyeSize >= 58;
             const maxAbsSph = Math.max(Math.abs(odSph || 0), Math.abs(osSph || 0));
@@ -1943,6 +2059,7 @@
             const needsSphOver4 = maxAbsSph >= 4 && !needsSphOver8;
             const needsAddOver4 = maxAdd >= 4;
             const needsAddOver3 = maxAdd >= 3 && !needsAddOver4;
+            const needsPrism = hasPrismValue(odPrismRaw) || hasPrismValue(osPrismRaw);
 
             if (needsOversize) {
                 const oversizeRow = getOrAssignAutoChargeRow(AUTO_OVERSIZE_KEY, "m1");
@@ -2003,6 +2120,18 @@
             } else {
                 clearAutoCharge(AUTO_ADD_3_KEY);
             }
+
+            if (needsPrism) {
+                const prismRow = getOrAssignAutoChargeRow(AUTO_PRISM_KEY);
+                setAutoChargeInRow(
+                    prismRow,
+                    AUTO_PRISM_KEY,
+                    AUTO_PRISM_NAME,
+                    AUTO_PRISM_PRICE,
+                );
+            } else {
+                clearAutoCharge(AUTO_PRISM_KEY);
+            }
         }
         let allowSegHeightModal = true;
         let programmaticChange = false; // Flag to prevent prompt loop
@@ -2019,6 +2148,7 @@
         window.onload = () => {
             resize();
             renderItems();
+            updateExportFolderStatus();
 
             // Theme toggle functionality
             const themeToggle = document.getElementById("theme-toggle");
@@ -2667,7 +2797,7 @@
             updateSlip();
         }
 
-        function printJob() {
+        async function printJob() {
             document.getElementById("out-sig-image").src = canvas.toDataURL();
             let currentNum = parseInt(document.getElementById("in-job-num").value);
             let nextNum = currentNum + 1;
@@ -2724,15 +2854,31 @@
                 },
                 timestamp: firebase.database.ServerValue.TIMESTAMP,
             };
+
+            if (!exportDirectoryHandle) {
+                const wantsFolder = confirm(
+                    "Select an auto-save folder now? A copy of each submitted write-up will be saved there.",
+                );
+                if (wantsFolder) {
+                    await chooseExportFolder();
+                }
+            }
+
+            if (exportDirectoryHandle) {
+                try {
+                    await savePrintedCopy(currentNum, snapshot.patient);
+                } catch (error) {
+                    alert("Auto-save failed: " + error.message);
+                }
+            }
+
             historyRef.push(snapshot);
-            jobNumRef
-                .set(nextNum)
-                .then(() => {
-                    window.print();
-                })
-                .catch((error) => {
-                    alert("Sync Failed! " + error.message);
-                });
+            try {
+                await jobNumRef.set(nextNum);
+                window.print();
+            } catch (error) {
+                alert("Sync Failed! " + error.message);
+            }
         }
 
         function updateSlip() {
