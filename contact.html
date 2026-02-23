@@ -218,14 +218,11 @@
             opacity: 0;
             pointer-events: none;
         }
-
-        
-            background: #000;
     </style>
 </head>
 <body>
     <div id='page-loader-overlay'>
-        <img src='contact.gif' alt='Loading'>
+        <img src='assets/loaders/contact.gif' alt='Loading'>
     </div>
 
 
@@ -245,7 +242,7 @@
             </div>
             <div class="input-group">
                 <label>Supply Size</label>
-                <select id="supplyType" onchange="toggleBoxField()">
+                <select id="supplyType">
                     <option value="Annual Supply">Annual Supply</option>
                     <option value="6-Month Supply">6-Month Supply</option>
                     <option value="Custom Box Count">Custom Box Count</option>
@@ -260,7 +257,7 @@
                 <label for="isPerEye">Per Eye? (Else: Total)</label>
             </div>
             <div class="input-group checkbox-group">
-                <input type="checkbox" id="usingIns" onchange="toggleInsuranceField()">
+                <input type="checkbox" id="usingIns">
                 <label for="usingIns">Using Insurance?</label>
             </div>
             <div class="input-group" id="insuranceNameGroup">
@@ -283,7 +280,7 @@
                 <textarea id="ptNotes" placeholder="Any special instructions?"></textarea>
             </div>
         </div>
-        <button onclick="addPatient()">Add to Order List âœ¨</button>
+        <button id="add-patient-btn">Add to Order List âœ¨</button>
     </div>
 
     <div class="section" style="background-color: #e1f5fe;">
@@ -305,9 +302,9 @@
                 <tbody></tbody>
             </table>
         </div>
-        <button class="export-btn" onclick="exportToExcel()">Export Alphabetized List to Excel ðŸ’¾</button>
-        <button class="export-btn" style="background-color: #90caf9;" onclick="window.print()">Print List ðŸ–¨ï¸</button>
-        <button class="export-btn reset-btn" onclick="resetFullList()">Reset Full List (Clear Browser Memory) ðŸ—‘ï¸</button>
+        <button class="export-btn" id="export-excel-btn">Export Alphabetized List to Excel ðŸ’¾</button>
+        <button class="export-btn" style="background-color: #90caf9;" id="print-list-btn">Print List ðŸ–¨ï¸</button>
+        <button class="export-btn reset-btn" id="reset-list-btn">Reset Full List (Clear Browser Memory) ðŸ—‘ï¸</button>
     </div>
 
     <div class="footer-trademark">
@@ -319,13 +316,16 @@
     let patients = [];
 
     // âœ¨ LOAD DATA FROM BROWSER STORAGE ON START âœ¨
-    window.onload = function() {
+    document.addEventListener('DOMContentLoaded', () => {
         const savedData = localStorage.getItem('palOpticalOrders');
         if (savedData) {
             patients = JSON.parse(savedData);
             renderTable();
         }
-    };
+        setupEventHandlers();
+        toggleInsuranceField();
+        toggleBoxField();
+    });
 
     function saveData() {
         localStorage.setItem('palOpticalOrders', JSON.stringify(patients));
@@ -415,9 +415,25 @@
                     <td>${payDisplay}</td>
                     <td class="notes-text">${pt.notes || '-'}</td>
                     <td>${pt.dateAdded}</td>
-                    <td><button style="background-color:#ff6961; padding:5px 10px;" onclick="removePatient(${pt.id})">X</button></td>
+                    <td><button class="remove-patient-btn" data-patient-id="${pt.id}" style="background-color:#ff6961; padding:5px 10px;" type="button">X</button></td>
                 </tr>
             `;
+        });
+    }
+
+    function setupEventHandlers() {
+        document.getElementById('supplyType').addEventListener('change', toggleBoxField);
+        document.getElementById('usingIns').addEventListener('change', toggleInsuranceField);
+        document.getElementById('add-patient-btn').addEventListener('click', addPatient);
+        document.getElementById('export-excel-btn').addEventListener('click', exportToExcel);
+        document.getElementById('print-list-btn').addEventListener('click', () => window.print());
+        document.getElementById('reset-list-btn').addEventListener('click', resetFullList);
+        document.querySelector('#pendingTable tbody').addEventListener('click', (event) => {
+            const removeBtn = event.target.closest('.remove-patient-btn');
+            if (!removeBtn) {
+                return;
+            }
+            removePatient(Number(removeBtn.dataset.patientId));
         });
     }
 

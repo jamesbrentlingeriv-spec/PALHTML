@@ -133,14 +133,11 @@
             opacity: 0;
             pointer-events: none;
         }
-
-        
-            background: #000;
     </style>
 </head>
 <body>
     <div id='page-loader-overlay'>
-        <img src='lens-availability.gif' alt='Loading'>
+        <img src='assets/loaders/lens-availability.gif' alt='Loading'>
     </div>
 
 
@@ -151,27 +148,27 @@
     </header>
 
     <div class="controls no-print">
-        <button class="btn-save" onclick="saveToLocal()">ðŸ’¾ Save Progress</button>
-        <button class="btn-export" onclick="exportData()">ðŸ“¤ Export JSON</button>
-        <button class="btn-import" onclick="document.getElementById('import-input').click()">ðŸ“¥ Import JSON</button>
-        <input type="file" id="import-input" accept=".json" onchange="importData(event)">
+        <button class="btn-save" id="save-progress-btn">ðŸ’¾ Save Progress</button>
+        <button class="btn-export" id="export-json-btn">ðŸ“¤ Export JSON</button>
+        <button class="btn-import" id="import-json-btn">ðŸ“¥ Import JSON</button>
+        <input type="file" id="import-input" accept=".json">
         <span id="status-msg" style="margin-left:10px; font-style:italic; color:var(--primary-blue); line-height: 3;"></span>
     </div>
 
     <div class="material-nav no-print">
         <strong>Global Material Filter:</strong>
-        <button class="btn-mat active" onclick="filterAll('All', this)">All Materials</button>
-        <button class="btn-mat" onclick="filterAll('Plastic', this)">Plastic</button>
-        <button class="btn-mat" onclick="filterAll('Polycarbonate', this)">Polycarbonate</button>
-        <button class="btn-mat" onclick="filterAll('Mid Index', this)">Mid Index</button>
-        <button class="btn-mat" onclick="filterAll('High Index', this)">High Index</button>
-        <button class="btn-mat" onclick="filterAll('Glass', this)">Glass</button>
+        <button class="btn-mat active" data-material="All">All Materials</button>
+        <button class="btn-mat" data-material="Plastic">Plastic</button>
+        <button class="btn-mat" data-material="Polycarbonate">Polycarbonate</button>
+        <button class="btn-mat" data-material="Mid Index">Mid Index</button>
+        <button class="btn-mat" data-material="High Index">High Index</button>
+        <button class="btn-mat" data-material="Glass">Glass</button>
     </div>
 
     <section class="lens-section">
         <div class="section-header">
             <h2>Progressives</h2>
-            <button class="no-print" style="font-size: 0.7rem; padding: 5px;" onclick="addRow('table-pal')">+ Add Progressive</button>
+            <button class="no-print add-row-btn" data-table-id="table-pal" style="font-size: 0.7rem; padding: 5px;">+ Add Progressive</button>
         </div>
         <table id="table-pal">
             <thead>
@@ -193,7 +190,7 @@
     <section class="lens-section">
         <div class="section-header">
             <h2>Multifocals (Bifocal/Trifocal/Task)</h2>
-            <button class="no-print" style="font-size: 0.7rem; padding: 5px;" onclick="addRow('table-multi')">+ Add Multifocal</button>
+            <button class="no-print add-row-btn" data-table-id="table-multi" style="font-size: 0.7rem; padding: 5px;">+ Add Multifocal</button>
         </div>
         <table id="table-multi">
             <thead>
@@ -320,7 +317,31 @@
         setTimeout(() => status.innerText = "", 3000);
     }
 
-    window.onload = loadFromLocal;
+    function setupEventHandlers() {
+        document.getElementById('save-progress-btn').addEventListener('click', saveToLocal);
+        document.getElementById('export-json-btn').addEventListener('click', exportData);
+        document.getElementById('import-json-btn').addEventListener('click', () => {
+            document.getElementById('import-input').click();
+        });
+        document.getElementById('import-input').addEventListener('change', importData);
+
+        document.querySelector('.material-nav').addEventListener('click', (event) => {
+            const btn = event.target.closest('.btn-mat');
+            if (!btn) {
+                return;
+            }
+            filterAll(btn.dataset.material, btn);
+        });
+
+        document.querySelectorAll('.add-row-btn').forEach((button) => {
+            button.addEventListener('click', () => addRow(button.dataset.tableId));
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        setupEventHandlers();
+        loadFromLocal();
+    });
 </script>
 
 

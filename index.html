@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,7 +21,7 @@
             --border-color: #cccccc;
             --link-bg: #000000;
             --link-color: #ffffff;
-            --shadow: rgba(0,0,0,0.1);
+            --shadow: rgba(0, 0, 0, 0.1);
         }
 
         [data-theme="dark"] {
@@ -30,7 +31,7 @@
             --border-color: #666666;
             --link-bg: #ffffff;
             --link-color: #000000;
-            --shadow: rgba(255,255,255,0.1);
+            --shadow: rgba(255, 255, 255, 0.1);
         }
 
         body {
@@ -67,12 +68,19 @@
             height: 34px;
         }
 
-        .switch input { opacity: 0; width: 0; height: 0; }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
 
         .slider {
             position: absolute;
             cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background-color: #ccc;
             transition: .4s;
             border-radius: 34px;
@@ -81,18 +89,33 @@
         .slider:before {
             position: absolute;
             content: "";
-            height: 26px; width: 26px;
-            left: 4px; bottom: 4px;
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
             background-color: white;
             transition: .4s;
             border-radius: 50%;
         }
 
-        input:checked + .slider { background-color: #2196F3; }
-        input:checked + .slider:before { transform: translateX(26px); }
+        input:checked+.slider {
+            background-color: #2196F3;
+        }
 
-        h1 { text-align: center; margin-bottom: 10px; }
-        .welcome-text { text-align: center; margin-bottom: 30px; opacity: 0.8; }
+        input:checked+.slider:before {
+            transform: translateX(26px);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .welcome-text {
+            text-align: center;
+            margin-bottom: 30px;
+            opacity: 0.8;
+        }
 
         .app-grid {
             display: grid;
@@ -114,8 +137,14 @@
             box-shadow: 0 5px 15px var(--shadow);
         }
 
-        .app-card h3 { margin-bottom: 10px; }
-        .app-card p { font-size: 0.9em; margin-bottom: 15px; }
+        .app-card h3 {
+            margin-bottom: 10px;
+        }
+
+        .app-card p {
+            font-size: 0.9em;
+            margin-bottom: 15px;
+        }
 
         .app-link {
             display: inline-block;
@@ -142,7 +171,7 @@
     </style>
 
     <script>
-        window.onload = () => {
+        document.addEventListener('DOMContentLoaded', () => {
             const themeToggle = document.getElementById('theme-toggle');
             const metaTheme = document.getElementById('meta-theme-color');
             const currentTheme = localStorage.getItem('theme') || 'light';
@@ -173,7 +202,7 @@
                     .then(() => console.log("Pal Optical PWA: Active"))
                     .catch(err => console.log("PWA Registration Failed", err));
             }
-        };
+        });
     </script>
 
     <style>
@@ -192,12 +221,12 @@
             opacity: 0;
             pointer-events: none;
         }
-
     </style>
 </head>
+
 <body>
     <div id='page-loader-overlay'>
-        <img id='page-loader-image' src='./index.gif?v=20260223b' alt='Loading'>
+        <img id='page-loader-image' src='./assets/loaders/index.gif?v=20260223b' alt='Loading'>
     </div>
 
 
@@ -216,7 +245,7 @@
             <div class="app-card">
                 <h3>P.O.S.T. Write-Ups</h3>
                 <p>New digital write-up system for store efficiency.</p>
-                <a href="WRITEUP.html" class="app-link">Open App</a>            
+                <a href="WRITEUP.html" class="app-link">Open App</a>
             </div>
 
             <div class="app-card">
@@ -225,7 +254,7 @@
                 <a href="contact.html" class="app-link">Open App</a>
             </div>
 
-            <div class="app-card"> 
+            <div class="app-card">
                 <h3>Detailed Receipt</h3>
                 <p>Generate itemized receipts for optical services.</p>
                 <a href="PAL OPTICAL RECEIPT.HTML" class="app-link">Open App</a>
@@ -277,10 +306,10 @@
             if (!loader || !loaderImage) return;
 
             const candidates = [
-                './index.gif?v=20260223b',
-                '/PALHTML/index.gif?v=20260223b',
-                './contact.gif?v=20260223b',
-                '/PALHTML/contact.gif?v=20260223b'
+                './assets/loaders/index.gif?v=20260223b',
+                '/PALHTML/assets/loaders/index.gif?v=20260223b',
+                './assets/loaders/contact.gif?v=20260223b',
+                '/PALHTML/assets/loaders/contact.gif?v=20260223b'
             ];
 
             const shownAt = Date.now();
@@ -334,9 +363,5 @@
         })();
     </script>
 </body>
+
 </html>
-
-
-
-
-

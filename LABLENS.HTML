@@ -418,14 +418,11 @@
             opacity: 0;
             pointer-events: none;
         }
-
-        
-            background: #000;
     </style>
 </head>
 <body>
     <div id='page-loader-overlay'>
-        <img src='lab-lens.gif' alt='Loading'>
+        <img src='assets/loaders/lab-lens.gif' alt='Loading'>
     </div>
 
 
@@ -433,12 +430,12 @@
         <header>
             <h1>Pal Optical <span>// Tally System</span></h1>
             <div class="header-right">
-                <button class="theme-toggle" onclick="toggleTheme()">ðŸŒ— Dark/Light Mode</button>
+                <button class="theme-toggle" id="theme-toggle-btn">ðŸŒ— Dark/Light Mode</button>
             </div>
         </header>
         
         <div class="stats-bar">
-            <select id="material-select" class="material-select" onchange="switchMaterial()">
+            <select id="material-select" class="material-select">
                 <option value="poly">POLYCARBONATE</option>
                 <option value="plastic">PLASTIC (CR-39)</option>
             </select>
@@ -450,10 +447,10 @@
         </div>
 
         <div class="controls">
-            <button class="btn-main" onclick="toggleCamera()">ðŸ“· Camera Scan</button>
-            <button class="btn-secondary" onclick="resetGrid()">Clear Sheet</button>
-            <button class="btn-secondary" onclick="window.print()">Print Receipt</button>
-            <button class="btn-main" onclick="exportCSV()">Export CSV</button>
+            <button class="btn-main" id="toggle-camera-btn">ðŸ“· Camera Scan</button>
+            <button class="btn-secondary" id="reset-grid-btn">Clear Sheet</button>
+            <button class="btn-secondary" id="print-receipt-btn">Print Receipt</button>
+            <button class="btn-main" id="export-csv-btn">Export CSV</button>
         </div>
 
         <div id="reader"></div>
@@ -583,7 +580,7 @@
                 const activeClass = count > 0 ? 'active' : '';
                 const cellClass = count > 0 ? 'cell has-data' : 'cell';
                 
-                html += `<td class="${cellClass}" onclick="handleCellClick('${key}', this)" oncontextmenu="handleRightClick(event, '${key}', this)">
+                html += `<td class="${cellClass}" data-key="${key}">
                         <span class="count-display ${activeClass}" id="count-${key.replace(/\s/g, '_')}">${count > 0 ? count : '-'}</span>
                     </td>`;
             }
@@ -784,7 +781,36 @@
         }
     }
 
-    window.onload = initGrid;
+    function setupEventHandlers() {
+        const lensGrid = document.getElementById('lens-grid');
+        document.getElementById('theme-toggle-btn').addEventListener('click', toggleTheme);
+        document.getElementById('material-select').addEventListener('change', switchMaterial);
+        document.getElementById('toggle-camera-btn').addEventListener('click', toggleCamera);
+        document.getElementById('reset-grid-btn').addEventListener('click', resetGrid);
+        document.getElementById('print-receipt-btn').addEventListener('click', () => window.print());
+        document.getElementById('export-csv-btn').addEventListener('click', exportCSV);
+
+        lensGrid.addEventListener('click', (event) => {
+            const cell = event.target.closest('td.cell');
+            if (!cell || !cell.dataset.key) {
+                return;
+            }
+            handleCellClick(cell.dataset.key, cell);
+        });
+
+        lensGrid.addEventListener('contextmenu', (event) => {
+            const cell = event.target.closest('td.cell');
+            if (!cell || !cell.dataset.key) {
+                return;
+            }
+            handleRightClick(event, cell.dataset.key, cell);
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        setupEventHandlers();
+        initGrid();
+    });
 
 </script>
 
