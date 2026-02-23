@@ -4,217 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Receipt - Dr. Klecker & Dr. Robbins</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #eef2f5;
-            padding: 20px;
-            color: #333;
-        }
-        .controls {
-            max-width: 850px;
-            margin: 0 auto 20px auto;
-            text-align: right;
-        }
-        .btn {
-            background-color: #2980b9;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 4px;
-            font-size: 14px;
-            margin-left: 10px;
-        }
-        .btn:hover { background-color: #1f6391; }
-        .btn-green { background-color: #27ae60; }
-        .btn-red { background-color: #c0392b; padding: 5px 10px; font-size: 12px; }
-        
-        .receipt-container {
-            max-width: 850px;
-            margin: 0 auto;
-            background-color: #ffffff;
-            padding: 40px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border: 1px solid #ddd;
-        }
+    
 
-        /* Input Styling */
-        input:not([type="checkbox"]) {
-            border: 1px solid #ddd; 
-            padding: 5px;
-            font-family: inherit;
-            font-size: inherit;
-            width: 100%;
-            box-sizing: border-box;
-            background: #fff;
-            color: #333;
-            border-radius: 3px;
-        }
-        input:not([type="checkbox"]):focus {
-            border-color: #2980b9;
-            outline: none;
-            background-color: #f0f8ff;
-        }
-        
-        /* Layout Sections */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 2px solid #333;
-            padding-bottom: 20px;
-            margin-bottom: 20px;
-        }
-        .clinic-info { width: 60%; }
-        .clinic-info input.large {
-            font-size: 22px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            color: #2c3e50;
-        }
-        .receipt-details { text-align: right; width: 35%; }
-        
-        .patient-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
-        }
-        .info-col { width: 48%; }
-        .info-col h3 {
-            font-size: 14px;
-            text-transform: uppercase;
-            color: #7f8c8d;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 10px;
-        }
-        .field-group {
-            display: flex;
-            margin-bottom: 5px;
-            align-items: center;
-        }
-        .field-group label {
-            width: 80px;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        /* Tables */
-        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-        th {
-            background-color: #2c3e50;
-            color: white;
-            padding: 10px;
-            text-align: left;
-            font-size: 14px;
-        }
-        td { padding: 8px; border-bottom: 1px solid #eee; }
-        
-        .items-table input.qty { width: 50px; text-align: center; }
-        .items-table input.price { width: 90px; text-align: right; }
-        .items-table .total-display { text-align: right; font-weight: bold; padding-right: 15px; }
-        .items-table .action-col { text-align: center; width: 40px; }
-
-        .rx-table th { background-color: #ecf0f1; color: #333; border-bottom: 1px solid #ccc; }
-        .rx-table input { text-align: center; }
-
-        /* Totals Section */
-        .totals-section {
-            width: 380px;
-            margin-left: auto;
-        }
-        .total-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px 0;
-        }
-        .total-row input.money {
-            width: 100px;
-            text-align: right;
-        }
-        
-        /* Checkbox Grid */
-        .payment-options {
-            display: flex;
-            flex-wrap: wrap;
-            margin: 10px 0;
-            padding: 10px;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            background-color: #fafafa;
-        }
-        .payment-check {
-            width: 33%; /* 3 columns */
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
-        }
-        .payment-check input {
-            width: auto;
-            margin-right: 5px;
-        }
-        
-        .final-row {
-            border-top: 2px solid #333;
-            margin-top: 10px;
-            padding-top: 10px;
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        /* PRINT STYLES */
-        @media print {
-            body { background: white; padding: 0; }
-            .controls, .action-col, .add-row-btn { display: none !important; }
-            .receipt-container { 
-                box-shadow: none; 
-                border: none; 
-                padding: 0; 
-                width: 100%;
-                max-width: 100%;
-            }
-            input:not([type="checkbox"]) { 
-                border: none; 
-                background: transparent; 
-                padding: 0; 
-                width: auto; 
-            }
-            input[type="text"], input[type="number"] { width: 100%; }
-            input::placeholder { color: transparent; }
-            .items-table input.price { text-align: right; }
-            .totals-section input.money { text-align: right; }
-            .payment-options { border: none; background: none; padding: 0; }
-        }
-    </style>
-
-    <style>
-        #page-loader-overlay {
-            position: fixed;
-            inset: 0;
-            display: grid;
-            place-items: center;
-            background: #000;
-            z-index: 99999;
-            opacity: 1;
-            transition: opacity 0.35s ease;
-        }
-
-        #page-loader-overlay.is-hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        
-            background: #000;
-    </style>
+    <link rel="stylesheet" href="loader.css">
 </head>
 <body>
-    <div id='page-loader-overlay'>
-        <img src='dr-itemized-receipt.gif' alt='Loading'>
+    <div id='page-loader-overlay' data-loader-sources='./dr-itemized-receipt.gif?v=20260223c|/PALHTML/dr-itemized-receipt.gif?v=20260223c' data-min-ms='3000' data-max-wait='7000'>
+        <img id='page-loader-image' src='./dr-itemized-receipt.gif?v=20260223c' alt='Loading'>
     </div>
-
 
 <div class="controls">
     <button class="btn btn-green" onclick="addItemRow()">+ Add Item</button>
@@ -257,8 +54,6 @@
             <div class="field-group"><label>Auth #:</label><input type="text" placeholder="Auth Number"></div>
         </div>
     </div>
-
-
 
     <table class="items-table" id="itemsTable">
         <thead>
@@ -379,32 +174,9 @@
     }
 </script>
 
+    
 
-    <script>
-        (() => {
-            const MIN_LOADER_MS = 3000;
-            const loader = document.getElementById('page-loader-overlay');
-            if (!loader) {
-                return;
-            }
-
-            const startTime = Date.now();
-            const hideLoader = () => {
-                const elapsed = Date.now() - startTime;
-                const delay = Math.max(0, MIN_LOADER_MS - elapsed);
-                setTimeout(() => {
-                    loader.classList.add('is-hidden');
-                    setTimeout(() => loader.remove(), 400);
-                }, delay);
-            };
-
-            if (document.readyState === 'complete') {
-                hideLoader();
-            } else {
-                window.addEventListener('load', hideLoader, { once: true });
-            }
-        })();
-    </script>
+    <script src="loader.js"></script>
 </body>
 </html>
 

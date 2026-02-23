@@ -1,0 +1,26 @@
+﻿#page-loader-overlay {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    --loader-scale: 0.92;
+    background: #000;
+    z-index: 99999;
+    opacity: 1;
+    transition: opacity 0.35s ease;
+}
+
+#page-loader-overlay.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+#page-loader-overlay img {
+    width: 100vw;
+    height: 100vh;
+    object-fit: contain;
+    transform: scale(var(--loader-scale));
+    display: block;
+    background: #000;
+}
+
