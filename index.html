@@ -204,7 +204,7 @@
 </head>
 <body>
     <div id='page-loader-overlay'>
-        <img src='index.gif' alt='Loading'>
+        <img id='page-loader-image' src='index.gif?v=20260223' alt='Loading'>
     </div>
 
 
@@ -279,8 +279,19 @@
         (() => {
             const MIN_LOADER_MS = 3000;
             const loader = document.getElementById('page-loader-overlay');
+            const loaderImage = document.getElementById('page-loader-image');
             if (!loader) {
                 return;
+            }
+
+            // Fallback in case a stale PWA cache serves a missing/old asset.
+            if (loaderImage) {
+                loaderImage.addEventListener('error', () => {
+                    if (!loaderImage.dataset.fallbackTried) {
+                        loaderImage.dataset.fallbackTried = 'true';
+                        loaderImage.src = 'contact.gif?v=20260223';
+                    }
+                }, { once: true });
             }
 
             const startTime = Date.now();

@@ -1361,7 +1361,7 @@
 
 <body>
     <div id='page-loader-overlay'>
-        <img src='writeup.gif' alt='Loading'>
+        <img id='page-loader-image' src='writeup.gif?v=20260223' alt='Loading'>
     </div>
 
     <div id="rotate-overlay">
@@ -4409,8 +4409,19 @@ ${printablePage.outerHTML}
         (() => {
             const MIN_LOADER_MS = 3000;
             const loader = document.getElementById('page-loader-overlay');
+            const loaderImage = document.getElementById('page-loader-image');
             if (!loader) {
                 return;
+            }
+
+            // Fallback in case the primary file is stale/missing in PWA cache.
+            if (loaderImage) {
+                loaderImage.addEventListener('error', () => {
+                    if (!loaderImage.dataset.fallbackTried) {
+                        loaderImage.dataset.fallbackTried = 'true';
+                        loaderImage.src = 'writeup%20(Large).gif?v=20260223';
+                    }
+                }, { once: true });
             }
 
             const startTime = Date.now();
