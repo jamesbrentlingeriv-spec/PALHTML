@@ -182,7 +182,7 @@
             inset: 0;
             display: grid;
             place-items: center;
-            background: #111;
+            background: #000;
             z-index: 99999;
             opacity: 1;
             transition: opacity 0.35s ease;
@@ -193,18 +193,13 @@
             pointer-events: none;
         }
 
-        #page-loader-overlay img {
-            width: 100vw;
-            height: 100vh;
-            object-fit: contain;
-            transform: scale(0.92);
-            display: block;
-        }
+        
+            background: #000;
     </style>
 </head>
 <body>
     <div id='page-loader-overlay'>
-        <img id='page-loader-image' src='index.gif?v=20260223' alt='Loading'>
+        <img id='page-loader-image' src='./index.gif?v=20260223b' alt='Loading'>
     </div>
 
 
@@ -278,25 +273,25 @@
     <script>
         (() => {
             const MIN_LOADER_MS = 3000;
+            const MAX_IMAGE_WAIT_MS = 6000;
             const loader = document.getElementById('page-loader-overlay');
             const loaderImage = document.getElementById('page-loader-image');
-            if (!loader) {
-                return;
-            }
+            if (!loader || !loaderImage) return;
 
-            // Fallback in case a stale PWA cache serves a missing/old asset.
-            if (loaderImage) {
-                loaderImage.addEventListener('error', () => {
-                    if (!loaderImage.dataset.fallbackTried) {
-                        loaderImage.dataset.fallbackTried = 'true';
-                        loaderImage.src = 'contact.gif?v=20260223';
-                    }
-                }, { once: true });
-            }
+            const candidates = [
+                './index.gif?v=20260223b',
+                '/PALHTML/index.gif?v=20260223b',
+                './contact.gif?v=20260223b',
+                '/PALHTML/contact.gif?v=20260223b'
+            ];
 
-            const startTime = Date.now();
-            const hideLoader = () => {
-                const elapsed = Date.now() - startTime;
+            const shownAt = Date.now();
+            let pageLoaded = document.readyState === 'complete';
+            let imageResolved = false;
+
+            const hideWhenReady = () => {
+                if (!pageLoaded || !imageResolved) return;
+                const elapsed = Date.now() - shownAt;
                 const delay = Math.max(0, MIN_LOADER_MS - elapsed);
                 setTimeout(() => {
                     loader.classList.add('is-hidden');
@@ -304,15 +299,45 @@
                 }, delay);
             };
 
-            if (document.readyState === 'complete') {
-                hideLoader();
-            } else {
-                window.addEventListener('load', hideLoader, { once: true });
-            }
+            let i = 0;
+            const tryNext = () => {
+                if (i >= candidates.length) {
+                    imageResolved = true;
+                    hideWhenReady();
+                    return;
+                }
+                loaderImage.src = candidates[i++];
+            };
+
+            loaderImage.addEventListener('load', () => {
+                imageResolved = true;
+                hideWhenReady();
+            }, { once: true });
+
+            loaderImage.addEventListener('error', () => {
+                if (imageResolved) return;
+                tryNext();
+            });
+
+            setTimeout(() => {
+                if (!imageResolved) {
+                    imageResolved = true;
+                    hideWhenReady();
+                }
+            }, MAX_IMAGE_WAIT_MS);
+
+            if (pageLoaded) hideWhenReady();
+            else window.addEventListener('load', () => {
+                pageLoaded = true;
+                hideWhenReady();
+            }, { once: true });
+
+            tryNext();
         })();
     </script>
 </body>
 </html>
+
 
 
 
