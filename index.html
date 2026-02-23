@@ -12,14 +12,196 @@
     <link rel="apple-touch-icon" href="icon-192.png">
     <meta name="theme-color" content="#ffffff" id="meta-theme-color">
 
-    
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --card-bg: #f8f9fa;
+            --border-color: #cccccc;
+            --link-bg: #000000;
+            --link-color: #ffffff;
+            --shadow: rgba(0,0,0,0.1);
+        }
 
-    <link rel="stylesheet" href="loader.css">
+        [data-theme="dark"] {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --card-bg: #333333;
+            --border-color: #666666;
+            --link-bg: #ffffff;
+            --link-color: #000000;
+            --shadow: rgba(255,255,255,0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px var(--shadow);
+            border: 2px solid var(--border-color);
+            position: relative;
+        }
+
+        /* Theme Toggle UI */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px; width: 26px;
+            left: 4px; bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider { background-color: #2196F3; }
+        input:checked + .slider:before { transform: translateX(26px); }
+
+        h1 { text-align: center; margin-bottom: 10px; }
+        .welcome-text { text-align: center; margin-bottom: 30px; opacity: 0.8; }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .app-card {
+            background: var(--bg-color);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid var(--border-color);
+        }
+
+        .app-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+
+        .app-card h3 { margin-bottom: 10px; }
+        .app-card p { font-size: 0.9em; margin-bottom: 15px; }
+
+        .app-link {
+            display: inline-block;
+            background-color: var(--link-bg);
+            color: var(--link-color);
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        .app-link:hover {
+            background-color: #2196F3;
+            color: #ffffff;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+    </style>
+
+    <script>
+        window.onload = () => {
+            const themeToggle = document.getElementById('theme-toggle');
+            const metaTheme = document.getElementById('meta-theme-color');
+            const currentTheme = localStorage.getItem('theme') || 'light';
+
+            // Apply saved theme on load
+            if (currentTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                themeToggle.checked = true;
+                metaTheme.setAttribute('content', '#000000');
+            }
+
+            // Theme Toggle Listener
+            themeToggle.addEventListener('change', () => {
+                if (themeToggle.checked) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                    metaTheme.setAttribute('content', '#000000');
+                } else {
+                    document.documentElement.removeAttribute('data-theme');
+                    localStorage.setItem('theme', 'light');
+                    metaTheme.setAttribute('content', '#ffffff');
+                }
+            });
+
+            // Service Worker Registration for PWA Installation
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/PALHTML/sw.js')
+                    .then(() => console.log("Pal Optical PWA: Active"))
+                    .catch(err => console.log("PWA Registration Failed", err));
+            }
+        };
+    </script>
+
+    <style>
+        #page-loader-overlay {
+            position: fixed;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            background: #000;
+            z-index: 99999;
+            opacity: 1;
+            transition: opacity 0.35s ease;
+        }
+
+        #page-loader-overlay.is-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        
+            background: #000;
+    </style>
 </head>
 <body>
-    <div id='page-loader-overlay' data-loader-sources='./index.gif?v=20260223c|/PALHTML/index.gif?v=20260223c|./contact.gif?v=20260223c|/PALHTML/contact.gif?v=20260223c' data-min-ms='3000' data-max-wait='7000'>
-        <img id='page-loader-image' src='./index.gif?v=20260223c' alt='Loading'>
+    <div id='page-loader-overlay'>
+        <img id='page-loader-image' src='./index.gif?v=20260223b' alt='Loading'>
     </div>
+
 
     <div class="container">
         <div class="theme-toggle">
@@ -87,11 +269,75 @@
         </div>
     </div>
 
-    
 
-    <script src="loader.js"></script>
+    <script>
+        (() => {
+            const MIN_LOADER_MS = 3000;
+            const MAX_IMAGE_WAIT_MS = 6000;
+            const loader = document.getElementById('page-loader-overlay');
+            const loaderImage = document.getElementById('page-loader-image');
+            if (!loader || !loaderImage) return;
+
+            const candidates = [
+                './index.gif?v=20260223b',
+                '/PALHTML/index.gif?v=20260223b',
+                './contact.gif?v=20260223b',
+                '/PALHTML/contact.gif?v=20260223b'
+            ];
+
+            const shownAt = Date.now();
+            let pageLoaded = document.readyState === 'complete';
+            let imageResolved = false;
+
+            const hideWhenReady = () => {
+                if (!pageLoaded || !imageResolved) return;
+                const elapsed = Date.now() - shownAt;
+                const delay = Math.max(0, MIN_LOADER_MS - elapsed);
+                setTimeout(() => {
+                    loader.classList.add('is-hidden');
+                    setTimeout(() => loader.remove(), 400);
+                }, delay);
+            };
+
+            let i = 0;
+            const tryNext = () => {
+                if (i >= candidates.length) {
+                    imageResolved = true;
+                    hideWhenReady();
+                    return;
+                }
+                loaderImage.src = candidates[i++];
+            };
+
+            loaderImage.addEventListener('load', () => {
+                imageResolved = true;
+                hideWhenReady();
+            }, { once: true });
+
+            loaderImage.addEventListener('error', () => {
+                if (imageResolved) return;
+                tryNext();
+            });
+
+            setTimeout(() => {
+                if (!imageResolved) {
+                    imageResolved = true;
+                    hideWhenReady();
+                }
+            }, MAX_IMAGE_WAIT_MS);
+
+            if (pageLoaded) hideWhenReady();
+            else window.addEventListener('load', () => {
+                pageLoaded = true;
+                hideWhenReady();
+            }, { once: true });
+
+            tryNext();
+        })();
+    </script>
 </body>
 </html>
+
 
 
 

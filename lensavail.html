@@ -4,14 +4,145 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pal Optical - Advanced Lens Master</title>
-    
+    <style>
+        :root {
+            --primary-blue: #2a52be;
+            --accent-green: #28a745;
+            --soft-gray: #f4f7f6;
+            --dark-text: #333;
+            --border-color: #ddd;
+            --highlight: #fffdf0;
+        }
 
-    <link rel="stylesheet" href="loader.css">
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-text);
+            background-color: var(--soft-gray);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1350px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 3px solid var(--primary-blue);
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+        }
+
+        .material-nav {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+            padding: 15px;
+            background: #eef2f3;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .btn-save { background-color: var(--primary-blue); color: white; }
+        .btn-export { background-color: var(--accent-green); color: white; }
+        .btn-import { background-color: #6f42c1; color: white; }
+        .btn-mat { background-color: white; border: 1px solid var(--primary-blue); color: var(--primary-blue); }
+        .btn-mat.active { background-color: var(--primary-blue); color: white; }
+        
+        .lens-section { margin-bottom: 60px; }
+        .section-header { 
+            background: var(--primary-blue); 
+            color: white; 
+            padding: 10px 20px; 
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+            font-size: 0.85rem;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            text-align: left;
+        }
+
+        th { background-color: #e9ecef; text-transform: uppercase; font-size: 0.75rem; }
+
+        td[contenteditable="true"] {
+            background-color: var(--highlight);
+            outline: none;
+        }
+
+        .hidden { display: none; }
+
+        #import-input { display: none; }
+
+        @media print {
+            .controls, .material-nav, .no-print, button { display: none; }
+        }
+    </style>
+
+    <style>
+        #page-loader-overlay {
+            position: fixed;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            background: #000;
+            z-index: 99999;
+            opacity: 1;
+            transition: opacity 0.35s ease;
+        }
+
+        #page-loader-overlay.is-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        
+            background: #000;
+    </style>
 </head>
 <body>
-    <div id='page-loader-overlay' data-loader-sources='./lens-availability.gif?v=20260223c|/PALHTML/lens-availability.gif?v=20260223c' data-min-ms='3000' data-max-wait='7000'>
-        <img id='page-loader-image' src='./lens-availability.gif?v=20260223c' alt='Loading'>
+    <div id='page-loader-overlay'>
+        <img src='lens-availability.gif' alt='Loading'>
     </div>
+
 
 <div class="container">
     <header>
@@ -192,9 +323,32 @@
     window.onload = loadFromLocal;
 </script>
 
-    
 
-    <script src="loader.js"></script>
+    <script>
+        (() => {
+            const MIN_LOADER_MS = 3000;
+            const loader = document.getElementById('page-loader-overlay');
+            if (!loader) {
+                return;
+            }
+
+            const startTime = Date.now();
+            const hideLoader = () => {
+                const elapsed = Date.now() - startTime;
+                const delay = Math.max(0, MIN_LOADER_MS - elapsed);
+                setTimeout(() => {
+                    loader.classList.add('is-hidden');
+                    setTimeout(() => loader.remove(), 400);
+                }, delay);
+            };
+
+            if (document.readyState === 'complete') {
+                hideLoader();
+            } else {
+                window.addEventListener('load', hideLoader, { once: true });
+            }
+        })();
+    </script>
 </body>
 </html>
 

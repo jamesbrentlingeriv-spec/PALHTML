@@ -5,14 +5,429 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pal Optical // Lens Tally System</title>
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
-    
+    <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            /* Default to Dark Mode */
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-main: #ffffff;
+            --text-muted: #aaaaaa;
+            --border-color: #444444;
+            --highlight: #333333;
+            --active-cell: #ffffff; 
+            --active-text: #000000;
+            --input-bg: #2c2c2c;
+            --btn-bg: #ffffff;
+            --btn-text: #000000;
+        }
 
-    <link rel="stylesheet" href="loader.css">
+        /* Light Mode Overrides */
+        body.light-mode {
+            --bg-color: #f4f4f4;
+            --card-bg: #ffffff;
+            --text-main: #000000;
+            --text-muted: #555555;
+            --border-color: #cccccc;
+            --highlight: #eeeeee;
+            --active-cell: #000000;
+            --active-text: #ffffff;
+            --input-bg: #ffffff;
+            --btn-bg: #000000;
+            --btn-text: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif; /* Professional Font */
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        /* --- SCREEN ONLY STYLES --- */
+        @media screen {
+            .print-only {
+                display: none !important;
+            }
+
+            header {
+                width: 100%;
+                max-width: 1200px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                border-bottom: 2px solid var(--text-main);
+                padding-bottom: 15px;
+            }
+
+            h1 {
+                margin: 0;
+                font-size: 1.5rem;
+                text-transform: uppercase;
+                letter-spacing: 1px;
+                font-weight: 800;
+            }
+
+            .header-right {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            /* Theme Toggle */
+            .theme-toggle {
+                background: transparent;
+                border: 1px solid var(--text-main);
+                color: var(--text-main);
+                padding: 5px 10px;
+                cursor: pointer;
+                font-size: 0.8rem;
+                text-transform: uppercase;
+            }
+
+            .stats-bar {
+                display: flex;
+                gap: 20px;
+                align-items: center;
+                margin-top: 10px;
+                width: 100%;
+                max-width: 1200px;
+                justify-content: space-between;
+            }
+
+            /* MATERIAL SELECTOR */
+            .material-select {
+                background: var(--input-bg);
+                color: var(--text-main);
+                border: 1px solid var(--border-color);
+                padding: 10px;
+                font-size: 1rem;
+                border-radius: 4px;
+                cursor: pointer;
+                font-weight: bold;
+                width: 200px;
+            }
+
+            .stat-box {
+                background: var(--card-bg);
+                padding: 10px 20px;
+                border: 1px solid var(--border-color);
+                text-align: center;
+                min-width: 150px;
+            }
+
+            .stat-value {
+                font-size: 1.5rem;
+                font-weight: bold;
+            }
+
+            .controls {
+                width: 100%;
+                max-width: 1200px;
+                display: flex;
+                gap: 10px;
+                margin: 20px 0;
+                justify-content: flex-end;
+                flex-wrap: wrap;
+            }
+
+            button {
+                padding: 10px 20px;
+                font-weight: bold;
+                cursor: pointer;
+                border-radius: 4px;
+                text-transform: uppercase;
+                font-size: 0.8rem;
+                letter-spacing: 0.5px;
+            }
+
+            button.btn-main {
+                background: var(--btn-bg);
+                color: var(--btn-text);
+                border: 1px solid var(--btn-bg);
+            }
+
+            button.btn-secondary {
+                background: transparent;
+                color: var(--text-main);
+                border: 1px solid var(--border-color);
+            }
+            
+            button:hover {
+                opacity: 0.8;
+            }
+
+            /* Scanner Camera Box */
+            #reader {
+                width: 100%;
+                max-width: 500px;
+                display: none;
+                margin: 20px auto;
+                border: 2px solid var(--text-main);
+            }
+
+            /* INPUT AREA */
+            .manual-input {
+                margin: 0 0 20px 0;
+                width: 100%;
+                max-width: 1200px;
+            }
+            
+            input[type="text"] {
+                width: 100%;
+                background: var(--input-bg);
+                border: 1px solid var(--border-color);
+                color: var(--text-main);
+                padding: 15px;
+                border-radius: 4px;
+                font-size: 1.1rem;
+                font-family: 'Courier New', monospace;
+            }
+            
+            input[type="text"]:focus {
+                outline: 2px solid var(--text-main);
+            }
+
+            /* GRID */
+            .grid-container {
+                width: 100%;
+                max-width: 1200px;
+                overflow-x: auto;
+                background: var(--card-bg);
+                border: 1px solid var(--border-color);
+                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            }
+
+            table.matrix {
+                border-collapse: collapse;
+                width: 100%;
+                min-width: 800px;
+            }
+
+            th, td {
+                border: 1px solid var(--border-color);
+                text-align: center;
+                padding: 5px;
+                position: relative;
+                font-family: 'Courier New', monospace;
+            }
+
+            thead th {
+                position: sticky;
+                top: 0;
+                background: var(--highlight);
+                z-index: 10;
+                font-size: 0.9rem;
+                padding: 10px;
+            }
+
+            tbody th {
+                position: sticky;
+                left: 0;
+                background: var(--highlight);
+                z-index: 5;
+                font-weight: bold;
+                min-width: 80px;
+            }
+
+            td.cell {
+                cursor: pointer;
+                user-select: none;
+                height: 45px; 
+                vertical-align: middle;
+                transition: background 0.1s;
+            }
+
+            td.cell:hover {
+                background-color: var(--highlight);
+            }
+
+            .count-display {
+                font-size: 1.1rem;
+                font-weight: bold;
+                display: block;
+            }
+
+            /* Active Cell Style */
+            .count-display.active {
+                color: var(--text-main);
+            }
+            
+            /* High Contrast for active cells */
+            td.cell.has-data {
+                background-color: var(--active-cell) !important;
+            }
+            td.cell.has-data .count-display {
+                color: var(--active-text) !important;
+            }
+
+            footer {
+                margin-top: 40px;
+                color: var(--text-muted);
+                font-size: 0.8rem;
+                text-align: center;
+            }
+        }
+
+        /* --- PRINT STYLES (Always Black & White) --- */
+        @media print {
+            @page { margin: 0.5cm; }
+            body {
+                background: white;
+                color: black;
+                padding: 0;
+                margin: 0;
+                display: block;
+                font-family: Arial, sans-serif;
+                font-size: 10px;
+            }
+
+            .screen-only {
+                display: none !important;
+            }
+
+            .print-only {
+                display: block !important;
+                width: 100%;
+            }
+
+            .print-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                border-bottom: 2px solid black;
+                padding-bottom: 10px;
+                margin-bottom: 10px;
+            }
+
+            .print-header-left {
+                font-size: 11px;
+                line-height: 1.4;
+                width: 40%;
+            }
+
+            .print-header-center {
+                width: 25%;
+                text-align: center;
+                border: 2px solid black;
+                padding: 5px;
+                font-weight: bold;
+                font-size: 12px;
+            }
+
+            .print-header-right {
+                text-align: right;
+                font-size: 11px;
+                width: 30%;
+            }
+
+            .print-title {
+                border: 2px solid black;
+                padding: 5px;
+                width: 100%;
+                max-width: 200px;
+                text-align: center;
+                font-weight: bold;
+                margin-top: 10px;
+                font-size: 12px;
+                text-transform: uppercase;
+            }
+            
+            .print-date-input {
+                border: none;
+                border-bottom: 1px solid black;
+                text-align: center;
+                font-family: inherit;
+                font-size: inherit;
+                font-weight: bold;
+                width: 100px;
+            }
+
+            .print-grid {
+                column-count: 4;
+                column-gap: 20px;
+            }
+
+            .print-item {
+                display: flex;
+                justify-content: space-between;
+                border-bottom: 1px solid #ccc;
+                padding: 2px 0;
+                break-inside: avoid;
+            }
+            
+            .print-item.new-group {
+                margin-top: 15px;
+                border-top: 2px solid #000;
+            }
+            
+            .print-label {
+                font-weight: bold;
+                font-size: 11px;
+            }
+
+            .print-value {
+                padding-right: 5px;
+                font-weight: bold;
+                min-width: 30px;
+                text-align: right;
+                font-family: 'Courier New', monospace; 
+                letter-spacing: 2px;
+            }
+            
+            .print-value::after {
+                content: "___";
+                color: transparent;
+                border-bottom: 1px solid #000;
+                margin-left: 5px;
+            }
+            
+            .print-value.has-count {
+                font-size: 12px;
+            }
+            .print-value.has-count::after {
+                display: none;
+            }
+        }
+    </style>
+
+    <style>
+        #page-loader-overlay {
+            position: fixed;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            background: #000;
+            z-index: 99999;
+            opacity: 1;
+            transition: opacity 0.35s ease;
+        }
+
+        #page-loader-overlay.is-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        
+            background: #000;
+    </style>
 </head>
 <body>
-    <div id='page-loader-overlay' data-loader-sources='./lab-lens.gif?v=20260223c|/PALHTML/lab-lens.gif?v=20260223c' data-min-ms='3000' data-max-wait='7000'>
-        <img id='page-loader-image' src='./lab-lens.gif?v=20260223c' alt='Loading'>
+    <div id='page-loader-overlay'>
+        <img src='lab-lens.gif' alt='Loading'>
     </div>
+
 
     <div class="screen-only">
         <header>
@@ -373,9 +788,31 @@
 
 </script>
 
-    
+    <script>
+        (() => {
+            const MIN_LOADER_MS = 3000;
+            const loader = document.getElementById('page-loader-overlay');
+            if (!loader) {
+                return;
+            }
 
-    <script src="loader.js"></script>
+            const startTime = Date.now();
+            const hideLoader = () => {
+                const elapsed = Date.now() - startTime;
+                const delay = Math.max(0, MIN_LOADER_MS - elapsed);
+                setTimeout(() => {
+                    loader.classList.add('is-hidden');
+                    setTimeout(() => loader.remove(), 400);
+                }, delay);
+            };
+
+            if (document.readyState === 'complete') {
+                hideLoader();
+            } else {
+                window.addEventListener('load', hideLoader, { once: true });
+            }
+        })();
+    </script>
 </body>
 </html>
 
