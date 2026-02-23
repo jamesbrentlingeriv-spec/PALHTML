@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pal Optical - Contacts To Order ฅ/ᐠ. ̫ .ᐟ\ฅ</title>
+    <title>Pal Optical - Contacts To Order à¸…/á . Ì« .áŸ\à¸…</title>
     <style>
         :root {
             --primary-pink: #ffb7c5;
@@ -201,11 +201,41 @@
             @page { margin: 0.5cm; }
         }
     </style>
+
+    <style>
+        #page-loader-overlay {
+            position: fixed;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            background: #111;
+            z-index: 99999;
+            opacity: 1;
+            transition: opacity 0.35s ease;
+        }
+
+        #page-loader-overlay.is-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #page-loader-overlay img {
+            width: 100vw;
+            height: 100vh;
+            object-fit: contain;
+            transform: scale(0.92);
+            display: block;
+        }
+    </style>
 </head>
 <body>
+    <div id='page-loader-overlay'>
+        <img src='contact.gif' alt='Loading'>
+    </div>
+
 
 <div class="container">
-    <h1>Contact Lens Order Sheet (✿◠‿◠)</h1>
+    <h1>Contact Lens Order Sheet (âœ¿â— â€¿â— )</h1>
 
     <div class="section">
         <h2>Add New Order</h2>
@@ -250,19 +280,19 @@
                     <option value="Card">Card</option>
                     <option value="Check">Check</option>
                     <option value="Insurance Benefit">Insurance Benefit</option>
-                    <option value="Pay When It Comes In">Pay When It Comes In ⏳</option>
+                    <option value="Pay When It Comes In">Pay When It Comes In â³</option>
                 </select>
             </div>
             <div class="input-group" style="grid-column: span 2;">
-                <label>Additional Notes 📝</label>
+                <label>Additional Notes ðŸ“</label>
                 <textarea id="ptNotes" placeholder="Any special instructions?"></textarea>
             </div>
         </div>
-        <button onclick="addPatient()">Add to Order List ✨</button>
+        <button onclick="addPatient()">Add to Order List âœ¨</button>
     </div>
 
     <div class="section" style="background-color: #e1f5fe;">
-        <h2>Contacts That Need To Be Ordered (｡•́︿•̀｡)</h2>
+        <h2>Contacts That Need To Be Ordered (ï½¡â€¢Ìï¸¿â€¢Ì€ï½¡)</h2>
         <div style="overflow-x: auto;">
             <table id="pendingTable">
                 <thead>
@@ -280,20 +310,20 @@
                 <tbody></tbody>
             </table>
         </div>
-        <button class="export-btn" onclick="exportToExcel()">Export Alphabetized List to Excel 💾</button>
-        <button class="export-btn" style="background-color: #90caf9;" onclick="window.print()">Print List 🖨️</button>
-        <button class="export-btn reset-btn" onclick="resetFullList()">Reset Full List (Clear Browser Memory) 🗑️</button>
+        <button class="export-btn" onclick="exportToExcel()">Export Alphabetized List to Excel ðŸ’¾</button>
+        <button class="export-btn" style="background-color: #90caf9;" onclick="window.print()">Print List ðŸ–¨ï¸</button>
+        <button class="export-btn reset-btn" onclick="resetFullList()">Reset Full List (Clear Browser Memory) ðŸ—‘ï¸</button>
     </div>
 
     <div class="footer-trademark">
-        James Brentlinger™
+        James Brentlingerâ„¢
     </div>
 </div>
 
 <script>
     let patients = [];
 
-    // ✨ LOAD DATA FROM BROWSER STORAGE ON START ✨
+    // âœ¨ LOAD DATA FROM BROWSER STORAGE ON START âœ¨
     window.onload = function() {
         const savedData = localStorage.getItem('palOpticalOrders');
         if (savedData) {
@@ -397,7 +427,7 @@
     }
 
     function exportToExcel() {
-        if(patients.length === 0) { alert("The list is empty, senpai! ヾ(｡ꏿ﹏ꏿ)ﾉ"); return; }
+        if(patients.length === 0) { alert("The list is empty, senpai! ãƒ¾(ï½¡ê¿ï¹ê¿)ï¾‰"); return; }
         const sortedPatients = [...patients].sort((a, b) => a.name.localeCompare(b.name));
 
         let xml = '<?xml version="1.0"?><?mso-application progid="Excel.Sheet"?>';
@@ -440,5 +470,34 @@
     }
 </script>
 
+
+    <script>
+        (() => {
+            const MIN_LOADER_MS = 3000;
+            const loader = document.getElementById('page-loader-overlay');
+            if (!loader) {
+                return;
+            }
+
+            const startTime = Date.now();
+            const hideLoader = () => {
+                const elapsed = Date.now() - startTime;
+                const delay = Math.max(0, MIN_LOADER_MS - elapsed);
+                setTimeout(() => {
+                    loader.classList.add('is-hidden');
+                    setTimeout(() => loader.remove(), 400);
+                }, delay);
+            };
+
+            if (document.readyState === 'complete') {
+                hideLoader();
+            } else {
+                window.addEventListener('load', hideLoader, { once: true });
+            }
+        })();
+    </script>
 </body>
 </html>
+
+
+

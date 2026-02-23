@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -210,8 +210,38 @@
             .total-row { font-size: 2em; }
         }
     </style>
+
+    <style>
+        #page-loader-overlay {
+            position: fixed;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            background: #111;
+            z-index: 99999;
+            opacity: 1;
+            transition: opacity 0.35s ease;
+        }
+
+        #page-loader-overlay.is-hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #page-loader-overlay img {
+            width: 100vw;
+            height: 100vh;
+            object-fit: contain;
+            transform: scale(0.92);
+            display: block;
+        }
+    </style>
 </head>
 <body>
+    <div id='page-loader-overlay'>
+        <img src='pal-quote.gif' alt='Loading'>
+    </div>
+
 
     <div class="catalog-container">
         <header>
@@ -647,8 +677,8 @@
             const copayVal = parseFloat(document.getElementById('copayAmount').value);
             if (isNaN(copayVal)) { alert("Enter a Copay amount first!"); return; }
             addToCart({ name: `${itemName} (Retail)`, price: retailPrice });
-            addToCart({ name: `   ↳ Insurance Benefit`, price: -retailPrice });
-            addToCart({ name: `   ↳ Copay: ${itemName}`, price: copayVal });
+            addToCart({ name: `   â†³ Insurance Benefit`, price: -retailPrice });
+            addToCart({ name: `   â†³ Copay: ${itemName}`, price: copayVal });
         }
     }
 
@@ -671,8 +701,8 @@
                 const allowance = parseFloat(document.getElementById('frameAllowance').value) || 0;
                 const discountFlat = parseFloat(document.getElementById('frameDiscountFlat').value) || 0;
                 addToCart({ name: `Frame: ${name} (Retail)`, price: retail });
-                if (allowance > 0) addToCart({ name: `   ↳ Insurance Allowance`, price: -Math.min(allowance, retail) });
-                if (discountFlat > 0) addToCart({ name: `   ↳ Plan Discount`, price: -discountFlat });
+                if (allowance > 0) addToCart({ name: `   â†³ Insurance Allowance`, price: -Math.min(allowance, retail) });
+                if (discountFlat > 0) addToCart({ name: `   â†³ Plan Discount`, price: -discountFlat });
             }
             ['frameName', 'framePrice', 'frameAllowance', 'frameDiscountFlat'].forEach(id => document.getElementById(id).value = "");
         }
@@ -703,7 +733,7 @@
                 itemDiv.className = 'cart-item';
                 const isNegative = item.price < 0;
                 itemDiv.innerHTML = `
-                    <div style="flex:1;"><span class="item-remove" onclick="removeFromCart(${i})">×</span>${item.name}</div>
+                    <div style="flex:1;"><span class="item-remove" onclick="removeFromCart(${i})">Ã—</span>${item.name}</div>
                     <div class="price-col" style="color: ${isNegative ? 'var(--danger)' : 'inherit'}">$${item.price.toFixed(2)}</div>
                 `;
                 div.appendChild(itemDiv);
@@ -746,5 +776,34 @@
         renderLenses();
     })();
 </script>
+
+    <script>
+        (() => {
+            const MIN_LOADER_MS = 3000;
+            const loader = document.getElementById('page-loader-overlay');
+            if (!loader) {
+                return;
+            }
+
+            const startTime = Date.now();
+            const hideLoader = () => {
+                const elapsed = Date.now() - startTime;
+                const delay = Math.max(0, MIN_LOADER_MS - elapsed);
+                setTimeout(() => {
+                    loader.classList.add('is-hidden');
+                    setTimeout(() => loader.remove(), 400);
+                }, delay);
+            };
+
+            if (document.readyState === 'complete') {
+                hideLoader();
+            } else {
+                window.addEventListener('load', hideLoader, { once: true });
+            }
+        })();
+    </script>
 </body>
 </html>
+
+
+
