@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pal Optical Master App</title>
 
+    <link rel="icon" type="image/png" href="POMT.PNG">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -226,7 +227,11 @@
 
 <body>
     <div id='page-loader-overlay'>
+<<<<<<< HEAD
+        <img id='page-loader-image' src='/assets/loaders/index.gif?v=20260223b' alt='Loading'>
+=======
         <img id='page-loader-image' src='./assets/loaders/index.gif?v=20260223b' alt='Loading'>
+>>>>>>> parent of 8aaf4fc (update)
     </div>
 
 
@@ -306,11 +311,19 @@
             if (!loader || !loaderImage) return;
 
             const candidates = [
+<<<<<<< HEAD
+                '/assets/loaders/index.gif?v=20260223b',
+                '/assets/loaders/index.gif?v=20260223b',
+                '/assets/loaders/contact.gif?v=20260223b',
+                '/assets/loaders/contact.gif?v=20260223b'
+            ];
+=======
                 './assets/loaders/index.gif?v=20260223b',
                 '/PALHTML/assets/loaders/index.gif?v=20260223b',
                 './assets/loaders/contact.gif?v=20260223b',
                 '/PALHTML/assets/loaders/contact.gif?v=20260223b'
             ];
+>>>>>>> parent of 8aaf4fc (update)
 
             const shownAt = Date.now();
             let pageLoaded = document.readyState === 'complete';
@@ -364,4 +377,8 @@
     </script>
 </body>
 
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> parent of 8aaf4fc (update)
