@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pal Optical Master App</title>
 
+    <link rel="icon" type="image/png" href="POMT.PNG">
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -198,7 +199,7 @@
 
             // Service Worker Registration for PWA Installation
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('/PALHTML/sw.js')
+                navigator.serviceWorker.register('/sw.js')
                     .then(() => console.log("Pal Optical PWA: Active"))
                     .catch(err => console.log("PWA Registration Failed", err));
             }
@@ -226,7 +227,7 @@
 
 <body>
     <div id='page-loader-overlay'>
-        <img id='page-loader-image' src='./assets/loaders/index.gif?v=20260223b' alt='Loading'>
+        <img id='page-loader-image' src='/assets/loaders/index.gif?v=20260223b' alt='Loading'>
     </div>
 
 
@@ -306,10 +307,10 @@
             if (!loader || !loaderImage) return;
 
             const candidates = [
-                './assets/loaders/index.gif?v=20260223b',
-                '/PALHTML/assets/loaders/index.gif?v=20260223b',
-                './assets/loaders/contact.gif?v=20260223b',
-                '/PALHTML/assets/loaders/contact.gif?v=20260223b'
+                '/assets/loaders/index.gif?v=20260223b',
+                '/assets/loaders/index.gif?v=20260223b',
+                '/assets/loaders/contact.gif?v=20260223b',
+                '/assets/loaders/contact.gif?v=20260223b'
             ];
 
             const shownAt = Date.now();
