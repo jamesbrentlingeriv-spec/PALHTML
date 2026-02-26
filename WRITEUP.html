@@ -1276,7 +1276,7 @@
 
         .waiver-title {
             font-size: 1.6em;
-            font-weight: bold;
+                                                       font-weight: bold;
             text-align: center;
             border-bottom: 2px solid #000;
             margin-bottom: 15px;
@@ -1350,6 +1350,19 @@
             pointer-events: none;
         }
 
+        #page-loader-overlay img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @media (max-width: 768px) {
+            #page-loader-overlay img {
+                width: 50%;
+                height: auto;
+                object-fit: contain;
+            }
+        }
     </style>
 </head>
 
