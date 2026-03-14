@@ -1,10 +1,11 @@
-# Integration TODO: opticalc.html into index.html
+# TODO: Add DOB to contact.html - COMPLETE ✅
 
-## Plan Steps
+## Steps:
 
-- [x] Step 1: Add Optician Calculator app-card to index.html .app-grid
-- [x] Step 2: Verify integration (test link, grid layout)
-- [x] Step 3: Complete task
-
-**Status**: Integration complete. opticalc.html now accessible from index.html
-dashboard.
+- [x] Step 1: Edit HTML form to insert DOB input-group after ptName
+- [x] Step 2: Update JavaScript addPatient() to capture and store ptDob value
+- [x] Step 3: Update clearForm() to reset ptDob
+- [x] Step 4: Update table header and renderTable() to display DOB column after
+      Patient Name
+- [x] Step 5: Update exportToExcel() to include DOB in headers and data rows
+- [x] Step 6: Test the implementation and mark complete
