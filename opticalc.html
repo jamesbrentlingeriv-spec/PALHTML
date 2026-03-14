@@ -374,10 +374,28 @@
                 display: block;
             }
         }
+
+        #splash-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            transition: opacity 0.5s ease;
+        }
     </style>
 </head>
 
 <body>
+
+    <div id="splash-overlay">
+        <img src="assets/loaders/opticalc.gif" alt="Loading...">
+    </div>
 
     <header>
         <img id="app-logo" src="icon-192.png" alt="OptiCalc Logo">
@@ -855,6 +873,20 @@
         function clearSession() {
             document.getElementById('receipt').innerHTML = '<div>--- Session Cleared ---</div>';
         }
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                var splash = document.getElementById('splash-overlay');
+                if (splash) {
+                    splash.style.opacity = '0';
+                    setTimeout(function() {
+                        splash.style.display = 'none';
+                    }, 500); // Should match the transition duration
+                }
+            }, 2000);
+        });
     </script>
 </body>
 

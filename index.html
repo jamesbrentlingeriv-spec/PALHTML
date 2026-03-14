@@ -227,7 +227,7 @@
 
 <body>
     <div id='page-loader-overlay'>
-        <img id='page-loader-image' src='/assets/loaders/index.gif?v=20260223b' alt='Loading'>
+        <img id='page-loader-image' src='assets/loaders/index.gif' alt='Loading'>
     </div>
 
 
@@ -309,10 +309,7 @@
             if (!loader || !loaderImage) return;
 
             const candidates = [
-                '/assets/loaders/index.gif?v=20260223b',
-                '/assets/loaders/index.gif?v=20260223b',
-                '/assets/loaders/contact.gif?v=20260223b',
-                '/assets/loaders/contact.gif?v=20260223b'
+                'assets/loaders/index.gif',
             ];
 
             const shownAt = Date.now();
