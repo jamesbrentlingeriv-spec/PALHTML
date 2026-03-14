@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pal Optical - Contacts To Order à¸…/á . Ì« .áŸ\à¸…</title>
+    <title>Pal Optical - Contacts To Order</title>
     <link rel="icon" type="image/png" href="POMT.PNG">
     <style>
         :root {
@@ -274,7 +274,7 @@
 
 
     <div class="container">
-        <h1>Contact Lens Order Sheet (âœ¿â— â€¿â— )</h1>
+        <h1>Contact Lens Order Sheet</h1>
 
         <div class="section">
             <h2>Add New Order</h2>
@@ -324,19 +324,19 @@
                         <option value="Card">Card</option>
                         <option value="Check">Check</option>
                         <option value="Insurance Benefit">Insurance Benefit</option>
-                        <option value="Pay When It Comes In">Pay When It Comes In â³</option>
+                        <option value="Pay When It Comes In">Pay When It Comes In</option>
                     </select>
                 </div>
                 <div class="input-group" style="grid-column: span 2;">
-                    <label>Additional Notes ðŸ“</label>
+                    <label>Additional Notes</label>
                     <textarea id="ptNotes" placeholder="Any special instructions?"></textarea>
                 </div>
             </div>
-            <button id="add-patient-btn">Add to Order List âœ¨</button>
+            <button id="add-patient-btn">Add to Order List</button>
         </div>
 
         <div class="section" style="background-color: #e1f5fe;">
-            <h2>Contacts That Need To Be Ordered (ï½¡â€¢Ìï¸¿â€¢Ì€ï½¡)</h2>
+            <h2>Contacts That Need To Be Ordered</h2>
             <div style="overflow-x: auto;">
                 <table id="pendingTable">
                     <thead>
@@ -356,15 +356,14 @@
                     <tbody></tbody>
                 </table>
             </div>
-            <button class="export-btn" id="export-excel-btn">Export Alphabetized List to Excel ðŸ’¾</button>
+            <button class="export-btn" id="export-excel-btn">Export Alphabetized List to Excel</button>
             <button class="export-btn" style="background-color: #90caf9;" id="print-list-btn">Print List
                 ðŸ–¨ï¸</button>
-            <button class="export-btn reset-btn" id="reset-list-btn">Reset Full List (Clear Browser Memory)
-                ðŸ—‘ï¸</button>
+            <button class="export-btn reset-btn" id="reset-list-btn">Reset Full List (Clear Browser Memory)</button>
         </div>
 
         <div class="footer-trademark">
-            James Brentlingerâ„¢
+            jamesbtrentlinger2026
         </div>
     </div>
 
@@ -500,7 +499,7 @@
         }
 
         function exportToExcel() {
-            if (patients.length === 0) { alert("The list is empty, senpai! ãƒ¾(ï½¡ê¿ï¹ê¿)ï¾‰"); return; }
+            if (patients.length === 0) { alert("The list is empty!"); return; }
             const sortedPatients = [...patients].sort((a, b) => a.name.localeCompare(b.name));
 
             let xml = '<?xml version="1.0"?><?mso-application progid="Excel.Sheet"?>';
