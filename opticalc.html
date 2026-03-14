@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Optician Calculator & Visualizer</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="shortcut icon" href="favicon.ico">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <meta name="theme-color" content="#ffffff">
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #000000;
+            --btn-bg: #000000;
+            --btn-text: #ffffff;
+            --btn-hover: #333333;
+            --calc-bg: #f4f4f4;
+            --receipt-bg: #fffbd1;
+            --border: #cccccc;
+        }
+
+        /* --- Theme 2: Pip-Boy Terminal Dark Mode --- */
+        body.dark-mode {
+            --bg-color: #000000;
+            --text-color: #1aff80;
+            --btn-bg: #002200;
+            --btn-text: #1aff80;
+            --btn-hover: #004400;
+            --calc-bg: #050505;
+            --receipt-bg: #001100;
+            --border: #1aff80;
+
+            font-family: 'Courier New', Courier, monospace;
+            text-shadow: 0 0 2px #1aff80;
+        }
+
+        body.dark-mode input,
+        body.dark-mode select,
+        body.dark-mode textarea {
+            font-family: 'Courier New', Courier, monospace;
+            text-shadow: 0 0 2px #1aff80;
+            color: #1aff80;
+        }
+
+        body.dark-mode .calculator,
+        body.dark-mode .optician-tools,
+        body.dark-mode .receipt-section,
+        body.dark-mode #display {
+            box-shadow: 0 0 5px #1aff80 inset, 0 0 5px #1aff80;
+        }
+
+        body.dark-mode .keypad button {
+            border: 1px solid var(--border);
+            box-shadow: 0 0 3px #1aff80 inset;
+        }
+
+        body.dark-mode .keypad button.special {
+            background-color: #003300;
+            color: #1aff80;
+        }
+
+        /* --- Theme 3: Modern 3D Rainbow (Glassmorphism) --- */
+        body.rainbow-mode {
+            --text-color: #2d3436;
+            --btn-text: #ffffff;
+            --border: rgba(255, 255, 255, 0.4);
+
+            /* Animated gradient background */
+            background: linear-gradient(120deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb, #ffb199);
+            background-size: 300% 300%;
+            animation: rainbowBg 12s ease infinite;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        @keyframes rainbowBg {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Frosted Glass Effect */
+        body.rainbow-mode .calculator,
+        body.rainbow-mode .optician-tools,
+        body.rainbow-mode .receipt-section {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15), inset 0 2px 2px rgba(255, 255, 255, 0.5);
+            border-radius: 16px;
+        }
+
+        body.rainbow-mode #display,
+        body.rainbow-mode input,
+        body.rainbow-mode select,
+        body.rainbow-mode .receipt-roll {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            color: #2d3436;
+        }
+
+        body.rainbow-mode .receipt-roll {
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        /* 3D Gradient Buttons */
+        body.rainbow-mode .keypad button,
+        body.rainbow-mode .calc-btn,
+        body.rainbow-mode header button {
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+            border: none;
+            box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3), inset 0 2px 2px rgba(255, 255, 255, 0.4);
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        body.rainbow-mode .keypad button.special {
+            background: linear-gradient(135deg, #ff7675, #fab1a0);
+            box-shadow: 0 4px 10px rgba(255, 118, 117, 0.3), inset 0 2px 2px rgba(255, 255, 255, 0.4);
+        }
+
+        body.rainbow-mode .calc-btn {
+            background: linear-gradient(135deg, #00b894, #55efc4);
+            box-shadow: 0 4px 10px rgba(0, 184, 148, 0.3), inset 0 2px 2px rgba(255, 255, 255, 0.4);
+        }
+
+        body.rainbow-mode .keypad button:active,
+        body.rainbow-mode .calc-btn:active,
+        body.rainbow-mode header button:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Logo Styles */
+        #app-logo {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            width: 48px;
+            height: 48px;
+            z-index: 1001;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        body.dark-mode #app-logo {
+            filter: drop-shadow(0 0 4px #1aff80);
+        }
+
+        body.rainbow-mode #app-logo {
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+
+
+        /* --- Base Layout Styles --- */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 60px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1002;
+        }
+
+        header button {
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: 1px solid var(--border);
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        header button:hover {
+            background-color: var(--btn-hover);
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .calculator,
+        .optician-tools,
+        .receipt-section {
+            background-color: var(--calc-bg);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        #display {
+            width: 100%;
+            height: 90px;
+            font-size: 20px;
+            text-align: right;
+            margin-bottom: 15px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid var(--border);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            resize: none;
+            transition: all 0.3s;
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .keypad button {
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: none;
+            padding: 15px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 4px;
+            touch-action: manipulation;
+        }
+
+        .keypad button:hover {
+            background-color: var(--btn-hover);
+        }
+
+        .keypad button.special {
+            background-color: #555;
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border: 1px solid var(--border);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s;
+        }
+
+        .calc-btn {
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            border: 1px solid var(--border);
+            padding: 10px;
+            width: 100%;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+
+        .calc-btn:hover {
+            background-color: var(--btn-hover);
+        }
+
+        .receipt-roll {
+            background-color: var(--receipt-bg);
+            border: 1px dashed var(--border);
+            padding: 15px;
+            height: 400px;
+            overflow-y: auto;
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--text-color);
+            transition: all 0.3s;
+        }
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            .receipt-section,
+            .receipt-section * {
+                visibility: visible;
+            }
+
+            .receipt-section {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+                border: none;
+                box-shadow: none;
+                background: white;
+            }
+
+            .receipt-roll {
+                height: auto;
+                border: none;
+                overflow: visible;
+                box-shadow: none;
+                background: white;
+            }
+
+            header,
+            .calculator,
+            .optician-tools,
+            .no-print {
+                display: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Print canvas */
+        @media print {
+            #lensProfile {
+                display: block !important;
+                max-width: 100% !important;
+                height: auto !important;
+                border: 1px solid black !important;
+            }
+
+            .optician-tools {
+                break-inside: avoid;
+            }
+
+            .form-group {
+                display: block;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <img id="app-logo" src="icon-192.png" alt="OptiCalc Logo">
+        <h2>Optician Calculator</h2>
+        <div>
+            <button onclick="toggleTheme()">Toggle Theme</button>
+            <button onclick="window.print()">Print Session</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="calculator">
+            <h3>Standard & Retail Calc</h3>
+            <textarea id="display" rows="3" disabled></textarea>
+            <div class="keypad">
+                <button class="special" onclick="applyRetail(1.06, '+6% Tax')">+6% Tax</button>
+                <button class="special" onclick="applyRetail(0.90, '-10% Off')">-10% Off</button>
+                <button class="special" onclick="applyRetail(0.80, '-20% Off')">-20% Off</button>
+                <button class="special" onclick="clearDisplay()">C</button>
+
+                <button class="special" onclick="append('Math.sin(')">sin</button>
+                <button class="special" onclick="append('Math.cos(')">cos</button>
+                <button class="special" onclick="append('Math.tan(')">tan</button>
+                <button class="special" onclick="append('Math.sqrt(')">√</button>
+
+                <button class="special" onclick="append('Math.log10(')">log</button>
+                <button class="special" onclick="append('(')">(</button>
+                <button class="special" onclick="append(')')">)</button>
+                <button class="special" onclick="append('/')">÷</button>
+
+                <button onclick="append('7')">7</button>
+                <button onclick="append('8')">8</button>
+                <button onclick="append('9')">9</button>
+                <button class="special" onclick="append('*')">×</button>
+
+                <button onclick="append('4')">4</button>
+                <button onclick="append('5')">5</button>
+                <button onclick="append('6')">6</button>
+                <button class="special" onclick="append('-')">-</button>
+
+                <button onclick="append('1')">1</button>
+                <button onclick="append('2')">2</button>
+                <button onclick="append('3')">3</button>
+                <button class="special" onclick="append('+')">+</button>
+
+                <button onclick="append('0')">0</button>
+                <button onclick="append('.')">.</button>
+                <button class="special" onclick="calculate()">=</button>
+            </div>
+        </div>
+
+        <div class="optician-tools">
+            <h3>Optician Formulas</h3>
+
+            <h4>Decentration (Per Eye)</h4>
+            <div class="form-group">
+                <label>Frame A Measurement (mm):</label>
+                <input type="number" id="frameA" step="0.1">
+            </div>
+            <div class="form-group">
+                <label>Bridge / DBL (mm):</label>
+                <input type="number" id="bridge" step="0.1">
+            </div>
+            <div class="form-group">
+                <label>Binocular Patient PD (mm):</label>
+                <input type="number" id="decPatientPd" step="0.1">
+            </div>
+            <button class="calc-btn" onclick="calcDecentration()">Calculate Decentration</button>
+
+            <hr style="margin: 20px 0; border-color: var(--border);">
+
+            <h4>Minimum Blank Size (MBS)</h4>
+            <div class="form-group">
+                <label>Effective Diameter (ED) in mm:</label>
+                <input type="number" id="ed" step="0.1">
+            </div>
+            <div class="form-group">
+                <label>Frame PD (A + DBL) in mm:</label>
+                <input type="number" id="framePd" step="0.1">
+            </div>
+            <div class="form-group">
+                <label>Patient PD in mm:</label>
+                <input type="number" id="patientPd" step="0.1">
+            </div>
+            <button class="calc-btn" onclick="calcMBS()">Calculate MBS</button>
+
+            <hr style="margin: 20px 0; border-color: var(--border);">
+
+            <h4>Lens Thickness (Approximate)</h4>
+            <div class="form-group">
+                <label>Lens Material (Index):</label>
+                <select id="index">
+                    <option value="1.50">CR-39 (1.50)</option>
+                    <option value="1.523">Crown Glass (1.523)</option>
+                    <option value="1.53">Trivex (1.53)</option>
+                    <option value="1.59">Polycarbonate (1.59)</option>
+                    <option value="1.67">High Index (1.67)</option>
+                    <option value="1.74">High Index (1.74)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Frame Type:</label>
+                <select id="frameType">
+                    <option value="2.5">Plastic Frame (2.5mm)</option>
+                    <option value="1.2">Metal Frame (1.2mm)</option>
+                    <option value="1.21">Semi-Rimless (1.2mm)</option>
+                    <option value="0">Drill-Mount (0mm)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Sphere Power (Diopters):</label>
+                <input type="number" id="power" step="0.25">
+            </div>
+            <div class="form-group">
+                <label>Lens Diameter or ED (mm):</label>
+                <input type="number" id="diameter" step="1">
+            </div>
+            <div class="form-group">
+                <label>Decentration per lens (mm):</label>
+                <input type="number" id="decentration" step="0.5" value="0">
+                <small style="opacity: 0.7; font-size: 11px;">Typically: (Frame PD - Patient PD) / 2</small>
+            </div>
+            <div class="form-group">
+                <label>Base/Min Thickness (mm):</label>
+                <input type="number" id="minThick" step="0.1" value="1.5">
+            </div>
+            <button class="calc-btn" onclick="calcThickness()">Calculate & Visualize</button>
+
+            <div style="margin-top: 15px; text-align: center;">
+                <canvas id="lensProfile" width="400" height="300"
+                    style="max-width: 100%; border: 1px solid var(--border); border-radius: 8px; transition: all 0.3s;"></canvas>
+            </div>
+        </div>
+
+        <div class="receipt-section">
+            <h3>Session Receipt</h3>
+            <div class="receipt-roll" id="receipt">
+                <div>--- Session Started ---</div>
+            </div>
+            <button class="calc-btn no-print" onclick="clearSession()">Clear Session</button>
+        </div>
+    </div>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log("Service Worker Registered"))
+                .catch(err => console.error("Service Worker Failed", err));
+        }
+
+        // Theme Cycler Logic
+        const themes = ['', 'dark-mode', 'rainbow-mode'];
+        let currentThemeIndex = 0;
+
+        function toggleTheme() {
+            // Remove current theme class
+            if (themes[currentThemeIndex] !== '') {
+                document.body.classList.remove(themes[currentThemeIndex]);
+            }
+
+            // Advance to next theme
+            currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+
+            // Apply new theme class
+            if (themes[currentThemeIndex] !== '') {
+                document.body.classList.add(themes[currentThemeIndex]);
+            }
+
+            // Re-render canvas to match new theme colors
+            let power = parseFloat(document.getElementById('power').value);
+            if (!isNaN(power)) { calcThickness(); }
+        }
+
+        let isMultilineDisplay = false;
+        let displayStr = '';
+
+        function append(char) {
+            if (isMultilineDisplay) {
+                clearDisplay();
+                isMultilineDisplay = false;
+            }
+            displayStr += char;
+            document.getElementById('display').value = displayStr.replace(/Math./g, '');
+        }
+
+        function clearDisplay() {
+            displayStr = '';
+            document.getElementById('display').value = '';
+            isMultilineDisplay = false;
+        }
+
+        function calculate() {
+            try {
+                let result = eval(displayStr);
+                let readableCalc = displayStr.replace(/Math./g, '');
+                addReceiptItem(`${readableCalc} = ${result}`);
+                displayStr = result.toString();
+                document.getElementById('display').value = displayStr;
+                isMultilineDisplay = false;
+            } catch (error) {
+                document.getElementById('display').value = "Error";
+                displayStr = '';
+                isMultilineDisplay = false;
+            }
+        }
+
+        function applyRetail(multiplier, label) {
+            let currentVal = parseFloat(eval(displayStr));
+            if (isNaN(currentVal)) return;
+
+            let newTotal = (currentVal * multiplier).toFixed(2);
+            let difference = (Math.abs(currentVal - newTotal)).toFixed(2);
+            let summaryText = `Before Price: $${currentVal}\n${label}: $${difference}\nTotal: $${newTotal}`;
+
+            addReceiptItem(`${currentVal} ${label} = ${newTotal}`);
+            displayStr = newTotal.toString();
+            document.getElementById('display').value = summaryText;
+            isMultilineDisplay = true;
+        }
+
+        function calcDecentration() {
+            let a = parseFloat(document.getElementById('frameA').value);
+            let bridge = parseFloat(document.getElementById('bridge').value);
+            let pd = parseFloat(document.getElementById('decPatientPd').value);
+
+            if (isNaN(a) || isNaN(bridge) || isNaN(pd)) {
+                alert("Please fill in all Decentration fields.");
+                return;
+            }
+
+            let framePd = a + bridge;
+            let decentrationPerEye = (framePd - pd) / 2;
+
+            addReceiptItem(`Decentration: (A:${a} + DBL:${bridge} - PD:${pd}) / 2 = ${decentrationPerEye.toFixed(2)}mm`);
+
+            document.getElementById('decentration').value = Math.abs(decentrationPerEye).toFixed(2);
+            document.getElementById('framePd').value = framePd.toFixed(1);
+            document.getElementById('patientPd').value = pd.toFixed(1);
+        }
+
+        function calcMBS() {
+            let ed = parseFloat(document.getElementById('ed').value);
+            let framePd = parseFloat(document.getElementById('framePd').value);
+            let patientPd = parseFloat(document.getElementById('patientPd').value);
+
+            if (isNaN(ed) || isNaN(framePd) || isNaN(patientPd)) {
+                alert("Please fill in all MBS fields.");
+                return;
+            }
+
+            let mbs = ed + (framePd - patientPd) + 2;
+            addReceiptItem(`MBS Calc: ED(${ed}) + F.PD(${framePd}) - P.PD(${patientPd}) + 2 = ${mbs.toFixed(1)}mm`);
+        }
+
+        function calcThickness() {
+            let n = parseFloat(document.getElementById('index').value);
+            let power = parseFloat(document.getElementById('power').value);
+            let diameter = parseFloat(document.getElementById('diameter').value);
+            let dec = parseFloat(document.getElementById('decentration').value) || 0;
+            let minThick = parseFloat(document.getElementById('minThick').value);
+            let frameThicknessValue = parseFloat(document.getElementById('frameType').value);
+
+            let frameThickMm = (frameThicknessValue === 1.21) ? 1.2 : frameThicknessValue;
+
+            if (isNaN(power) || isNaN(diameter) || isNaN(minThick)) {
+                alert("Please fill in all required Thickness fields.");
+                return;
+            }
+
+            let r = (diameter / 2) + Math.abs(dec);
+            let sag = (Math.pow(r, 2) * Math.abs(power)) / (2000 * (n - 1));
+            let finalThickness = sag + minThick;
+
+            let isPlus = power > 0;
+            let lensType = isPlus ? "Center Thickness (Plus Lens)" : "Edge Thickness (Minus Lens)";
+
+            if (event && event.type !== "click") { } else {
+                addReceiptItem(`Thickness Calc: ${power}D, Index ${n}, Ø${diameter}mm, Dec: ${dec}mm`);
+                addReceiptItem(`--> Est. ${lensType}: ${finalThickness.toFixed(2)}mm`);
+            }
+
+            let maxThickness = finalThickness;
+
+            drawHumanProfileVisualizer(maxThickness, frameThickMm, frameThicknessValue, isPlus);
+        }
+
+        function drawHumanProfileVisualizer(maxThickness, frameThickMm, frameTypeRaw, isPlus) {
+            const canvas = document.getElementById('lensProfile');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const isDark = document.body.classList.contains('dark-mode');
+            const isRainbow = document.body.classList.contains('rainbow-mode');
+
+            const isSemi = (frameTypeRaw === 1.21);
+            const isZyl = (frameTypeRaw === 2.5);
+            const isDrill = (frameThickMm === 0);
+
+            // Canvas Theme Colors
+            let faceColor, lensColor, lensOutline, frameColor, templeColor, textColor, warnColor, okColor;
+
+            if (isDark) {
+                faceColor = '#1aff80';
+                lensColor = 'rgba(26, 255, 128, 0.15)';
+                lensOutline = '#1aff80';
+                frameColor = '#1aff80';
+                templeColor = '#1aff80';
+                textColor = '#1aff80';
+                warnColor = '#ff4d4d';
+                okColor = '#1aff80';
+                ctx.shadowBlur = 4;
+                ctx.shadowColor = '#1aff80';
+            } else if (isRainbow) {
+                faceColor = '#ff6b81'; // Vibrant Coral Face
+                lensColor = 'rgba(29, 209, 161, 0.3)'; // Mint transparent
+                lensOutline = '#1dd1a1';
+                frameColor = '#5f27cd'; // Deep Purple Frame
+                templeColor = '#341f97';
+                textColor = '#2d3436';
+                warnColor = '#e84118';
+                okColor = '#00a8ff';
+                ctx.shadowBlur = 6;
+                ctx.shadowColor = 'rgba(255, 255, 255, 0.5)';
+            } else {
+                // Light mode
+                faceColor = '#555555';
+                lensColor = 'rgba(0, 150, 255, 0.4)';
+                lensOutline = '#0066cc';
+                frameColor = '#222222';
+                templeColor = '#444444';
+                textColor = '#000000';
+                warnColor = '#cc0000';
+                okColor = '#008800';
+                ctx.shadowBlur = 0;
+            }
+
+            // Face Outline
+            ctx.beginPath();
+            ctx.moveTo(220, 20);
+            ctx.bezierCurveTo(230, 50, 220, 80, 200, 100);
+            ctx.bezierCurveTo(220, 120, 240, 140, 240, 160);
+            ctx.bezierCurveTo(220, 170, 210, 175, 210, 180);
+            ctx.bezierCurveTo(220, 185, 225, 190, 215, 195);
+            ctx.bezierCurveTo(210, 198, 205, 200, 210, 205);
+            ctx.bezierCurveTo(220, 215, 225, 220, 220, 230);
+            ctx.bezierCurveTo(210, 250, 180, 260, 150, 280);
+            ctx.strokeStyle = faceColor;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Eye
+            ctx.beginPath();
+            ctx.ellipse(170, 105, 12, 6, 0, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(175, 105, 3, 0, Math.PI * 2);
+            ctx.fillStyle = faceColor;
+            ctx.fill();
+
+            const scale = 5;
+            let lensThickPx = maxThickness * scale;
+            let frameThickPx = frameThickMm * scale;
+
+            let frontX = 225;
+            let topY = 75;
+            let lensHeight = 90;
+            let backX = frontX - lensThickPx;
+
+            // Lens Cross-Section
+            ctx.fillStyle = lensColor;
+            ctx.strokeStyle = lensOutline;
+            ctx.lineWidth = 1;
+
+            ctx.beginPath();
+            ctx.moveTo(frontX, topY);
+            ctx.quadraticCurveTo(frontX + 3, topY + lensHeight / 2, frontX, topY + lensHeight);
+            ctx.lineTo(backX, topY + lensHeight);
+            ctx.quadraticCurveTo(backX - (isPlus ? 8 : 4), topY + lensHeight / 2, backX, topY);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+
+            // Frame Details
+            if (isDrill) {
+                ctx.fillStyle = (isDark || isRainbow) ? lensOutline : '#888888';
+                ctx.fillRect(frontX - lensThickPx - 2, topY + 20, lensThickPx + 4, 6);
+                ctx.fillStyle = isDark ? 'white' : (isRainbow ? '#fff' : 'black');
+                ctx.beginPath(); ctx.arc(frontX + 2, topY + 23, 1.5, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(backX - 2, topY + 23, 1.5, 0, Math.PI * 2); ctx.fill();
+
+                ctx.fillStyle = templeColor;
+                ctx.fillRect(50, topY + 20, backX - 50, 4);
+            } else {
+                ctx.fillStyle = frameColor;
+
+                if (isZyl) {
+                    ctx.beginPath();
+                    ctx.moveTo(frontX + 0.5, topY - 0.5);
+                    ctx.lineTo(frontX + 0.5, topY + lensHeight + 0.5);
+                    ctx.lineTo(frontX - frameThickPx, topY + lensHeight + 0.5);
+                    ctx.lineTo(frontX - frameThickPx, topY - 0.5);
+                    ctx.closePath();
+                    ctx.fill();
+
+                    ctx.fillStyle = templeColor;
+                    ctx.fillRect(50, topY + 15, frontX - frameThickPx - 50, (isDark || isRainbow) ? 4 : 6);
+
+                } else if (isSemi) {
+                    ctx.fillRect(frontX - frameThickPx - 1, topY - 2, lensThickPx + frameThickPx + 2, 4);
+
+                    ctx.strokeStyle = frameColor; ctx.lineWidth = 1;
+                    ctx.beginPath(); ctx.moveTo(backX, topY + lensHeight + 0.5); ctx.lineTo(frontX, topY + lensHeight + 0.5); ctx.stroke();
+
+                    ctx.fillStyle = templeColor;
+                    ctx.fillRect(50, topY + 15, backX - 50, (isDark || isRainbow) ? 4 : 6);
+
+                } else {
+                    ctx.strokeStyle = frameColor;
+                    ctx.lineWidth = 1.5;
+                    ctx.strokeRect(frontX - frameThickPx, topY - 1, frameThickPx + 1, lensHeight + 2);
+
+                    ctx.fillStyle = templeColor;
+                    ctx.fillRect(50, topY + 15, backX - 50, (isDark || isRainbow) ? 4 : 6);
+                }
+            }
+
+            // Data Labels
+            let exposedMm = Math.max(0, maxThickness - frameThickMm).toFixed(2);
+
+            ctx.fillStyle = textColor;
+            ctx.font = isDark ? "14px 'Courier New'" : "14px Arial";
+            ctx.textAlign = "left";
+            ctx.fillText(`Max Lens Thickness: ${maxThickness.toFixed(2)} mm`, 15, 25);
+            ctx.fillText(`Frame Coverage: ${frameThickMm.toFixed(2)} mm`, 15, 45);
+
+            if (isDark && exposedMm > 0) {
+                ctx.shadowColor = warnColor;
+            } else if (isRainbow) {
+                ctx.shadowColor = 'transparent';
+            }
+
+            ctx.fillStyle = (exposedMm > 0) ? warnColor : okColor;
+            ctx.font = isDark ? "bold 15px 'Courier New'" : "bold 15px Arial";
+            ctx.fillText(`Exposed Lens: ${exposedMm} mm`, 15, 68);
+
+            // Measurement Lines
+            if (exposedMm > 0 && !isDrill) {
+                ctx.strokeStyle = ctx.fillStyle;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(frontX - frameThickPx, topY + lensHeight + 10);
+                ctx.lineTo(backX, topY + lensHeight + 10);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(frontX - frameThickPx, topY + lensHeight + 5);
+                ctx.lineTo(frontX - frameThickPx, topY + lensHeight + 15);
+                ctx.moveTo(backX, topY + lensHeight + 5);
+                ctx.lineTo(backX, topY + lensHeight + 15);
+                ctx.stroke();
+            }
+
+            ctx.shadowBlur = 0;
+        }
+
+        function addReceiptItem(text) {
+            const receipt = document.getElementById('receipt');
+            const div = document.createElement('div');
+            const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            div.textContent = `[${time}] ${text}`;
+            receipt.appendChild(div);
+            receipt.scrollTop = receipt.scrollHeight;
+        }
+
+        function clearSession() {
+            document.getElementById('receipt').innerHTML = '<div>--- Session Cleared ---</div>';
+        }
+    </script>
+</body>
+
+</html>
