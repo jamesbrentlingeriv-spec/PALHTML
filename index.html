@@ -124,6 +124,26 @@
             gap: 20px;
         }
 
+        @media screen and (max-width: 600px) and (orientation: portrait) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+                border-radius: 12px;
+            }
+
+            .app-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .theme-toggle {
+                top: 12px;
+                right: 12px;
+            }
+        }
+
         .app-card {
             background: var(--bg-color);
             padding: 20px;

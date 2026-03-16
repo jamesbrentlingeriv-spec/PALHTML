@@ -32,22 +32,75 @@
         }
 
         [data-theme="dark"] {
-            --primary: #ffffff;
-            --accent: #ffffff;
-            --success: #05ff61;
-            --border: #ffffff;
+            --primary: #bbbbbb;
+            --accent: #bbbbbb;
+            --success: #555555;
+            --border: #666666;
             --bg-color: #000000;
-            --text-color: #ffffff;
-            --card-bg: #000000;
-            --sidebar-bg: #000000;
-            --input-bg: #000000;
-            --input-border: #ffffff;
-            --table-bg: #000000;
-            --table-border: #ffffff;
-            --overlay-bg: #000000;
-            --overlay-text: #ffffff;
-            --bypasses-bg: var(--card-bg);
-            --waiver-bg: #4a2a2a;
+            --text-color: #e0e0e0;
+            --card-bg: #1a1a1a;
+            --sidebar-bg: #1a1a1a;
+            --input-bg: #222222;
+            --input-border: #444444;
+            --table-bg: #222222;
+            --table-border: #444444;
+            --overlay-bg: #111111;
+            --overlay-text: #e0e0e0;
+            --bypasses-bg: #222222;
+            --waiver-bg: #2a2a2a;
+        }
+
+        [data-theme="dark"] body,
+        [data-theme="dark"] .sidebar,
+        [data-theme="dark"] .catalog-container {
+            font-family: "Segoe UI", Arial, sans-serif;
+        }
+
+        [data-theme="dark"] input,
+        [data-theme="dark"] select,
+        [data-theme="dark"] textarea,
+        [data-theme="dark"] button,
+        [data-theme="dark"] label,
+        [data-theme="dark"] td,
+        [data-theme="dark"] th,
+        [data-theme="dark"] span,
+        [data-theme="dark"] div,
+        [data-theme="dark"] h1,
+        [data-theme="dark"] h2,
+        [data-theme="dark"] h3,
+        [data-theme="dark"] p,
+        [data-theme="dark"] b {
+            font-family: "Segoe UI", Arial, sans-serif;
+            text-shadow: none;
+        }
+
+        [data-theme="dark"] .sidebar,
+        [data-theme="dark"] .catalog-container,
+        [data-theme="dark"] .lens-card,
+        [data-theme="dark"] .payment-box,
+        [data-theme="dark"] .medicaid-options,
+        [data-theme="dark"] .school-options {
+            box-shadow: none;
+            border: 1px solid var(--border);
+        }
+
+        [data-theme="dark"] .login-box,
+        [data-theme="dark"] .language-box,
+        [data-theme="dark"] .prompt-box,
+        [data-theme="dark"] .seght-box,
+        [data-theme="dark"] .remake-box,
+        [data-theme="dark"] .info-sheet-container,
+        [data-theme="dark"] .overlay-section {
+            border: 1px solid var(--border);
+        }
+
+        [data-theme="dark"] .action-btn,
+        [data-theme="dark"] .cat-btn.active {
+            box-shadow: none;
+        }
+
+        [data-theme="dark"] #sig-canvas {
+            filter: none;
         }
 
         [data-theme="dark"] .input-row {
@@ -55,8 +108,9 @@
         }
 
         [data-theme="dark"] .action-btn {
-            background: var(--card-bg) !important;
-            color: var(--text-color) !important;
+            background: #333333 !important;
+            color: #e0e0e0 !important;
+            border: 1px solid #555555 !important;
         }
 
         [data-theme="dark"] .waiver-row {
@@ -67,50 +121,113 @@
             background: var(--card-bg) !important;
         }
 
+        /* --- DARK MODE: BOX DISTINCTION --- */
+        [data-theme="dark"] .sidebar input,
+        [data-theme="dark"] .sidebar select,
+        [data-theme="dark"] .bill-ui-table input {
+            border-color: #555555 !important;
+            background: #2a2a2a !important;
+        }
+
+        [data-theme="dark"] #job-type-section {
+            background: #1e1e2e !important;
+            border-color: #5555aa !important;
+        }
+
+        [data-theme="dark"] #time-promised-section {
+            background: #1e2a1e !important;
+            border-color: #3a7a3a !important;
+        }
+
+        [data-theme="dark"] .color-section {
+            background: #2a1e1e !important;
+            border-color: #7a3a3a !important;
+        }
+
+        [data-theme="dark"] .bill-ui-table th {
+            background: #2a2a3a !important;
+        }
+
+        [data-theme="dark"] .bill-ui-table td,
+        [data-theme="dark"] .rx-ui-table td,
+        [data-theme="dark"] .bill-ui-table th,
+        [data-theme="dark"] .rx-ui-table th {
+            border-color: #555555 !important;
+        }
+
+        [data-theme="dark"] .rx-ui-table th {
+            background: #2a2a3a !important;
+        }
+
+        [data-theme="dark"] .sig-pad-container {
+            border-color: #666666 !important;
+            background: #1a1a2a !important;
+        }
+
+        [data-theme="dark"] .payment-box {
+            background: #1e2a1e !important;
+            border-color: #3a7a3a !important;
+        }
+
+        [data-theme="dark"] .medicaid-options,
+        [data-theme="dark"] .school-options {
+            background: #2a1e2a !important;
+            border-color: #7a3a7a !important;
+        }
+
+        [data-theme="dark"] div[style*="background: #ffffff"],
+        [data-theme="dark"] div[style*="background: var(--table-bg)"] {
+            background: #252535 !important;
+            border-color: #5555aa !important;
+        }
+
+        [data-theme="dark"] div[style*="background: var(--waiver-bg)"] {
+            background: #2a1a1a !important;
+            border-color: #aa4444 !important;
+        }
+
+        [data-theme="dark"] div[style*="background: var(--bypasses-bg)"] {
+            background: #1a2a2a !important;
+        }
+
         [data-theme="dark"] .sidebar input,
         [data-theme="dark"] .sidebar select {
             background: var(--input-bg) !important;
-            color: var(--text-color) !important;
-            border-color: var(--input-border) !important;
+            color: #e0e0e0 !important;
+            border-color: #444444 !important;
         }
 
         [data-theme="dark"] .sidebar-branding {
-            color: var(--primary) !important;
+            color: #e0e0e0 !important;
         }
 
         [data-theme="dark"] .sidebar-branding p {
-            color: var(--accent) !important;
+            color: #e0e0e0 !important;
+        }
+
+        [data-theme="dark"] .prices-btn {
+            background: #333333 !important;
+            color: #e0e0e0 !important;
+            border: 1px solid #555555 !important;
+            box-shadow: none !important;
+        }
+
+        [data-theme="dark"] .validation-message {
+            background: #331a1a !important;
+            color: #ff4d4d !important;
+            border: 1px solid #ff4d4d;
+            text-shadow: none;
+        }
+
+        [data-theme="dark"] #printBtn:disabled {
+            background-color: #222222 !important;
+            color: #555555 !important;
+            border: 1px solid #555555 !important;
         }
 
         /* --- ROTATE DEVICE OVERLAY --- */
         #rotate-overlay {
-            display: none;
-            /* Hidden by default */
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: #2c3e50;
-            color: white;
-            z-index: 99999;
-            /* Highest possible z-index */
-            text-align: center;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* If the screen is taller than it is wide (Portrait), show the overlay */
-        @media screen and (orientation: portrait) and (max-width: 900px) {
-            #rotate-overlay {
-                display: flex;
-            }
-
-            /* Stop the background from scrolling while the overlay is up */
-            body {
-                overflow: hidden !important;
-            }
+            display: none !important;
         }
 
 
@@ -129,6 +246,7 @@
 
         body {
             font-family: "Segoe UI", Arial, sans-serif;
+            font-size: 18px;
             margin: 0;
             display: flex;
             height: 100vh;
@@ -302,6 +420,43 @@
 
         input:checked+.slider:before {
             transform: translateX(26px);
+        }
+
+        /* Prices Toggle Styles */
+        .prices-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: var(--primary);
+            color: var(--card-bg);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85em;
+            z-index: 100;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .prices-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        [data-theme="dark"] .prices-btn {
+            background: var(--success) !important;
+            color: var(--card-bg) !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .catalog-container {
+            display: none !important;
+        }
+
+        body.catalog-visible .catalog-container {
+            display: block !important;
         }
 
         /* --- P.O.S.T. BRANDING STYLES --- */
@@ -1349,7 +1504,6 @@
             opacity: 0;
             pointer-events: none;
         }
-
     </style>
 </head>
 
@@ -1614,6 +1768,8 @@
             </div>
         </div>
     </div>
+
+    <button class="prices-btn" id="pricesToggle">💰 Prices</button>
 
     <div class="catalog-container">
         <input type="text" class="search-box" id="searchInput" placeholder="Search Lenses and Options..." />
@@ -2372,7 +2528,7 @@
 
     <script>
         // --- CAMERA MEASUREMENT LOGIC (CREDIT CARD METHOD) ---
-        // --- CAMERA MEASUREMENT LOGIC (CREDIT CARD METHOD) ---
+
         const video = document.getElementById('videoElement');
         const photoCanvas = document.getElementById('photoCanvas');
         const photoCtx = photoCanvas.getContext('2d');
@@ -4362,108 +4518,60 @@ ${printablePage.outerHTML}
             }
         }
 
-        // Add event listeners to required fields for real-time validation
+        // Prices Toggle Functionality
         document.addEventListener("DOMContentLoaded", function () {
-            // Initial validation on page load
-            validateForm();
+            const pricesBtn = document.getElementById("pricesToggle");
+            if (pricesBtn) {
+                pricesBtn.onclick = function () {
+                    document.body.classList.toggle("catalog-visible");
+                    if (document.body.classList.contains("catalog-visible")) {
+                        this.textContent = "✖ Hide Prices";
+                    } else {
+                        this.textContent = "💰 Prices";
+                    }
+                };
+            }
 
-            // Add input listeners to required fields
-            const requiredFields = [
-                "in-name",
-                "in-frame",
-                "in-pd",
-                "in-dr",
-                "pt-phone",
-                "in-seght",
-                "rx-od-sph",
-                "rx-od-cyl",
-                "rx-od-axis",
-                "rx-od-add",
-                "rx-od-prism",
-                "rx-os-sph",
-                "rx-os-cyl",
-                "rx-os-axis",
-                "rx-os-add",
-                "rx-os-prism",
-                "rx-dvo",
-                "rx-nvo",
-                "rx-ivo",
-            ];
-            requiredFields.forEach(function (fieldId) {
-                const field = document.getElementById(fieldId);
-                if (field) {
-                    field.addEventListener("input", validateForm);
-                    field.addEventListener("change", validateForm);
-                }
+            // Add event listeners to required fields for real-time validation
+            document.addEventListener("DOMContentLoaded", function () {
+                // Initial validation on page load
+                validateForm();
+
+                // Add input listeners to required fields
+                const requiredFields = [
+                    "in-name",
+                    "in-frame",
+                    "in-pd",
+                    "in-dr",
+                    "pt-phone",
+                    "in-seght",
+                    "rx-od-sph",
+                    "rx-od-cyl",
+                    "rx-od-axis",
+                    "rx-od-add",
+                    "rx-od-prism",
+                    "rx-os-sph",
+                    "rx-os-cyl",
+                    "rx-os-axis",
+                    "rx-os-add",
+                    "rx-os-prism",
+                    "rx-dvo",
+                    "rx-nvo",
+                    "rx-ivo",
+                ];
+                requiredFields.forEach(function (fieldId) {
+                    const field = document.getElementById(fieldId);
+                    if (field) {
+                        field.addEventListener("input", validateForm);
+                        field.addEventListener("change", validateForm);
+                    }
+                });
             });
         });
     </script>
 
-    <script>
-        (() => {
-            const MIN_LOADER_MS = 3000;
-            const MAX_IMAGE_WAIT_MS = 7000;
-            const loader = document.getElementById('page-loader-overlay');
-            const loaderImage = document.getElementById('page-loader-image');
-            if (!loader || !loaderImage) return;
+    <script src="loader.js"></script>
 
-            const candidates = [
-                './assets/loaders/writeup.gif?v=20260223b',
-                '/PALHTML/assets/loaders/writeup.gif?v=20260223b',
-                './assets/loaders/writeup%20(Large).gif?v=20260223b',
-                '/PALHTML/assets/loaders/writeup%20(Large).gif?v=20260223b'
-            ];
-
-            const shownAt = Date.now();
-            let pageLoaded = document.readyState === 'complete';
-            let imageResolved = false;
-
-            const hideWhenReady = () => {
-                if (!pageLoaded || !imageResolved) return;
-                const elapsed = Date.now() - shownAt;
-                const delay = Math.max(0, MIN_LOADER_MS - elapsed);
-                setTimeout(() => {
-                    loader.classList.add('is-hidden');
-                    setTimeout(() => loader.remove(), 400);
-                }, delay);
-            };
-
-            let i = 0;
-            const tryNext = () => {
-                if (i >= candidates.length) {
-                    imageResolved = true;
-                    hideWhenReady();
-                    return;
-                }
-                loaderImage.src = candidates[i++];
-            };
-
-            loaderImage.addEventListener('load', () => {
-                imageResolved = true;
-                hideWhenReady();
-            }, { once: true });
-
-            loaderImage.addEventListener('error', () => {
-                if (imageResolved) return;
-                tryNext();
-            });
-
-            setTimeout(() => {
-                if (!imageResolved) {
-                    imageResolved = true;
-                    hideWhenReady();
-                }
-            }, MAX_IMAGE_WAIT_MS);
-
-            if (pageLoaded) hideWhenReady();
-            else window.addEventListener('load', () => {
-                pageLoaded = true;
-                hideWhenReady();
-            }, { once: true });
-
-            tryNext();
-        })();
-    </script>
 </body>
 
 
