@@ -24,6 +24,31 @@
             --fill-opacity: 0.15;
         }
 
+        /* Welcome Overlay */
+        #welcome-overlay {
+            position: fixed;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 100000;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        #welcome-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #welcome-gif {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
         [data-theme="dark"] {
             /* Dark Mode Variables */
             --bg-main: #121212;
@@ -243,6 +268,10 @@
 </head>
 
 <body>
+    <div id="welcome-overlay">
+        <img id="welcome-gif" src="assets/loaders/lensguide.gif" alt="Lens Guide Welcome">
+    </div>
+
     <a href="index.html"
         style="display: inline-block; padding: 10px 15px; margin: 10px; background-color: #ffb7c5; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">Back
         to Home</a>
@@ -445,10 +474,10 @@
                             <div class="diagram-column">
                                 <div class="diagram-container">
                                     <div class="diagram-title">Visual Corridor Demonstration</div>
-                                    ${svgHtml}
-                                    <div class="legend">
-                                        <span><div class="line-sample line-clear"></div> Clear Vision</span>
-                                        <span><div class="line-sample line-blurry"></div> Blurry/No Vision</span>
+                                    <img src="lensguideman.svg" alt="Lens Vision Man" style="width: 100%; height: 400px; object-fit: contain; border-radius: 8px;">
+                                    <div class="legend" style="margin-top: 10px;">
+                                        <span><div class="line-sample line-clear"></div> Clear Vision (🕐 Clock, 💻 Computer, 📱 Phone)</span>
+                                        <span><div class="line-sample line-blurry"></div> Blurry Vision</span>
                                     </div>
                                 </div>
                             </div>
@@ -460,6 +489,13 @@
         }
 
         renderInterface();
+
+        // 2 second welcome GIF overlay
+        setTimeout(() => {
+            const overlay = document.getElementById('welcome-overlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => overlay.style.display = 'none', 500);
+        }, 2000);
     </script>
 </body>
 
