@@ -7,7 +7,6 @@
     <title>Optician Calculator & Visualizer</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="shortcut icon" href="favicon.ico">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="apple-touch-icon" href="icon-192.png">
@@ -398,7 +397,9 @@
 </head>
 
 <body>
-    <a href="index.html" style="display: inline-block; padding: 10px 15px; margin: 10px; background-color: #ffb7c5; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">Back to Home</a>
+    <a href="index.html"
+        style="display: inline-block; padding: 10px 15px; margin: 10px; background-color: #ffb7c5; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">Back
+        to Home</a>
 
     <div id="splash-overlay">
         <img src="assets/loaders/opticalc.gif" alt="Loading..." class="splash-gif">
@@ -543,7 +544,8 @@
                 <div>--- Session Started ---</div>
             </div>
             <button class="calc-btn no-print" onclick="clearSession()">Clear Session</button>
-            <div style="text-align:center; margin-top:15px; font-size:0.75em; opacity:0.6;">jamesbrentlinger2026&trade;</div>
+            <div style="text-align:center; margin-top:15px; font-size:0.75em; opacity:0.6;">jamesbrentlinger2026&trade;
+            </div>
         </div>
     </div>
 
@@ -884,12 +886,12 @@
     </script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(function() {
+        document.addEventListener('DOMContentLoaded', function () {
+            setTimeout(function () {
                 var splash = document.getElementById('splash-overlay');
                 if (splash) {
                     splash.style.opacity = '0';
-                    setTimeout(function() {
+                    setTimeout(function () {
                         splash.style.display = 'none';
                     }, 500); // Should match the transition duration
                 }

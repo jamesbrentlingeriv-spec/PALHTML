@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,7 +16,7 @@
             --text-muted: #aaaaaa;
             --border-color: #444444;
             --highlight: #333333;
-            --active-cell: #ffffff; 
+            --active-cell: #ffffff;
             --active-text: #000000;
             --input-bg: #2c2c2c;
             --btn-bg: #ffffff;
@@ -39,7 +40,8 @@
 
         * {
             box-sizing: border-box;
-            font-family: 'Helvetica Neue', Arial, sans-serif; /* Professional Font */
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            /* Professional Font */
         }
 
         body {
@@ -163,7 +165,7 @@
                 color: var(--text-main);
                 border: 1px solid var(--border-color);
             }
-            
+
             button:hover {
                 opacity: 0.8;
             }
@@ -183,7 +185,7 @@
                 width: 100%;
                 max-width: 1200px;
             }
-            
+
             input[type="text"] {
                 width: 100%;
                 background: var(--input-bg);
@@ -194,7 +196,7 @@
                 font-size: 1.1rem;
                 font-family: 'Courier New', monospace;
             }
-            
+
             input[type="text"]:focus {
                 outline: 2px solid var(--text-main);
             }
@@ -206,7 +208,7 @@
                 overflow-x: auto;
                 background: var(--card-bg);
                 border: 1px solid var(--border-color);
-                box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             }
 
             table.matrix {
@@ -215,7 +217,8 @@
                 min-width: 800px;
             }
 
-            th, td {
+            th,
+            td {
                 border: 1px solid var(--border-color);
                 text-align: center;
                 padding: 5px;
@@ -244,7 +247,7 @@
             td.cell {
                 cursor: pointer;
                 user-select: none;
-                height: 45px; 
+                height: 45px;
                 vertical-align: middle;
                 transition: background 0.1s;
             }
@@ -263,11 +266,12 @@
             .count-display.active {
                 color: var(--text-main);
             }
-            
+
             /* High Contrast for active cells */
             td.cell.has-data {
                 background-color: var(--active-cell) !important;
             }
+
             td.cell.has-data .count-display {
                 color: var(--active-text) !important;
             }
@@ -282,7 +286,10 @@
 
         /* --- PRINT STYLES (Always Black & White) --- */
         @media print {
-            @page { margin: 0.5cm; }
+            @page {
+                margin: 0.5cm;
+            }
+
             body {
                 background: white;
                 color: black;
@@ -343,7 +350,7 @@
                 font-size: 12px;
                 text-transform: uppercase;
             }
-            
+
             .print-date-input {
                 border: none;
                 border-bottom: 1px solid black;
@@ -366,12 +373,12 @@
                 padding: 2px 0;
                 break-inside: avoid;
             }
-            
+
             .print-item.new-group {
                 margin-top: 15px;
                 border-top: 2px solid #000;
             }
-            
+
             .print-label {
                 font-weight: bold;
                 font-size: 11px;
@@ -382,20 +389,21 @@
                 font-weight: bold;
                 min-width: 30px;
                 text-align: right;
-                font-family: 'Courier New', monospace; 
+                font-family: 'Courier New', monospace;
                 letter-spacing: 2px;
             }
-            
+
             .print-value::after {
                 content: "___";
                 color: transparent;
                 border-bottom: 1px solid #000;
                 margin-left: 5px;
             }
-            
+
             .print-value.has-count {
                 font-size: 12px;
             }
+
             .print-value.has-count::after {
                 display: none;
             }
@@ -418,10 +426,15 @@
             opacity: 0;
             pointer-events: none;
         }
+
+        <link rel="icon" type="image/x-icon" href="favicon.ico">
     </style>
 </head>
+
 <body>
-    <a href="index.html" style="display: inline-block; padding: 10px 15px; margin: 10px; background-color: #ffb7c5; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">Back to Home</a>
+    <a href="index.html"
+        style="display: inline-block; padding: 10px 15px; margin: 10px; background-color: #ffb7c5; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">Back
+        to Home</a>
     <div id='page-loader-overlay'>
         <img src='assets/loaders/lab-lens.gif' alt='Loading'>
     </div>
@@ -434,7 +447,7 @@
                 <button class="theme-toggle" id="theme-toggle-btn">ðŸŒ— Dark/Light Mode</button>
             </div>
         </header>
-        
+
         <div class="stats-bar">
             <select id="material-select" class="material-select">
                 <option value="poly">POLYCARBONATE</option>
@@ -462,7 +475,7 @@
 
         <div class="grid-container">
             <table class="matrix" id="lens-grid">
-                </table>
+            </table>
         </div>
 
         <footer>
@@ -480,7 +493,7 @@
                 Lexington, Kentucky 40509<br>
                 Business Line: 859-266-3003<br>
                 Fax Line: 859-266-9504<br>
-                
+
                 <div class="print-title">
                     <span id="print-material-title">POLYCARB</span><br>
                     FINISHED SV<br>
@@ -491,7 +504,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="print-header-center">
                 Vision Ease Acc# 103440<br>
                 Date: <input type="text" id="date-input" class="print-date-input">
@@ -499,321 +512,321 @@
 
             <div class="print-header-right"></div>
         </div>
-        
+
         <div id="print-content" class="print-grid">
-            </div>
+        </div>
     </div>
 
-<script>
-    /** CONFIGURATION */
-    const CONFIG = { sphMax: 4.00, sphMin: -8.00, cylMax: 0.00, cylMin: -2.75, step: 0.25 };
-    
-    // STATE
-    let sheets = { poly: {}, plastic: {} };
-    let currentMaterial = 'poly'; 
-    let barcodeDb = JSON.parse(localStorage.getItem('palOpticalBarcodes')) || {}; 
+    <script>
+        /** CONFIGURATION */
+        const CONFIG = { sphMax: 4.00, sphMin: -8.00, cylMax: 0.00, cylMin: -2.75, step: 0.25 };
 
-    // --- SOUND ---
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    function playBeep() {
-        if (audioContext.state === 'suspended') audioContext.resume();
-        const oscillator = audioContext.createOscillator();
-        const gainNode = audioContext.createGain();
-        oscillator.connect(gainNode);
-        gainNode.connect(audioContext.destination);
-        oscillator.type = 'sine';
-        oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
-        gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-        oscillator.start();
-        oscillator.stop(audioContext.currentTime + 0.1);
-    }
+        // STATE
+        let sheets = { poly: {}, plastic: {} };
+        let currentMaterial = 'poly';
+        let barcodeDb = JSON.parse(localStorage.getItem('palOpticalBarcodes')) || {};
 
-    // --- THEME LOGIC ---
-    function toggleTheme() {
-        document.body.classList.toggle('light-mode');
-    }
-
-    // --- HELPERS ---
-    function formatDiopter(num) {
-        if (num === 0) return "PL"; 
-        let s = num.toFixed(2);
-        return num > 0 ? "+" + s : s;
-    }
-    function formatOpticalShort(num) {
-        if (num === 0) return "PL";
-        let val = Math.round(num * 100);
-        return (val > 0 ? "+" + val : val);
-    }
-    function getKey(sph, cyl) { return `${formatDiopter(sph)} ${formatDiopter(cyl)}`; }
-
-    // --- MAIN APP LOGIC ---
-    function switchMaterial() {
-        currentMaterial = document.getElementById('material-select').value;
-        initGrid(); 
-    }
-
-    function initGrid() {
-        // Init Date
-        const today = new Date();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-        const yyyy = today.getFullYear();
-        document.getElementById('date-input').value = `${mm}/${dd}/${yyyy}`;
-
-        const table = document.getElementById('lens-grid');
-        let html = '';
-
-        // Header
-        html += '<thead><tr><th>Sph \\ Cyl</th>';
-        for (let c = CONFIG.cylMax; c >= CONFIG.cylMin; c -= CONFIG.step) {
-            html += `<th>${formatDiopter(c)}</th>`;
+        // --- SOUND ---
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        function playBeep() {
+            if (audioContext.state === 'suspended') audioContext.resume();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+            gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+            oscillator.start();
+            oscillator.stop(audioContext.currentTime + 0.1);
         }
-        html += '</tr></thead>';
 
-        // Body - REPLACED "tbody" text with <tbody> tag
-        html += '<tbody>';
-        for (let s = CONFIG.sphMax; s >= CONFIG.sphMin; s -= CONFIG.step) {
-            html += `<tr><th>${formatDiopter(s)}</th>`; 
+        // --- THEME LOGIC ---
+        function toggleTheme() {
+            document.body.classList.toggle('light-mode');
+        }
+
+        // --- HELPERS ---
+        function formatDiopter(num) {
+            if (num === 0) return "PL";
+            let s = num.toFixed(2);
+            return num > 0 ? "+" + s : s;
+        }
+        function formatOpticalShort(num) {
+            if (num === 0) return "PL";
+            let val = Math.round(num * 100);
+            return (val > 0 ? "+" + val : val);
+        }
+        function getKey(sph, cyl) { return `${formatDiopter(sph)} ${formatDiopter(cyl)}`; }
+
+        // --- MAIN APP LOGIC ---
+        function switchMaterial() {
+            currentMaterial = document.getElementById('material-select').value;
+            initGrid();
+        }
+
+        function initGrid() {
+            // Init Date
+            const today = new Date();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const yyyy = today.getFullYear();
+            document.getElementById('date-input').value = `${mm}/${dd}/${yyyy}`;
+
+            const table = document.getElementById('lens-grid');
+            let html = '';
+
+            // Header
+            html += '<thead><tr><th>Sph \\ Cyl</th>';
             for (let c = CONFIG.cylMax; c >= CONFIG.cylMin; c -= CONFIG.step) {
-                const key = getKey(s, c);
-                const count = sheets[currentMaterial][key] || 0;
-                
-                const activeClass = count > 0 ? 'active' : '';
-                const cellClass = count > 0 ? 'cell has-data' : 'cell';
-                
-                html += `<td class="${cellClass}" data-key="${key}">
+                html += `<th>${formatDiopter(c)}</th>`;
+            }
+            html += '</tr></thead>';
+
+            // Body - REPLACED "tbody" text with <tbody> tag
+            html += '<tbody>';
+            for (let s = CONFIG.sphMax; s >= CONFIG.sphMin; s -= CONFIG.step) {
+                html += `<tr><th>${formatDiopter(s)}</th>`;
+                for (let c = CONFIG.cylMax; c >= CONFIG.cylMin; c -= CONFIG.step) {
+                    const key = getKey(s, c);
+                    const count = sheets[currentMaterial][key] || 0;
+
+                    const activeClass = count > 0 ? 'active' : '';
+                    const cellClass = count > 0 ? 'cell has-data' : 'cell';
+
+                    html += `<td class="${cellClass}" data-key="${key}">
                         <span class="count-display ${activeClass}" id="count-${key.replace(/\s/g, '_')}">${count > 0 ? count : '-'}</span>
                     </td>`;
+                }
+                html += '</tr>';
             }
-            html += '</tr>';
+            html += '</tbody>';
+            table.innerHTML = html;
+            updateTotals();
+            updatePrintView();
+            document.getElementById('quick-add').focus();
         }
-        html += '</tbody>';
-        table.innerHTML = html;
-        updateTotals();
-        updatePrintView(); 
-        document.getElementById('quick-add').focus();
-    }
 
-    function handleCellClick(key, cellElement) {
-        if (!sheets[currentMaterial][key]) sheets[currentMaterial][key] = 0;
-        sheets[currentMaterial][key]++;
-        refreshCell(key, cellElement);
-        updateTotals();
-        updatePrintView();
-    }
-
-    function handleRightClick(e, key, cellElement) {
-        e.preventDefault();
-        if (sheets[currentMaterial][key] && sheets[currentMaterial][key] > 0) {
-            sheets[currentMaterial][key]--;
-            if (sheets[currentMaterial][key] === 0) delete sheets[currentMaterial][key];
+        function handleCellClick(key, cellElement) {
+            if (!sheets[currentMaterial][key]) sheets[currentMaterial][key] = 0;
+            sheets[currentMaterial][key]++;
             refreshCell(key, cellElement);
             updateTotals();
             updatePrintView();
         }
-    }
 
-    function refreshCell(key, cellElement) {
-        const countSpan = document.getElementById(`count-${key.replace(/\s/g, '_')}`);
-        const count = sheets[currentMaterial][key] || 0;
-        
-        if (count > 0) {
-            countSpan.textContent = count;
-            countSpan.classList.add('active');
-            cellElement.classList.add('has-data');
-        } else {
-            countSpan.textContent = "-";
-            countSpan.classList.remove('active');
-            cellElement.classList.remove('has-data');
-        }
-    }
-
-    function updateTotals() {
-        let totalCount = 0;
-        for (const [key, count] of Object.entries(sheets[currentMaterial])) {
-            totalCount += count;
-        }
-        document.getElementById('total-count').innerText = totalCount;
-    }
-
-    // --- PRINT VIEW ---
-    function updatePrintView() {
-        const container = document.getElementById('print-content');
-        const titleEl = document.getElementById('print-material-title');
-        const warnEl = document.getElementById('print-poly-warning');
-        
-        if (currentMaterial === 'poly') {
-            titleEl.innerText = "POLYCARB";
-            warnEl.style.display = "block";
-        } else {
-            titleEl.innerText = "PLASTIC (CR-39)";
-            warnEl.style.display = "none";
+        function handleRightClick(e, key, cellElement) {
+            e.preventDefault();
+            if (sheets[currentMaterial][key] && sheets[currentMaterial][key] > 0) {
+                sheets[currentMaterial][key]--;
+                if (sheets[currentMaterial][key] === 0) delete sheets[currentMaterial][key];
+                refreshCell(key, cellElement);
+                updateTotals();
+                updatePrintView();
+            }
         }
 
-        let html = '';
-        const makeTallies = (num) => "|".repeat(num);
-
-        const renderRow = (s, c, isFirstInGroup, labelOverride = null) => {
-            const key = getKey(s, c);
+        function refreshCell(key, cellElement) {
+            const countSpan = document.getElementById(`count-${key.replace(/\s/g, '_')}`);
             const count = sheets[currentMaterial][key] || 0;
-            
-            let label = labelOverride ? labelOverride : `${formatOpticalShort(s)} ${formatOpticalShort(c)}`;
-            const groupClass = isFirstInGroup ? 'new-group' : '';
-            const valClass = count > 0 ? 'has-count' : '';
-            const valDisplay = count > 0 ? makeTallies(count) : '';
-            return `<div class="print-item ${groupClass}"><span class="print-label">${label}</span><span class="print-value ${valClass}">${valDisplay}</span></div>`;
-        };
 
-        // Render Blocks
-        let firstSph = true;
-        for (let s = CONFIG.sphMin; s <= CONFIG.sphMax; s += CONFIG.step) {
-             html += renderRow(s, 0, firstSph, `${formatOpticalShort(s)} SPH`);
-             firstSph = false;
-        }
-        for (let c = -0.25; c >= CONFIG.cylMin; c -= CONFIG.step) {
-            let firstInGroup = true;
-            for (let s = 0; s >= CONFIG.sphMin; s -= CONFIG.step) {
-                 html += renderRow(s, c, firstInGroup);
-                 firstInGroup = false;
+            if (count > 0) {
+                countSpan.textContent = count;
+                countSpan.classList.add('active');
+                cellElement.classList.add('has-data');
+            } else {
+                countSpan.textContent = "-";
+                countSpan.classList.remove('active');
+                cellElement.classList.remove('has-data');
             }
         }
-        for (let c = -0.25; c >= CONFIG.cylMin; c -= CONFIG.step) {
-            let firstInGroup = true;
-            for (let s = 0.25; s <= CONFIG.sphMax; s += CONFIG.step) {
-                 html += renderRow(s, c, firstInGroup);
-                 firstInGroup = false;
+
+        function updateTotals() {
+            let totalCount = 0;
+            for (const [key, count] of Object.entries(sheets[currentMaterial])) {
+                totalCount += count;
+            }
+            document.getElementById('total-count').innerText = totalCount;
+        }
+
+        // --- PRINT VIEW ---
+        function updatePrintView() {
+            const container = document.getElementById('print-content');
+            const titleEl = document.getElementById('print-material-title');
+            const warnEl = document.getElementById('print-poly-warning');
+
+            if (currentMaterial === 'poly') {
+                titleEl.innerText = "POLYCARB";
+                warnEl.style.display = "block";
+            } else {
+                titleEl.innerText = "PLASTIC (CR-39)";
+                warnEl.style.display = "none";
+            }
+
+            let html = '';
+            const makeTallies = (num) => "|".repeat(num);
+
+            const renderRow = (s, c, isFirstInGroup, labelOverride = null) => {
+                const key = getKey(s, c);
+                const count = sheets[currentMaterial][key] || 0;
+
+                let label = labelOverride ? labelOverride : `${formatOpticalShort(s)} ${formatOpticalShort(c)}`;
+                const groupClass = isFirstInGroup ? 'new-group' : '';
+                const valClass = count > 0 ? 'has-count' : '';
+                const valDisplay = count > 0 ? makeTallies(count) : '';
+                return `<div class="print-item ${groupClass}"><span class="print-label">${label}</span><span class="print-value ${valClass}">${valDisplay}</span></div>`;
+            };
+
+            // Render Blocks
+            let firstSph = true;
+            for (let s = CONFIG.sphMin; s <= CONFIG.sphMax; s += CONFIG.step) {
+                html += renderRow(s, 0, firstSph, `${formatOpticalShort(s)} SPH`);
+                firstSph = false;
+            }
+            for (let c = -0.25; c >= CONFIG.cylMin; c -= CONFIG.step) {
+                let firstInGroup = true;
+                for (let s = 0; s >= CONFIG.sphMin; s -= CONFIG.step) {
+                    html += renderRow(s, c, firstInGroup);
+                    firstInGroup = false;
+                }
+            }
+            for (let c = -0.25; c >= CONFIG.cylMin; c -= CONFIG.step) {
+                let firstInGroup = true;
+                for (let s = 0.25; s <= CONFIG.sphMax; s += CONFIG.step) {
+                    html += renderRow(s, c, firstInGroup);
+                    firstInGroup = false;
+                }
+            }
+            container.innerHTML = html;
+        }
+
+        // --- INPUT / SCANNER ---
+        document.getElementById('quick-add').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                handleInput(this.value.trim());
+                this.value = '';
+                setTimeout(() => document.getElementById('quick-add').focus(), 10);
+            }
+        });
+
+        function handleInput(val) {
+            if (!val) return;
+            if (barcodeDb[val]) { parseInput(barcodeDb[val]); playBeep(); return; }
+            if (val.includes(' ') || val.toUpperCase().includes('SPH') || val.toUpperCase().includes('PL')) { parseInput(val); return; }
+            if (/^\d+$/.test(val)) {
+                let mapVal = prompt(`New Barcode: ${val}\nMap to what lens? (e.g. -200 -125)`);
+                if (mapVal && parseInput(mapVal)) {
+                    barcodeDb[val] = mapVal;
+                    localStorage.setItem('palOpticalBarcodes', JSON.stringify(barcodeDb));
+                }
+                setTimeout(() => document.getElementById('quick-add').focus(), 10);
             }
         }
-        container.innerHTML = html;
-    }
 
-    // --- INPUT / SCANNER ---
-    document.getElementById('quick-add').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            handleInput(this.value.trim());
-            this.value = '';
-            setTimeout(() => document.getElementById('quick-add').focus(), 10);
-        }
-    });
+        function parseInput(str) {
+            let parts = str.match(/([+-]?\d*\.?\d+|PL|SPHERE|SPH)/gi);
+            if (!parts || parts.length < 1) return false;
+            let p1 = parts[0];
+            let p2 = parts[1] || "SPHERE";
 
-    function handleInput(val) {
-        if (!val) return;
-        if (barcodeDb[val]) { parseInput(barcodeDb[val]); playBeep(); return; }
-        if (val.includes(' ') || val.toUpperCase().includes('SPH') || val.toUpperCase().includes('PL')) { parseInput(val); return; }
-        if (/^\d+$/.test(val)) {
-            let mapVal = prompt(`New Barcode: ${val}\nMap to what lens? (e.g. -200 -125)`);
-            if (mapVal && parseInput(mapVal)) {
-                barcodeDb[val] = mapVal;
-                localStorage.setItem('palOpticalBarcodes', JSON.stringify(barcodeDb));
+            const cleanNum = (val) => {
+                if (typeof val === 'string' && (val.toUpperCase() === 'PL' || val.toUpperCase().includes('SPH'))) return 0;
+                let n = parseFloat(val);
+                if (Math.abs(n) >= 10) return n / 100;
+                return n;
+            };
+
+            const round25 = (num) => (Math.round(num * 4) / 4);
+            let sph = round25(cleanNum(p1));
+            let cyl = round25(cleanNum(p2));
+            let key = getKey(sph, cyl);
+
+            if (sph > CONFIG.sphMax || sph < CONFIG.sphMin || cyl > CONFIG.cylMax || cyl < CONFIG.cylMin) {
+                alert(`Out of bounds: ${key}`);
+                return false;
             }
-            setTimeout(() => document.getElementById('quick-add').focus(), 10);
-        }
-    }
 
-    function parseInput(str) {
-        let parts = str.match(/([+-]?\d*\.?\d+|PL|SPHERE|SPH)/gi);
-        if (!parts || parts.length < 1) return false;
-        let p1 = parts[0]; 
-        let p2 = parts[1] || "SPHERE"; 
+            if (!sheets[currentMaterial][key]) sheets[currentMaterial][key] = 0;
+            sheets[currentMaterial][key]++;
 
-        const cleanNum = (val) => {
-            if (typeof val === 'string' && (val.toUpperCase() === 'PL' || val.toUpperCase().includes('SPH'))) return 0;
-            let n = parseFloat(val);
-            if (Math.abs(n) >= 10) return n / 100;
-            return n;
-        };
+            const countSpan = document.getElementById(`count-${key.replace(/\s/g, '_')}`);
+            if (countSpan) {
+                refreshCell(key, countSpan.parentElement);
+            }
 
-        const round25 = (num) => (Math.round(num * 4) / 4);
-        let sph = round25(cleanNum(p1));
-        let cyl = round25(cleanNum(p2));
-        let key = getKey(sph, cyl);
-
-        if (sph > CONFIG.sphMax || sph < CONFIG.sphMin || cyl > CONFIG.cylMax || cyl < CONFIG.cylMin) {
-            alert(`Out of bounds: ${key}`);
-            return false;
+            updateTotals();
+            updatePrintView();
+            return true;
         }
 
-        if (!sheets[currentMaterial][key]) sheets[currentMaterial][key] = 0;
-        sheets[currentMaterial][key]++;
-        
-        const countSpan = document.getElementById(`count-${key.replace(/\s/g, '_')}`);
-        if (countSpan) {
-            refreshCell(key, countSpan.parentElement);
+        function exportCSV() {
+            let data = sheets[currentMaterial];
+            if (Object.keys(data).length === 0) { alert("Current sheet empty."); return; }
+            let csvContent = `data:text/csv;charset=utf-8,Material,Sphere,Cylinder,Quantity\n`;
+            for (const [key, count] of Object.entries(data)) {
+                let [sph, cyl] = key.split(" ");
+                csvContent += `${currentMaterial.toUpperCase()},${sph},${cyl},${count}\n`;
+            }
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `pal_optical_${currentMaterial}_tally.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
-        
-        updateTotals();
-        updatePrintView();
-        return true;
-    }
 
-    function exportCSV() {
-        let data = sheets[currentMaterial];
-        if (Object.keys(data).length === 0) { alert("Current sheet empty."); return; }
-        let csvContent = `data:text/csv;charset=utf-8,Material,Sphere,Cylinder,Quantity\n`;
-        for (const [key, count] of Object.entries(data)) {
-            let [sph, cyl] = key.split(" ");
-            csvContent += `${currentMaterial.toUpperCase()},${sph},${cyl},${count}\n`;
+        function resetGrid() {
+            if (confirm(`Delete all counts for ${currentMaterial.toUpperCase()}? (Other material is safe)`)) {
+                sheets[currentMaterial] = {};
+                initGrid();
+            }
         }
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", `pal_optical_${currentMaterial}_tally.csv`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
 
-    function resetGrid() {
-        if(confirm(`Delete all counts for ${currentMaterial.toUpperCase()}? (Other material is safe)`)) {
-            sheets[currentMaterial] = {};
+        // SCANNER CAMERA (Optional)
+        let cameraScanner = null;
+        function toggleCamera() {
+            if (cameraScanner) {
+                cameraScanner.clear(); cameraScanner = null; document.getElementById('reader').style.display = 'none';
+            } else {
+                document.getElementById('reader').style.display = 'block';
+                cameraScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+                cameraScanner.render((code) => handleInput(code));
+            }
+        }
+
+        function setupEventHandlers() {
+            const lensGrid = document.getElementById('lens-grid');
+            document.getElementById('theme-toggle-btn').addEventListener('click', toggleTheme);
+            document.getElementById('material-select').addEventListener('change', switchMaterial);
+            document.getElementById('toggle-camera-btn').addEventListener('click', toggleCamera);
+            document.getElementById('reset-grid-btn').addEventListener('click', resetGrid);
+            document.getElementById('print-receipt-btn').addEventListener('click', () => window.print());
+            document.getElementById('export-csv-btn').addEventListener('click', exportCSV);
+
+            lensGrid.addEventListener('click', (event) => {
+                const cell = event.target.closest('td.cell');
+                if (!cell || !cell.dataset.key) {
+                    return;
+                }
+                handleCellClick(cell.dataset.key, cell);
+            });
+
+            lensGrid.addEventListener('contextmenu', (event) => {
+                const cell = event.target.closest('td.cell');
+                if (!cell || !cell.dataset.key) {
+                    return;
+                }
+                handleRightClick(event, cell.dataset.key, cell);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupEventHandlers();
             initGrid();
-        }
-    }
-    
-    // SCANNER CAMERA (Optional)
-    let cameraScanner = null;
-    function toggleCamera() {
-        if (cameraScanner) {
-            cameraScanner.clear(); cameraScanner = null; document.getElementById('reader').style.display = 'none';
-        } else {
-            document.getElementById('reader').style.display = 'block';
-            cameraScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-            cameraScanner.render((code) => handleInput(code));
-        }
-    }
-
-    function setupEventHandlers() {
-        const lensGrid = document.getElementById('lens-grid');
-        document.getElementById('theme-toggle-btn').addEventListener('click', toggleTheme);
-        document.getElementById('material-select').addEventListener('change', switchMaterial);
-        document.getElementById('toggle-camera-btn').addEventListener('click', toggleCamera);
-        document.getElementById('reset-grid-btn').addEventListener('click', resetGrid);
-        document.getElementById('print-receipt-btn').addEventListener('click', () => window.print());
-        document.getElementById('export-csv-btn').addEventListener('click', exportCSV);
-
-        lensGrid.addEventListener('click', (event) => {
-            const cell = event.target.closest('td.cell');
-            if (!cell || !cell.dataset.key) {
-                return;
-            }
-            handleCellClick(cell.dataset.key, cell);
         });
 
-        lensGrid.addEventListener('contextmenu', (event) => {
-            const cell = event.target.closest('td.cell');
-            if (!cell || !cell.dataset.key) {
-                return;
-            }
-            handleRightClick(event, cell.dataset.key, cell);
-        });
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        setupEventHandlers();
-        initGrid();
-    });
-
-</script>
+    </script>
 
     <script>
         (() => {
@@ -841,8 +854,5 @@
         })();
     </script>
 </body>
+
 </html>
-
-
-
-
