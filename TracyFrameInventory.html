@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+?<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -147,9 +147,9 @@
 
 
 <div class="container">
-    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">ðŸŒ™</button>
+    <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()">🌙</button>
     <h1>Pal Optical Frame Inventory Tool</h1>
-    <p class="subtitle">James Brentlinger 2026â„¢</p>
+    <p class="subtitle">jamesbrentlinger2026&trade;
     
     <div class="form-section">
         <div class="grid">
@@ -190,8 +190,8 @@
         </div>
 
         <div class="btn-group">
-            <button class="btn-connect" id="connectBtn" onclick="setupFileHandle()">ðŸ”— Connect Master CSV</button>
-            <button class="btn-add" onclick="saveFrame()">Import to Master ðŸ“¥</button>
+            <button class="btn-connect" id="connectBtn" onclick="setupFileHandle()">🔗 Connect Master CSV</button>
+            <button class="btn-add" onclick="saveFrame()">Import to Master 📥</button>
         </div>
     </div>
 
@@ -247,7 +247,7 @@
         window.resolveLocalFileSystemURL(cordova.file.externalDataDirectory, function (dirEntry) {
             dirEntry.getFile(masterFileName, { create: true, exclusive: false }, function (entry) {
                 fileEntry = entry; // Save the file entry for later use
-                document.getElementById("connectBtn").innerText = "âœ… Master Connected";
+                document.getElementById("connectBtn").innerText = "✅ Master Connected";
                 document.getElementById("connectBtn").style.backgroundColor = "#888";
                 document.getElementById("connectBtn").onclick = null; // Disable further clicks
                 alert("Master File Connected! The file is stored at: " + fileEntry.nativeURL);
@@ -281,7 +281,7 @@
 
     async function saveFrame() {
         if(!fileEntry) {
-            alert("Please connect your Master CSV first! à«®ê’° Ë¶â€¢ à¼ â€¢Ë¶ê’±áƒ");
+            alert("Please connect your Master CSV first! ૮꒰ ˶• ༝ •˶꒱ა");
             return;
         }
 
@@ -291,7 +291,7 @@
         const wholesale = document.getElementById("wholesale").value;
         const retail = document.getElementById("retail").value;
 
-        if(!mfg || !brand || !model || !wholesale || !retail) { alert("Missing info! à«®ê’° Ë¶â€¢ à¼ â€¢Ë¶ê’±áƒ"); return; }
+        if(!mfg || !brand || !model || !wholesale || !retail) { alert("Missing info! ૮꒰ ˶• ༝ •˶꒱ა"); return; }
 
         const newFrame = {
             mfg, brand, model,
@@ -379,17 +379,17 @@
         const toggleBtn = document.getElementById("themeToggle");
         if (body.getAttribute("data-theme") === "dark") {
             body.removeAttribute("data-theme");
-            toggleBtn.innerText = "ðŸŒ™";
+            toggleBtn.innerText = "🌙";
         } else {
             body.setAttribute("data-theme", "dark");
-            toggleBtn.innerText = "â˜€ï¸";
+            toggleBtn.innerText = "☀️";
         }
     }
 
     // If not in a Cordova environment, fall back to the web-based file picker
     if (typeof cordova === 'undefined') {
         document.getElementById('connectBtn').onclick = async function() {
-            try { fileHandle = await window.showSaveFilePicker({ suggestedName: masterFileName, types: [{ description: 'CSV File', accept: {'text/csv': ['.csv']} }] }); document.getElementById("connectBtn").innerText = "âœ… Master Connected"; document.getElementById("connectBtn").style.backgroundColor = "#888"; alert("Master File Connected!"); } catch (err) { console.error(err); }
+            try { fileHandle = await window.showSaveFilePicker({ suggestedName: masterFileName, types: [{ description: 'CSV File', accept: {'text/csv': ['.csv']} }] }); document.getElementById("connectBtn").innerText = "✅ Master Connected"; document.getElementById("connectBtn").style.backgroundColor = "#888"; alert("Master File Connected!"); } catch (err) { console.error(err); }
         };
     }
 </script>
