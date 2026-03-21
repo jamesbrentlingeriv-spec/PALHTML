@@ -62,20 +62,40 @@ inventory management.
 
 ---
 
-## 🚀 Applications
+## 🚀 Applications - Complete Toolkit (10 Tools)
 
-The Pal Optical Master Suite includes **8 powerful applications**:
+**Pal Optical Master Suite** - Pure HTML/JS, offline PWA for optical lab/retail.
 
-| #   | Application             | Description                                                                                 | File                       |
-| --- | ----------------------- | ------------------------------------------------------------------------------------------- | -------------------------- |
-| 1   | **P.O.S.T. Write-Ups**  | Advanced digital write-up system with Firebase sync, patient forms, and camera measurements | `WRITEUP.html`             |
-| 2   | **Contact Lens Orders** | Manage and track patient contact lens orders                                                | `contact.html`             |
-| 3   | **Detailed Receipt**    | Generate itemized receipts for optical services                                             | `PAL OPTICAL RECEIPT.HTML` |
-| 4   | **Lab FSV Order Sheet** | Order Vision Ease FSV lenses directly from the lab                                          | `LABLENS.HTML`             |
-| 5   | **Lens Availability**   | RX Ranges database for Progressives and Multifocals                                         | `lensavail.html`           |
-| 6   | **Quote Tool**          | Professional estimates for lenses and frames                                                | `PALQUOTE (1).HTML`        |
-| 7   | **Frame Inventory**     | Full-service frame inventory management system                                              | `TracyFrameInventory.html` |
-| 8   | **DR Itemized Receipt** | Professional receipts for doctor services                                                   | `DRITEMIZEDRECPT.HTML`     |
+| 🛠️ # | Tool                                            | Live Demo                                              | Status          |
+| ---- | ----------------------------------------------- | ------------------------------------------------------ | --------------- |
+| 1️⃣   | [P.O.S.T. Write-Ups](WRITEUP.html)              | ![P.O.S.T.](assets/loaders/writeup.gif)                | ⭐ **Flagship** |
+| 2️⃣   | [Contact Lens Orders](contact.html)             | ![Contacts](assets/loaders/contact.gif)                | 🟢 Live         |
+| 3️⃣   | [Dr. Itemized Receipt](DRITEMIZEDRECPT.HTML)    | ![Dr Receipt](assets/loaders/dr-itemized-receipt.gif)  | 🟢 Live         |
+| 4️⃣   | [Master Dashboard](index.html)                  | ![Dashboard](assets/loaders/index.gif)                 | 🟢 Live         |
+| 5️⃣   | [Pal Optical Receipt](PAL OPTICAL RECEIPT.HTML) | ![Pal Receipt](assets/loaders/pal-optical-receipt.gif) | 🟢 Live         |
+| 6️⃣   | [Lab FSV Order Sheet](LABLENS.HTML)             | ![Lab Lens](assets/loaders/lab-lens.gif)               | 🟢 Live         |
+| 7️⃣   | [Lens Availability](lensavail.html)             | ![Lens Avail](assets/loaders/lens-availability.gif)    | 🟢 Live         |
+| 8️⃣   | [Optician Calculator](opticalc.html)            | N/A                                                    | 🟢 Live         |
+| 9️⃣   | [PAL Quote Tool](PALQUOTE (1).HTML)             | ![Quote](assets/loaders/pal-quote.gif)                 | 🟢 Live         |
+| 🔟   | [Frame Inventory](TracyFrameInventory.html)     | ![Frames](assets/loaders/tracy-frame-inventory.gif)    | 🟢 Live         |
+| 1️⃣1️⃣ | [Lens Guide](lens-guide.html)                   | ![Lens Guide](assets/loaders/lensguide.gif)            | 🟢 Live         |
+
+<details>
+<summary>🔍 Click to expand: Feature Matrix (All Tools)</summary>
+
+| Tool           | Key Features                                                               | Data                            | Output                                          |
+| -------------- | -------------------------------------------------------------------------- | ------------------------------- | ----------------------------------------------- |
+| **P.O.S.T.**   | Camera PD/Seg, 400+ lens catalog, Firebase sync, multi-lang forms, waivers | JSON pricing, Rx calc           | 3-page print (slips/forms/waivers), HTML export |
+| **Contacts**   | Supply tracking, ins/payments                                              | LocalStorage                    | Excel export, print list                        |
+| **Receipts**   | Dynamic items, ins adj, payments                                           | Live calc                       | Professional receipts                           |
+| **Dashboard**  | PWA launcher, dark theme                                                   | Links all                       | N/A                                             |
+| **Lens Avail** | RX ranges (50+ progs)                                                      | `Pal_Optical_Lens_Catalog.json` | Tables/search                                   |
+| **Quote/Calc** | Estimates, thickness viz                                                   | Math engine                     | Quotes/calcs                                    |
+| **Inventory**  | Frame mgmt                                                                 | Tracy-specific                  | Inventory reports                               |
+
+</details>
+
+**Live Demos**: Open `index.html` → Click any tool 🖱️
 
 ---
 
@@ -94,22 +114,6 @@ output generation.
 
 Secure login system with personalized access codes:
 
-```
-┌─────────────────────────────────────────────────────────┐
-│  Available Users:                                       │
-│  • JAMES (JB) - Master Admin                           │
-│  • LINDA (LG) - Manager                               │
-│  • APRIL (AB) - Optician                              │
-│  • NAEROBI (NG) - Optician                            │
-│  • SABRINA (SJ) - Optician                            │
-│  • TRACY (TH) - Optician                              │
-│  • CARRIBYAN (CWR) - Optician                         │
-│  • MIRANDA (MS) - Optician                            │
-│  • DRR - Doctor Access                                │
-│  • DRK - Doctor Access                                │
-│  • ROB (RH) - Staff                                   │
-│  • LISA (LW) - Staff                                  │
-└─────────────────────────────────────────────────────────┘
 ```
 
 #### 📋 Patient Management
@@ -175,21 +179,15 @@ Complete billing table with automatic calculations:
 Revolutionary PD and Seg Height measurement using your device camera:
 
 ```
-┌────────────────────────────────────────────────────┐
-│         CAMERA MEASUREMENT PROCESS                │
-├────────────────────────────────────────────────────┤
-│  Step 1: Click LEFT edge of credit card            │
-│     ↓                                             │
-│  Step 2: Click RIGHT edge of credit card          │
-│     ↓                                             │
-│  Step 3: Click center of RIGHT pupil              │
-│     ↓                                             │
-│  Step 4: Click center of LEFT pupil               │
-│     ↓                                             │
-│  Step 5: Click BOTTOM of right lens (Seg)         │
-│     ↓                                             │
-│  Result: Instant PD & Seg Height Display          │
+
+┌────────────────────────────────────────────────────┐ │ CAMERA MEASUREMENT
+PROCESS │ ├────────────────────────────────────────────────────┤ │ Step 1: Click
+LEFT edge of credit card │ │ ↓ │ │ Step 2: Click RIGHT edge of credit card │ │ ↓
+│ │ Step 3: Click center of RIGHT pupil │ │ ↓ │ │ Step 4: Click center of LEFT
+pupil │ │ ↓ │ │ Step 5: Click BOTTOM of right lens (Seg) │ │ ↓ │ │ Result:
+Instant PD & Seg Height Display │
 └────────────────────────────────────────────────────┘
+
 ```
 
 - 📸 **Credit Card Calibration** - Uses standard ID-1 credit card (85.60mm) for
@@ -240,24 +238,17 @@ Extensive lens database with **400+ lens options** including:
 Multi-page print output generation:
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                    PRINT OUTPUT                         │
-├─────────────────────────────────────────────────────────┤
-│  📄 Page 1: Dual Slip Page                             │
-│     • Perforated lab slips (Store + Lab copies)        │
-│                                                         │
-│  📋 Page 2: Patient Information Sheet                  │
-│     • Multi-language form (EN/ES/FR)                   │
-│     • Demographics & Insurance                         │
-│     • HIPAA Consent & Signature                        │
-│                                                         │
-│  ⚠️ Page 3: Waiver/Disclosure Form                    │
-│     • Auto-generated based on checkboxes               │
-│     • Expired Rx, POF, Thickness, Poly, etc.           │
-│                                                         │
-│  💾 Auto-Save: HTML files to local folder             │
-│     • Patient name, Job #, Timestamp                   │
+
+┌─────────────────────────────────────────────────────────┐ │ PRINT OUTPUT │
+├─────────────────────────────────────────────────────────┤ │ 📄 Page 1: Dual
+Slip Page │ │ • Perforated lab slips (Store + Lab copies) │ │ │ │ 📋 Page 2:
+Patient Information Sheet │ │ • Multi-language form (EN/ES/FR) │ │ •
+Demographics & Insurance │ │ • HIPAA Consent & Signature │ │ │ │ ⚠️ Page 3:
+Waiver/Disclosure Form │ │ • Auto-generated based on checkboxes │ │ • Expired
+Rx, POF, Thickness, Poly, etc. │ │ │ │ 💾 Auto-Save: HTML files to local folder
+│ │ • Patient name, Job #, Timestamp │
 └─────────────────────────────────────────────────────────┘
+
 ```
 
 **Available Waivers:**
@@ -305,48 +296,159 @@ Intelligent form validation:
 
 ---
 
-## 📦 Installation
+## 📦 Quick Start
 
-### Quick Start (Local)
-
-```
-bash
-# Clone or download this repository
-git clone https://github.com/jbrentlinger/PALHTML.git
-cd PALHTML
-
-# Open index.html in your preferred browser
-
-# Windows
-start index.html
-
-# macOS
-open index.html
-
-# Linux
-xdg-open index.html
-```
-
-### PWA Installation
-
-For full offline capability:
+1. **Local**: `start index.html` (Windows) → Click any tool 🖱️
+2. **PWA**: Serve → Install (offline/fullscreen)
 
 ```
-bash
-# Using Python
-python -m http.server 8000
 
-# Using Node.js
-npx serve
-```
+# Live server (pick one)
 
-Then open in browser and install:
+npx serve . # Node.js python -m http.server 8000 # Python
 
-- **Chrome/Edge**: Click install icon in address bar
-- **iOS**: Share → Add to Home Screen
-- **Android**: Menu → Install App
+````
+
+**All tools work offline** after first load (Service Worker magic ✨).
 
 ---
+
+## 🛠️ Detailed Tool Breakdown
+
+### 1️⃣ P.O.S.T. Write-Ups (`WRITEUP.html`)
+
+![Loading](assets/loaders/writeup.gif)
+
+**Flagship Tool** - Complete digital replacement for paper slips (5000+ JS
+lines).
+
+| Feature        | Details                                         |
+| -------------- | ----------------------------------------------- |
+| 👥 **Users**   | 12 staff logins (James→Lisa) w/ initials        |
+| 📋 **Forms**   | Multi-lang (EN/ES/FR), HIPAA, guardians         |
+| 📷 **Camera**  | PD/Seg via credit card calibration (5 clicks)   |
+| 💰 **Billing** | Auto lens pricing (400+), ins copays/allowances |
+| 🏥 **Ins**     | Medicaid codes + 10 commercial (VSP 20% off)    |
+| 🖨️ **Print**   | 3 pages: Dual slips + Pt sheet + Waivers        |
+| ☁️ **Sync**    | Firebase realtime + local HTML export           |
+
+<details><summary>🎥 Live Features (Click to expand)</summary>
+
+```js
+// Camera PD/Seg (Credit card = 85.6mm scale)
+const CREDIT_CARD_WIDTH_MM = 85.6;
+measurePixelsPerMM = pixDist / CREDIT_CARD_WIDTH_MM;
+````
+
+**Auto Charges**:
+
+- Oversize (A≥58mm): +$20
+- High Rx (±4/±8): +$10/$20
+- High Add (+3/+4): +$15/$30
+- Prism: +$10
+
+**Lens Catalog Sample**: | Category | Examples | |----------|----------| |
+Plastic | Varilux X ($530), Shamir III ($465) | | Poly | Unity VIA ($410),
+Younger ($295) | | High Index | 1.67/1.74 SV ($365/$400) |
+
+</details>
+
+### 2️⃣ Contact Lens Orders (`contact.html`)
+
+![Loading](assets/loaders/contact.gif)
+
+**Supply Tracking** - Annual/6mo/Custom boxes, ins/payments.
+
+**Features**:
+
+- ✅ Per-eye/total boxes
+- ✅ Ins tracking (VSP/EyeMed)
+- ✅ Payments: "Pay When Comes In" warnings
+- 💾 **LocalStorage** persistence
+- 📊 **Excel Export** (alphabetized)
+- 🖨️ Print lists
+
+**UI Highlights**:
+
+```
+Annual Supply | 6-Month | Custom Boxes (Per Eye?)
+Payment: Cash/Card/Check/Ins/Pay Later ⚠️
+```
+
+### 3️⃣ Dr. Itemized Receipts (`DRITEMIZEDRECPT.HTML`)
+
+![Loading](assets/loaders/dr-itemized-receipt.gif)
+
+**Dr. Klecker/Robbins** receipts w/ confirm modal.
+
+**Key**:
+
+- ➕ Dynamic item rows (Code/Desc/Qty/Price)
+- 💰 Live totals: Subtotal - Ins Adj - Paid = Balance
+- 🧾 Payments: Visa/MC/AmEx/Disc/Check/Cash
+- ✅ **Date confirm** before print
+
+### 4️⃣ Pal Optical Receipts (`PAL OPTICAL RECEIPT.HTML`)
+
+![Loading](assets/loaders/pal-optical-receipt.gif)
+
+**Pal-branded** version (same engine).
+
+### 5️⃣ Master Dashboard (`index.html`)
+
+![Loading](assets/loaders/index.gif)
+
+**PWA Launcher** - Dark/light theme toggle.
+
+```
+P.O.S.T. | Contacts | Receipts | Calculator | ...
+[🌙 Dark Mode] [Install PWA]
+```
+
+### 6️⃣ Lab FSV Order Sheet (`LABLENS.HTML`)
+
+![Loading](assets/loaders/lab-lens.gif)
+
+**Vision Ease FSV** lab orders.
+
+### 7️⃣ Lens Availability (`lensavail.html`)
+
+![Loading](assets/loaders/lens-availability.gif)
+
+**RX Ranges** from `Pal_Optical_Lens_Catalog.json` (50+ progs).
+
+**Sample**: | Lens | Material | SPH | CYL | ADD | Min Height |
+|------|----------|-----|-----|-----|------------| | Varilux X | Plastic |
+-10→+6 | →-6 | 0.75-3.50 | 14mm | | Shamir III | 1.67 | -16.75→+8.25 | →-8 |
+0.75-4 | 17mm |
+
+### 8️⃣ Optician Calculator (`opticalc.html`)
+
+**Lens math** + thickness visualizer + retail tools.
+
+### 9️⃣ PAL Quote Tool (`PALQUOTE (1).HTML`)
+
+![Loading](assets/loaders/pal-quote.gif)
+
+**Professional estimates**.
+
+### 🔟 Frame Inventory (`TracyFrameInventory.html`)
+
+![Loading](assets/loaders/tracy-frame-inventory.gif)
+
+**Full mgmt** for Tracy.
+
+### 1️⃣1️⃣ Lens Viewing Guide (`lens-guide.html`)
+
+![Loading](assets/loaders/lensguide.gif)
+
+**Interactive visualizer** (corridors/types).
+
+</details>
+
+## 🔧 Technical Stack
+
+_Unchanged - Excellent_
 
 ## 🎯 Features
 
