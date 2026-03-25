@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEMI-RIMLESS CHIP WAIVER | Pal Optical</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0.75in;
+            max-width: 8.5in;
+            font-size: 1.05em;
+            line-height: 1.4;
+        }
+
+        .waiver-title {
+            font-size: 1.6em;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 2px solid #000;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+        }
+
+        .waiver-header {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .waiver-text {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-left: 5px solid #000;
+        }
+
+        .signature-section {
+            margin-top: 50px;
+        }
+
+        .sig-line {
+            border-bottom: 1px solid #000;
+            height: 70px;
+            margin-bottom: 5px;
+        }
+
+        .footer-row {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            border-top: 2px solid #000;
+            padding-top: 5px;
+        }
+
+        @page {
+            size: letter;
+            margin: 0.75in;
+        }
+
+        @media print {
+            body {
+                padding: 0.75in;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="waiver-title">PATIENT DISCLOSURE &amp; WAIVER FORM</div>
+    <div class="waiver-header">
+        Waiver: <strong>SEMI-RIMLESS CHIP WAIVER</strong> | Date: <span id="waiver-date"></span>
+    </div>
+    <div class="waiver-text">
+        <p><b>SEMI-RIMLESS CHIP WAIVER:</b> I have been warned of chipping and cracking of my lenses if I choose to not
+            get polycarbonate lenses in my semi-rimless frame. The way the edges are exposed make the lens more prone to
+            chipping. Polycarbonate will not chip.</p>
+    </div>
+    <div class="signature-section">
+        <div class="sig-line"></div>
+        <div class="footer-row">
+            <span>Patient Signature (Electronically Captured)</span>
+            <span>Date: <span id="waiver-date-footer"></span></span>
+        </div>
+    </div>
+    <script>
+        var date = new Date().toLocaleDateString();
+        document.getElementById('waiver-date').textContent = date;
+        document.getElementById('waiver-date-footer').textContent = date;
+        window.onload = function () { if (window.matchMedia('print').matches) return; window.print(); };
+    </script>
+</body>
+
+</html>

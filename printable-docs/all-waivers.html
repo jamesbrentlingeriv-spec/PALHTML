@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Waivers Combined | Pal Optical</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0.75in;
+            max-width: 8.5in;
+            font-size: 1em;
+            line-height: 1.4;
+        }
+
+        .waiver-title {
+            font-size: 1.6em;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 2px solid #000;
+            margin-bottom: 20px;
+            padding-bottom: 5px;
+        }
+
+        .waiver-header {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        .waiver-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 5px solid #333;
+        }
+
+        .waiver-title-small {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+            color: #d32f2f;
+        }
+
+        .checkbox-row {
+            margin-bottom: 8px;
+        }
+
+        .checkbox-row input {
+            margin-right: 8px;
+            transform: scale(1.2);
+        }
+
+        .signature-section {
+            margin-top: 60px;
+            page-break-inside: avoid;
+        }
+
+        .sig-line {
+            border-bottom: 2px solid #000;
+            height: 80px;
+            margin-bottom: 10px;
+        }
+
+        .footer-row {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .print-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .print-btn:hover {
+            background: #45a049;
+        }
+
+        @media print {
+            .print-btn {
+                display: none;
+            }
+
+            body {
+                padding: 0.75in;
+            }
+        }
+
+        @page {
+            size: letter landscape;
+            margin: 0.75in;
+        }
+    </style>
+</head>
+
+<body>
+    <button class="print-btn" onclick="window.print()">🖨️ Print All Selected Waivers</button>
+
+    <div class="waiver-title">PATIENT DISCLOSURE &amp; WAIVER FORM - SELECT ALL THAT APPLY</div>
+
+    <div class="waiver-section">
+        <div class="waiver-header"><strong>EXPIRED Rx WAIVER</strong></div>
+        <div class="checkbox-row">
+            <input type="checkbox" id="waiver-expired" onchange="toggleWaiverText(this, 'expired-text')">
+            <label for="waiver-expired">I acknowledge the EXPIRED Rx waiver above.</label>
+        </div>
+        <div id="expired-text"
+            style="display:none; margin-top:10px; padding:10px; background:#fff0f0; border-left:4px solid #d32f2f;">
+            I have been cautioned by my Optician that my Eye Exam has expired and it is in my best interest to get a new
+            exam. I will not hold Pal Optical responsible for any issues regarding my vision quality in the new glasses.
+        </div>
+    </div>
+
+    <div class="waiver-section">
+        <div class="waiver-header"><strong>PATIENT OWN FRAME (POF)</strong></div>
+        <div class="checkbox-row">
+            <input type="checkbox" id="waiver-pof" onchange="toggleWaiverText(this, 'pof-text')">
+            <label for="waiver-pof">I acknowledge the PATIENT OWN FRAME waiver.</label>
+        </div>
+        <div id="pof-text"
+            style="display:none; margin-top:10px; padding:10px; background:#fff0f0; border-left:4px solid #d32f2f;">
+            I understand that since my frame is either not new/not covered under warranty. While Pal Optical takes
+            utmost care, breakages occur. Pal Optical not liable for breakage during lab/mounting/adjustment.
+        </div>
+    </div>
+
+    <div class="waiver-section">
+        <div class="waiver-header"><strong>FRAME THICKNESS WAIVER</strong></div>
+        <div class="checkbox-row">
+            <input type="checkbox" id="waiver-thick" onchange="toggleWaiverText(this, 'thick-text')">
+            <label for="waiver-thick">I acknowledge the FRAME THICKNESS waiver.</label>
+        </div>
+        <div id="thick-text"
+            style="display:none; margin-top:10px; padding:10px; background:#fff0f0; border-left:4px solid #d32f2f;">
+            I have been cautioned my lenses will be thick/heavy in chosen frame. Pal Optical will not remake into
+            different frame. All costs on patient if frame changed after lenses made.
+        </div>
+    </div>
+
+    <div class="waiver-section">
+        <div class="waiver-header"><strong>CHILD POLY WAIVER</strong></div>
+        <div class="checkbox-row">
+            <input type="checkbox" id="waiver-poly" onchange="toggleWaiverText(this, 'poly-text')">
+            <label for="waiver-poly">I acknowledge the CHILD POLY waiver.</label>
+        </div>
+        <div id="poly-text"
+            style="display:none; margin-top:10px; padding:10px; background:#fff0f0; border-left:4px solid #d32f2f;">
+            My child should have polycarbonate lenses for safety. Choosing not to get poly. Pal Optical not responsible
+            if lenses shatter/break and injure child.
+        </div>
+    </div>
+
+    <div class="waiver-section">
+        <div class="waiver-header"><strong>LINED TO NO LINE WAIVER</strong></div>
+        <div class="checkbox-row">
+            <input type="checkbox" id="waiver-noline" onchange="toggleWaiverText(this, 'noline-text')">
+            <label for="waiver-noline">I acknowledge the LINED TO NO LINE waiver.</label>
+        </div>
+        <div id="noline-text"
+            style="display:none; margin-top:10px; padding:10px; background:#fff0f0; border-left:4px solid #d32f2f;">
+            Switching from lined bifocal to no-line/progressive is difficult. No-line has diminished field of view. Pal
+            Optical will not remake if cannot adapt to no-line field of view.
+        </div>
+    </div>
+
+    <div class="waiver-section">
+        <div class="waiver-header"><strong>SEMI-RIMLESS CHIP WAIVER</strong></div>
+        <div class="checkbox-row">
+            <input type="checkbox" id="waiver-semirim" onchange="toggleWaiverText(this, 'semirim-text')">
+            <label for="waiver-semirim">I acknowledge the SEMI-RIMLESS CHIP waiver.</label>
+        </div>
+        <div id="semirim-text"
+            style="display:none; margin-top:10px; padding:10px; background:#fff0f0; border-left:4px solid #d32f2f;">
+            Warned of chipping/cracking if not using polycarbonate in semi-rimless. Exposed edges prone to chipping.
+            Polycarbonate will not chip.
+        </div>
+    </div>
+
+    <div class="waiver-section">
+        <div class="waiver-header"><strong>REMAKE WAIVER</strong></div>
+        <div class="checkbox-row">
+            <input type="checkbox" id="waiver-remake" onchange="toggleWaiverText(this, 'remake-text')">
+            <label for="waiver-remake">I acknowledge the REMAKE waiver.</label>
+        </div>
+        <div class="reason-section" id="remake-reason-section" style="display:none;">
+            <div class="reason-label">Why is this a remake?</div>
+            <textarea class="reason-input" id="remake-reason" placeholder="Enter reason for remake..."></textarea>
+        </div>
+        <div id="remake-text"
+            style="display:none; margin-top:10px; padding:10px; background:#fff0f0; border-left:4px solid #d32f2f;">
+            Patient acknowledges this is a remake order and reason provided. Patient agrees not to hold Pal Optical
+            responsible for additional costs or delays.
+        </div>
+    </div>
+
+    <div class="signature-section">
+        <h3 style="text-align: center; margin-bottom: 20px;">Patient Acknowledgment</h3>
+        <div style="text-align: center; font-size: 0.9em; margin-bottom: 20px;">
+            I have read and acknowledge all selected waivers above.
+        </div>
+        <div class="sig-line"></div>
+        <div class="footer-row">
+            <span>Patient / Guardian Signature</span>
+            <span>Date: <span id="signature-date"></span></span>
+        </div>
+    </div>
+
+    <script>
+        function toggleWaiverText(checkbox, textId) {
+            var textDiv = document.getElementById(textId);
+            textDiv.style.display = checkbox.checked ? 'block' : 'none';
+
+            if (checkbox.id === 'waiver-remake' && checkbox.checked) {
+                document.getElementById('remake-reason-section').style.display = 'block';
+                document.getElementById('remake-reason').focus();
+            } else if (checkbox.id === 'waiver-remake') {
+                document.getElementById('remake-reason-section').style.display = 'none';
+            }
+        }
+
+        var date = new Date().toLocaleDateString();
+        document.getElementById('signature-date').textContent = date;
+
+        window.onload = function () {
+            if (window.matchMedia('print').matches) return;
+            var checked = document.querySelectorAll('input[type=\"checkbox\"]:checked');
+            if (checked.length === 0) {
+                alert('Please select waivers before printing.');
+            } else {
+                window.print();
+            }
+        };
+
+    </script>
+</body>
+
+</html>

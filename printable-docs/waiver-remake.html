@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REMAKE WAIVER | Pal Optical</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0.75in;
+            max-width: 8.5in;
+            font-size: 1.05em;
+            line-height: 1.4;
+        }
+
+        .waiver-title {
+            font-size: 1.6em;
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 2px solid #000;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+        }
+
+        .waiver-header {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .waiver-text {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-left: 5px solid #000;
+        }
+
+        .reason-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background: #fff8f0;
+        }
+
+        .reason-label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .reason-input {
+            width: 100%;
+            min-height: 80px;
+            border: 1px solid #999;
+            padding: 10px;
+            font-size: 1em;
+            font-family: monospace;
+        }
+
+        .signature-section {
+            margin-top: 50px;
+        }
+
+        .sig-line {
+            border-bottom: 1px solid #000;
+            height: 70px;
+            margin-bottom: 5px;
+        }
+
+        .footer-row {
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            border-top: 2px solid #000;
+            padding-top: 5px;
+        }
+
+        @page {
+            size: letter;
+            margin: 0.75in;
+        }
+
+        @media print {
+            body {
+                padding: 0.75in;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="waiver-title">PATIENT DISCLOSURE &amp; WAIVER FORM</div>
+    <div class="waiver-header">
+        Waiver: <strong>REMAKE WAIVER</strong> | Date: <span id="waiver-date"></span>
+    </div>
+    <div class="reason-section">
+        <div class="reason-label">Why is this a remake?</div>
+        <textarea class="reason-input" placeholder="Enter detailed reason for remake..."></textarea>
+    </div>
+    <div class="waiver-text">
+        <p><b>REMAKE WAIVER:</b> Patient acknowledges this is a remake order and has provided reason above. Patient
+            agrees not to hold Pal Optical responsible for additional costs or delays associated with remake.</p>
+    </div>
+    <div class="signature-section">
+        <div class="sig-line"></div>
+        <div class="footer-row">
+            <span>Patient Signature (Electronically Captured)</span>
+            <span>Date: <span id="waiver-date-footer"></span></span>
+        </div>
+    </div>
+    <script>
+        var date = new Date().toLocaleDateString();
+        document.getElementById('waiver-date').textContent = date;
+        document.getElementById('waiver-date-footer').textContent = date;
+        window.onload = function () { if (window.matchMedia('print').matches) return; window.print(); };
+    </script>
+</body>
+
+</html>

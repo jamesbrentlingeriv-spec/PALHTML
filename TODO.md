@@ -1,22 +1,16 @@
-# PALHTML README Enhancement TODO
+# Fix paldocs.html Waiver Links Issue
 
-_Created by BLACKBOXAI - Tracking progress for extreme-detail README.md_
+## Steps:
 
-## Approved Plan Breakdown
+- [ ] Step 1: Create TODO.md with plan breakdown (current)
+- [x] Step 2: Update paldocs.html - Replace printDoc() calls with simple
+      window.open() navigation for all waiver/patient-info buttons
+- [x] Step 3: Remove the problematic printDoc() JS function from paldocs.html
+- [x] Step 4: Add user guidance note in paldocs.html about viewing/printing from
+      opened docs
+- [x] Step 5: Update this TODO.md with completion status
+- [x] Step 6: Test by running `start paldocs.html` and clicking waiver buttons
+- [x] Step 7: Attempt completion
 
-**Goal**: Transform README.md into GitHub showcase w/ GIFs, features, tables for
-all 10 HTML tools.
-
-### Steps (Sequential)
-
-- [ ] **Step 1**: Create full enhanced README.md content (multi-tool details w/
-      GIFs).
-- [ ] **Step 2**: `edit_file` README.md using precise diffs (multi-string
-      replaces).
-- [ ] **Step 3**: Test GitHub rendering (`execute_command` preview if needed).
-- [ ] **Step 4**: `attempt_completion` w/ demo command (`start README.md`).
-
-**Progress**: 2/4 complete **Est. Time**: 5-10 mins  
-**Files**: README.md (only)
-
-_Next: Step 1 - Content generation._
+✅ Task complete: paldocs.html waivers open in new tabs (no popup block). Run
+`start paldocs.html` to verify.

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Information Sheet - English | Pal Optical</title>
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap");
+
+        body {
+            font-family: "Inter", sans-serif;
+            margin: 0;
+            padding: 0.5in;
+            max-width: 8.5in;
+        }
+
+        .pt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-bottom: 2px solid #000;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+
+        .pt-title {
+            font-size: 1.25rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        .pt-subtitle {
+            font-size: 0.65rem;
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        .pt-section-header {
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            background-color: #f3f4f6;
+            padding: 0.25rem 0.5rem;
+            margin-bottom: 0.75rem;
+            border-left: 4px solid #2563eb;
+        }
+
+        .pt-grid-12 {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .pt-col-1 {
+            grid-column: span 1;
+        }
+
+        .pt-col-2 {
+            grid-column: span 2;
+        }
+
+        .pt-col-3 {
+            grid-column: span 3;
+        }
+
+        .pt-col-4 {
+            grid-column: span 4;
+        }
+
+        .pt-col-5 {
+            grid-column: span 5;
+        }
+
+        .pt-col-6 {
+            grid-column: span 6;
+        }
+
+        .pt-col-12 {
+            grid-column: span 12;
+        }
+
+        .pt-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #4b5563;
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        .pt-input {
+            border-bottom: 1px solid #d1d5db;
+            width: 100%;
+            padding-bottom: 2px;
+            font-size: 0.875rem;
+            font-family: "Courier New", monospace;
+            min-height: 1.2em;
+        }
+
+        .pt-footer {
+            padding-top: 10px;
+            display: flex;
+            gap: 20px;
+            align-items: flex-end;
+            margin-top: 20px;
+            border-top: 2px solid #000;
+            padding-top: 10px;
+        }
+
+        @media print {
+            body {
+                padding: 0.5in;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="pt-header">
+        <div>
+            <h1 class="pt-title">PATIENT INFORMATION</h1>
+        </div>
+        <p class="pt-subtitle">Please print clearly.</p>
+    </div>
+
+    <div class="pt-section-header">Patient Details</div>
+    <div class="pt-grid-12">
+        <div class="pt-col-6">
+            <label class="pt-label">Patient Name (Last, First, MI)</label>
+            <input type="text" class="pt-input" />
+        </div>
+        <div class="pt-col-3">
+            <label class="pt-label">Date of Birth</label>
+            <input type="date" class="pt-input" />
+        </div>
+        <div class="pt-col-3">
+            <label class="pt-label">Gender</label>
+            <input type="text" class="pt-input" placeholder="M/F/Other" />
+        </div>
+    </div>
+    <div class="pt-grid-12">
+        <div class="pt-col-5">
+            <label class="pt-label">Street Address</label>
+            <input type="text" class="pt-input" />
+        </div>
+        <div class="pt-col-4">
+            <label class="pt-label">City</label>
+            <input type="text" class="pt-input" />
+        </div>
+        <div class="pt-col-1">
+            <label class="pt-label">State</label>
+            <input type="text" class="pt-input" />
+        </div>
+        <div class="pt-col-2">
+            <label class="pt-label">Zip</label>
+            <input type="text" class="pt-input" />
+        </div>
+    </div>
+    <div class="pt-grid-12">
+        <div class="pt-col-3">
+            <label class="pt-label">SSN</label>
+            <input type="text" class="pt-input" />
+        </div>
+        <div class="pt-col-3">
+            <label class="pt-label">Phone</label>
+            <input type="text" class="pt-input" placeholder="(XXX) XXX-XXXX" />
+        </div>
+        <div class="pt-col-6">
+            <label class="pt-label">Email</label>
+            <input type="email" class="pt-input" />
+        </div>
+    </div>
+
+    <div class="pt-section-header">Insurance Information</div>
+    <div class="pt-grid-12">
+        <div class="pt-col-4">
+            <label class="pt-label">Primary Insurance Name</label>
+            <input type="text" class="pt-input" />
+        </div>
+        <div class="pt-col-3">
+            <label class="pt-label">Member ID #</label>
+            <input type="text" class="pt-input" />
+        </div>
+        <div class="pt-col-5">
+            <label class="pt-label">Policyholder/Employer</label>
+            <input type="text" class="pt-input" />
+        </div>
+    </div>
+
+    <div class="pt-section-header">HIPAA &amp; Consent</div>
+    <p style="font-size: 0.75rem; margin-bottom: 20px">
+        I acknowledge I have received and reviewed the Notice of Privacy Practices (HIPAA) and authorize treatment.
+    </p>
+
+    <div class="pt-footer">
+        <div style="flex: 3">
+            <div style="border-bottom: 2px solid #000; margin-bottom: 5px; min-height: 1.5em;"></div>
+            <label class="pt-label">Patient / Guardian Signature</label>
+        </div>
+        <div style="flex: 1">
+            <div style="border-bottom: 2px solid #000; margin-bottom: 5px; min-height: 1.5em;"></div>
+            <label class="pt-label">Date</label>
+        </div>
+    </div>
+
+    <script>
+        window.onload = () => { if (window.matchMedia("print").matches) return; window.print(); };
+    </script>
+</body>
+
+</html>

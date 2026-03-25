@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pal Optical - Printable Documents Directory</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #000;
+            --bg: #f8f9fa;
+            --card-bg: #fff;
+            --text: #333;
+            --accent: #27ae60;
+        }
+
+        [data-theme="dark"] {
+            --primary: #eee;
+            --bg: #1a1a1a;
+            --card-bg: #2a2a2a;
+            --text: #eee;
+            --accent: #55aa77;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            margin: 0 0 0.5rem 0;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin: 0;
+        }
+
+        .theme-toggle {
+            position: absolute;
+            top: 2rem;
+            right: 2rem;
+            background: var(--card-bg);
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
+        [data-theme="dark"] .theme-toggle {
+            background: #333;
+        }
+
+        .docs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .doc-category {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        [data-theme="dark"] .doc-category {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .doc-category:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .category-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .doc-btn {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            margin: 0.5rem 0;
+            background: linear-gradient(135deg, var(--accent), #219a52);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4);
+        }
+
+        .doc-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(39, 174, 96, 0.6);
+        }
+
+        .doc-btn:active {
+            transform: translateY(0);
+        }
+
+        .print-icon {
+            font-size: 1.2rem;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            opacity: 0.7;
+            font-size: 0.9rem;
+        }
+
+        [data-theme="dark"] .footer {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+
+            .theme-toggle {
+                top: 1rem;
+                right: 1rem;
+            }
+
+            .docs-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+        🌙
+    </button>
+
+    <div class="header">
+        <h1>📄 Printable Documents</h1>
+        <p class="subtitle">Patient Information Sheets &amp; Disclosure Waivers<br><small style="opacity: 0.7;">👁️
+                Click to view in new tab, then Print (Ctrl+P) there - fixes popup blocker</small></p>
+    </div>
+
+    <div class="docs-grid">
+        <div class="doc-category">
+            <div class="category-title">
+                👤 <span>Patient Information Sheets</span>
+            </div>
+            <button class="doc-btn" onclick="openDoc('printable-docs/patient-info-en.html')">
+                <span class="print-icon">👁️</span> English
+            </button>
+            <button class="doc-btn" onclick="openDoc('printable-docs/patient-info-es.html')">
+                <span class="print-icon">👁️</span> Español
+            </button>
+            <button class="doc-btn" onclick="openDoc('printable-docs/patient-info-fr.html')">
+                <span class="print-icon">👁️</span> Français
+            </button>
+        </div>
+
+        <div class="doc-category">
+            <div class="category-title">
+                ⚠️ <span>Individual Waivers</span>
+            </div>
+            <button class="doc-btn" onclick="openDoc('printable-docs/waiver-expired-rx.html')">
+                <span class="print-icon">👁️</span> Expired Rx
+            </button>
+            <button class="doc-btn" onclick="openDoc('printable-docs/waiver-patient-own-frame.html')">
+                <span class="print-icon">👁️</span> Patient Own Frame
+            </button>
+            <button class="doc-btn" onclick="openDoc('printable-docs/waiver-frame-thickness.html')">
+                <span class="print-icon">👁️</span> Frame Thickness
+            </button>
+            <button class="doc-btn" onclick="openDoc('printable-docs/waiver-child-poly.html')">
+                <span class="print-icon">👁️</span> Child Poly
+            </button>
+            <button class="doc-btn" onclick="openDoc('printable-docs/waiver-lined-to-no-line.html')">
+                <span class="print-icon">👁️</span> Lined to No-Line
+            </button>
+            <button class="doc-btn" onclick="openDoc('printable-docs/waiver-semi-rimless.html')">
+                <span class="print-icon">👁️</span> Semi-Rimless Chip
+            </button>
+            <button class="doc-btn" onclick="openDoc('printable-docs/waiver-remake.html')">
+                <span class="print-icon">👁️</span> Remake
+            </button>
+        </div>
+
+        <div class="doc-category">
+            <div class="category-title">
+                📋 <span>Multiple Waivers</span>
+            </div>
+            <p style="padding: 1rem; background: rgba(39,174,96,0.1); border-radius: 8px; margin-bottom: 1rem;">
+                Select multiple waivers & print combined form with checkboxes & signature.
+            </p>
+            <button class="doc-btn" onclick="openDoc('printable-docs/all-waivers.html')"
+                style="background: linear-gradient(135deg, #ff9800, #f57c00); box-shadow: 0 4px 15px rgba(255,152,0,0.4); font-size: 1.1rem;">
+                <span class="print-icon">👁️</span> All Waivers Combined
+            </button>
+        </div>
+    </div>
+
+    <div class="footer">
+        Pal Optical | Printable Documents Directory | <span id="last-updated"></span>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            document.body.dataset.theme = document.body.dataset.theme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', document.body.dataset.theme);
+            document.querySelector('.theme-toggle').textContent = document.body.dataset.theme === 'dark' ? '☀️' : '🌙';
+            localStorage.setItem('theme', document.body.dataset.theme);
+        }
+
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.dataset.theme = 'dark';
+            document.querySelector('.theme-toggle').textContent = '☀️';
+        }
+
+        function openDoc(url) {
+            window.open(url, '_blank');
+        }
+
+        document.getElementById('last-updated').textContent = 'Updated ' + new Date().toLocaleDateString();
+
+        window.addEventListener('beforeinstallprompt', function (e) {
+            e.preventDefault();
+        });
+    </script>
+</body>
+
+</html>
