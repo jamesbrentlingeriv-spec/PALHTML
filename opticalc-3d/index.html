@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Opticalc Pro</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.183.2/build/three.module.js"
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">◈</span>
+        <div>
+          <div class="brand-title">OPTICALC PRO</div>
+          <div class="brand-subtitle">LENS ENGINE v2.4</div>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <button id="calcToggle" class="icon-button" type="button" title="Open calculator">🧮</button>
+        <button id="themeToggle" class="icon-button" type="button" title="Toggle dark mode">🌙</button>
+        <div class="topbar-note">SURFACING LAB SIMULATION</div>
+      </div>
+      <div id="statusMessage" class="status-message">Loading Opticalc Pro…</div>
+    </header>
+
+    <main class="layout-grid">
+      <section class="panel sidebar">
+        <div class="panel-section">
+          <div class="field-label">Frame Style</div>
+          <select id="frameStyle" class="field-input"></select>
+        </div>
+
+        <div class="panel-section">
+          <div class="field-label">Lens Material (Index)</div>
+          <select id="lensIndex" class="field-input"></select>
+        </div>
+
+        <div class="field-row">
+          <div class="field-column">
+            <div class="field-label">Patient PD</div>
+            <input id="pd" class="field-input" type="number" step="0.5" />
+          </div>
+          <div class="field-column">
+            <div class="field-label">Eye Size (A)</div>
+            <input id="eyeSize" class="field-input" type="number" />
+          </div>
+        </div>
+
+        <div class="field-row">
+          <div class="field-column">
+            <div class="field-label">Bridge (DBL)</div>
+            <input id="dbl" class="field-input" type="number" />
+          </div>
+          <div class="field-column">
+            <div class="field-label">B Dimension</div>
+            <input id="ed" class="field-input" type="number" />
+          </div>
+        </div>
+
+        <div class="panel-divider"></div>
+
+        <div class="panel-section">
+          <div class="field-label">Sphere Power (OD)</div>
+          <input id="sphere" class="field-input highlight" type="number" step="0.25" />
+        </div>
+
+        <button id="resetButton" class="reset-button" type="button">Reset Engine</button>
+      </section>
+
+      <section class="panel viewer">
+        <div id="sceneContainer" class="scene-container"></div>
+        <div class="view-chip">VIEW: TEMPORAL ANGLE (35°)</div>
+        <div class="floating-panel">
+          <div class="floating-title">Frame Profile</div>
+          <div class="floating-subtitle">Calculated Edge Protrusion</div>
+        </div>
+      </section>
+
+      <section class="panel results">
+        <div class="results-header">Calculated Metrics</div>
+        <div class="results-grid">
+          <div class="result-card">
+            <div class="result-label">Decentration (per eye)</div>
+            <div class="result-value" id="resultDecentration">0.0 mm</div>
+          </div>
+          <div class="result-card">
+            <div class="result-label">Temporal Edge Thickness</div>
+            <div class="result-value" id="resultTemporal">0.0 mm</div>
+            <div class="result-warning" id="resultProtrusion">No protrusion beyond frame</div>
+          </div>
+          <div class="result-card">
+            <div class="result-label">Nasal Edge Thickness</div>
+            <div class="result-value" id="resultNasal">0.0 mm</div>
+          </div>
+          <div class="result-card">
+            <div class="result-label">Center Thickness</div>
+            <div class="result-value" id="resultCenter">0.0 mm</div>
+          </div>
+          <div class="result-card">
+            <div class="result-label">Max Thickness</div>
+            <div class="result-value" id="resultMax">0.0 mm</div>
+          </div>
+          <div class="result-card">
+            <div class="result-label">Frame Depth</div>
+            <div class="result-value" id="resultFrameDepth">0.0 mm</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="calculatorOverlay" class="calculator-overlay hidden">
+    <div class="calculator-panel">
+      <div class="calculator-header">
+        <div class="calculator-title">Retail Calculator</div>
+        <button id="calcClose" class="calculator-close" type="button" title="Close calculator">×</button>
+      </div>
+      <div class="calculator-body">
+        <div class="calculator-display">
+          <div class="calculator-display-label">CALC</div>
+          <div id="calcValue" class="calculator-value">0</div>
+        </div>
+        <div class="calculator-keypad">
+          <button id="calcPlus6" class="calculator-key calculator-key--soft" type="button" data-action="percent6">+6%
+            TAX</button>
+          <button id="calcMinus10" class="calculator-key calculator-key--soft" type="button"
+            data-action="percent10">-10% OFF</button>
+          <button id="calcMinus20" class="calculator-key calculator-key--soft" type="button"
+            data-action="percent20">-20% OFF</button>
+          <button id="calcClear" class="calculator-key calculator-key--clear" type="button"
+            data-action="clear">C</button>
+
+          <button class="calculator-key" type="button" data-key="7">7</button>
+          <button class="calculator-key" type="button" data-key="8">8</button>
+          <button class="calculator-key" type="button" data-key="9">9</button>
+          <button class="calculator-key calculator-key--op" type="button" data-action="divide">÷</button>
+
+          <button class="calculator-key" type="button" data-key="4">4</button>
+          <button class="calculator-key" type="button" data-key="5">5</button>
+          <button class="calculator-key" type="button" data-key="6">6</button>
+          <button class="calculator-key calculator-key--op" type="button" data-action="multiply">×</button>
+
+          <button class="calculator-key" type="button" data-key="1">1</button>
+          <button class="calculator-key" type="button" data-key="2">2</button>
+          <button class="calculator-key" type="button" data-key="3">3</button>
+          <button class="calculator-key calculator-key--op" type="button" data-action="subtract">-</button>
+
+          <button class="calculator-key" type="button" data-key="0">0</button>
+          <button class="calculator-key" type="button" data-key=".">.</button>
+          <button class="calculator-key calculator-key--equal" type="button" data-action="equal">=</button>
+          <button class="calculator-key calculator-key--op" type="button" data-action="add">+</button>
+        </div>
+        <div class="calculator-note">This is a separate calculator display for quick number work, not tied to lens
+          decentration.</div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="script.js"></script>
+</body>
+
+</html>

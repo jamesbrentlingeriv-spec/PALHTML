@@ -1,0 +1,47 @@
+{
+  "entities": {
+    "Remake": {
+      "title": "Remake",
+      "description": "A record of an eyeglass remake job.",
+      "type": "object",
+      "properties": {
+        "employeeRemake": { "type": "string", "description": "Name of the employee performing the remake" },
+        "employeeOriginal": { "type": "string", "description": "Name of the employee who did the original job" },
+        "dateRemake": { "type": "string", "format": "date-time", "description": "Date the remake was requested" },
+        "dateOriginal": { "type": "string", "format": "date-time", "description": "Date of the original job" },
+        "reason": { 
+          "type": "string", 
+          "enum": ["dr rx change", "frame too big/small", "seg ht/pd/oc ht issue", "lens design change", "lab error", "other"],
+          "description": "Reason for the remake"
+        },
+        "customerName": { "type": "string", "description": "Name of the customer" },
+        "coachedOptician": { "type": "boolean", "description": "Whether the optician was coached" },
+        "remakeCount": { "type": "number", "description": "1st, 2nd, or 3rd remake" },
+        "managerAck": { "type": "boolean", "description": "Managerial acknowledgment for 3rd remake" },
+        "labNotes": { "type": "string", "description": "Notes from the lab" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when the record was created" }
+      },
+      "required": ["employeeRemake", "employeeOriginal", "dateRemake", "dateOriginal", "reason", "customerName", "remakeCount"]
+    },
+    "Technician": {
+      "title": "Technician",
+      "description": "A lab technician in the user list.",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "Name of the technician" },
+        "active": { "type": "boolean", "description": "Whether the technician is currently active" }
+      },
+      "required": ["name"]
+    }
+  },
+  "firestore": {
+    "/remakes/{remakeId}": {
+      "schema": "Remake",
+      "description": "Collection of remake records"
+    },
+    "/technicians/{techId}": {
+      "schema": "Technician",
+      "description": "Collection of lab technicians"
+    }
+  }
+}
