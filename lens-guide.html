@@ -51,6 +51,16 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
         }
 
+        /* Center GIF on mobile */
+        @media screen and (max-width: 768px) {
+            #welcome-gif {
+                max-width: 90vw;
+                max-height: 90vh;
+                width: auto;
+                height: auto;
+            }
+        }
+
         [data-theme="dark"] {
             /* Dark Mode Variables */
             --bg-main: #121212;

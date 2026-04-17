@@ -393,6 +393,24 @@
             height: 100%;
             object-fit: cover;
         }
+
+        /* Center GIF on mobile */
+        @media screen and (max-width: 768px) {
+            #splash-overlay {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .splash-gif {
+                max-width: 90vw;
+                max-height: 90vh;
+                width: auto;
+                height: auto;
+                object-fit: contain;
+            }
+        }
+
     </style>
 </head>
 
@@ -689,7 +707,7 @@
 
             let maxThickness = finalThickness;
 
-            drawHumanProfileVisualizer(maxThickness, frameThickMm, frameThicknessValue, isPlus);
+            drawHumanProfileVisualizer(maxThickness, frameThickMm, frameTypeRaw, isPlus);
         }
 
         function drawHumanProfileVisualizer(maxThickness, frameThickMm, frameTypeRaw, isPlus) {

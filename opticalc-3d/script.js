@@ -350,7 +350,7 @@ function initThree() {
   const height = Math.max(refs.sceneContainer.clientHeight, 360);
 
   camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
-  camera.position.set(0, 0, 3);
+  camera.position.set(0, 0, 5);
 
   renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setPixelRatio(window.devicePixelRatio);
@@ -360,8 +360,8 @@ function initThree() {
 
   controls = new OrbitControls(camera, renderer.domElement);
   controls.enablePan = false;
-  controls.minDistance = 2;
-  controls.maxDistance = 10;
+  controls.minDistance = 3;
+  controls.maxDistance = 12;
   controls.minPolarAngle = Math.PI / 4;
   controls.maxPolarAngle = Math.PI - Math.PI / 4;
 
@@ -412,7 +412,7 @@ function animate() {
 
 function createHeadModel() {
   const group = new THREE.Group();
-  group.position.set(0, -0.2, 0);
+  group.position.set(0, 0.35, 0);
 
   const skinMaterial = new THREE.MeshStandardMaterial({
     color: "#fcd4b4",
@@ -580,9 +580,10 @@ function createHeadModel() {
 
 function createGlassesModel(result, input) {
   const group = new THREE.Group();
-  group.position.set(0, -0.15, 0.9);
+  group.position.set(0, 0.45, 0.9);
 
-  const scale = 0.014;
+  const scale = 0.01;
+
   const eyesizeScaled = input.eyesize * scale;
   const dblScaled = input.dbl * scale;
   const frameDepth = result.frameDepth * scale;

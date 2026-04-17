@@ -212,8 +212,24 @@
             pointer-events: none;
         }
 
+        /* Center GIF on mobile */
+        @media screen and (max-width: 768px) {
+            #page-loader-overlay {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            #page-loader-overlay img {
+                max-width: 90vw;
+                max-height: 90vh;
+                width: auto;
+                height: auto;
+                object-fit: contain;
+            }
+        }
 
-        background: #000;
+
     </style>
 </head>
 

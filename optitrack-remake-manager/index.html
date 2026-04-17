@@ -17,8 +17,9 @@
 
   <!-- ==================== SPLASH SCREEN ==================== -->
   <div id="splash-screen"
-    style="position:fixed;inset:0;z-index:99999;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;">
-    <img src="OPTITRAK.gif" alt="OptiTrak" style="max-width:60vw;max-height:60vh;border-radius:24px;">
+    style="position:fixed;inset:0;z-index:99999;background:var(--bg-primary);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;">
+    <div style="font-size:48px;font-weight:700;color:var(--text-primary);letter-spacing:-0.5px;">OptiTrak</div>
+    <div style="font-size:16px;color:var(--text-secondary);">Remake Manager</div>
   </div>
   <script>
     setTimeout(function () {
@@ -32,8 +33,7 @@
   <!-- ==================== LOGIN SCREEN ==================== -->
   <div id="login-screen" class="login-wrapper">
     <div class="login-card rainbow-border">
-      <div class="login-icon"><img src="OPTITRAK.jpg" alt="OptiTrak Logo"
-          style="width:80px;height:80px;border-radius:50%;border:3px solid #FFFC00;" /></div>
+      <div class="login-icon" style="font-size:48px;margin-bottom:16px;">&#x1F4CB;</div>
       <h1 style="font-size:32px;font-weight:700;letter-spacing:-0.5px;">OptiTrak</h1>
       <p class="subtitle">Enter your credentials to access the shop dashboard.</p>
       <form id="login-form" style="display:flex;flex-direction:column;gap:1rem;text-align:left;">
