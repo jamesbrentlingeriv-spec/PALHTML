@@ -135,28 +135,28 @@ export default function Dashboard() {
         {/* P.O.S.T. Flagship Card */}
         <Link
           to="/post"
-          className="block mb-6 p-6 rounded-2xl border-2 border-yellow-400 hover:-translate-y-1 transition-transform shadow-lg relative overflow-hidden"
-          style={{
-            backgroundImage: "url(/POST.gif)",
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
+          className="block mb-6 p-6 rounded-2xl hover:-translate-y-1 transition-transform shadow-lg relative overflow-hidden"
         >
-          <div className="absolute inset-0 bg-gradient-to-r from-yellow-50/90 to-orange-50/90 dark:from-yellow-900/90 dark:to-orange-900/90" />
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+            src="/POST.mp4"
+          />
+          <div className="absolute inset-0 bg-black/40" />
           <div className="relative flex items-center gap-3">
-            <span className="text-3xl">⭐</span>
             <div>
-              <h2 className="text-xl font-bold text-yellow-700 dark:text-yellow-400">
+              <h2 className="text-xl font-bold text-white">
                 P.O.S.T. Write-Ups
               </h2>
-              <p
-                className={`text-sm ${dark ? "text-gray-300" : "text-gray-600"}`}
-              >
+              <p className="text-sm text-white/80">
                 Flagship — New digital write-up system for store efficiency.
                 Camera PD/Seg, 400+ lens catalog, Firebase sync.
               </p>
             </div>
-            <span className="ml-auto text-yellow-500 text-2xl">→</span>
+            <span className="ml-auto text-white text-2xl">→</span>
           </div>
         </Link>
 
