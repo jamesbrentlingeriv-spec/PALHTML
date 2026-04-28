@@ -135,9 +135,15 @@ export default function Dashboard() {
         {/* P.O.S.T. Flagship Card */}
         <Link
           to="/post"
-          className="block mb-6 p-6 rounded-2xl border-2 border-yellow-400 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 hover:-translate-y-1 transition-transform shadow-lg"
+          className="block mb-6 p-6 rounded-2xl border-2 border-yellow-400 hover:-translate-y-1 transition-transform shadow-lg relative overflow-hidden"
+          style={{
+            backgroundImage: "url(/POST.gif)",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }}
         >
-          <div className="flex items-center gap-3">
+          <div className="absolute inset-0 bg-gradient-to-r from-yellow-50/90 to-orange-50/90 dark:from-yellow-900/90 dark:to-orange-900/90" />
+          <div className="relative flex items-center gap-3">
             <span className="text-3xl">⭐</span>
             <div>
               <h2 className="text-xl font-bold text-yellow-700 dark:text-yellow-400">
@@ -156,7 +162,7 @@ export default function Dashboard() {
 
         {/* Tool Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {tools.map((tool) => (
+          {internalTools.map((tool) => (
             <Link
               key={tool.path}
               to={tool.path}
@@ -183,6 +189,35 @@ export default function Dashboard() {
                 Open App
               </span>
             </Link>
+          ))}
+          {externalTools.map((tool) => (
+            <a
+              key={tool.href}
+              href={tool.href}
+              target="_self"
+              className={`p-5 rounded-2xl border transition-all hover:-translate-y-1 hover:shadow-lg ${
+                dark
+                  ? "bg-gray-900 border-gray-700 hover:border-gray-500"
+                  : "bg-gray-50 border-gray-200 hover:border-gray-400"
+              }`}
+            >
+              <div className="text-3xl mb-2">{tool.emoji}</div>
+              <h3 className="font-bold text-base mb-1">{tool.title}</h3>
+              <p
+                className={`text-xs mb-4 ${dark ? "text-gray-400" : "text-gray-500"}`}
+              >
+                {tool.desc}
+              </p>
+              <span
+                className={`inline-block px-4 py-1.5 rounded-full text-xs font-bold transition-colors ${
+                  dark
+                    ? "bg-white text-black hover:bg-blue-400 hover:text-white"
+                    : "bg-black text-white hover:bg-blue-500"
+                }`}
+              >
+                Open ↗
+              </span>
+            </a>
           ))}
         </div>
 
