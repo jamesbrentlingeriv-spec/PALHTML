@@ -1076,7 +1076,11 @@ export default function App() {
                           <input
                             type="checkbox"
                             className="w-5 h-5 rounded border-theme-border text-theme-text focus:ring-theme-accent accent-theme-accent"
-                            checked={(promise as Record<string, boolean>)[p.id]}
+                            checked={
+                              (promise as Record<string, boolean | string>)[
+                                p.id
+                              ] as boolean
+                            }
                             onChange={(e) =>
                               setPromise({
                                 ...promise,
@@ -1290,7 +1294,7 @@ export default function App() {
                                 string,
                                 Record<string, string | boolean>
                               >
-                            )[eye][field]
+                            )[eye][field] as string
                           }
                           onChange={(e) =>
                             handleRxChange(
