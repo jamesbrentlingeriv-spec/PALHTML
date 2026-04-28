@@ -1017,7 +1017,7 @@ export default function App() {
             </div>
           </header>
 
-          <div className="flex flex-col gap-8 pb-32">
+                    <div className="flex flex-col gap-8 pb-32">
             {/* SINGLE COLUMN: ALL TOGETHER ON LEFT */}
             <section className="bg-theme-card p-6 rounded-3xl border-theme-main space-y-4 transition-all shadow-sm">
               <button
@@ -1190,7 +1190,347 @@ export default function App() {
               </div>
             </section>
 
-                        {/* DOCTOR & PRESCRIPTION */}
+            {/* FRAME & LENS SPECIFICATIONS (SECOND BOX) */}
+            <section className="bg-theme-card p-8 rounded-3xl border-theme-main space-y-6 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-black uppercase tracking-widest text-theme-text font-bold italic">
+                  Frame & Lens Specifications
+                </h3>
+                <button
+                  onClick={() => setShowMeasureTool(true)}
+                  className="text-[10px] font-black uppercase text-theme-text flex items-center gap-1 hover:underline"
+                >
+                  <CreditCard className="w-3 h-3 text-theme-accent" /> Use
+                  Camera Grid
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-theme-bg p-4 rounded-2xl border-theme-border">
+                  <label className="block text-[10px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
+                    Frame Name
+                  </label>
+                  <input
+                    className="w-full bg-transparent font-black text-xl outline-none text-theme-text"
+                    placeholder="e.g. Ray-Ban RB5154"
+                    value={frame}
+                    onChange={(e) => {
+                      setFrame(e.target.value);
+                      updateBillingRow("frame", {
+                        label: e.target.value
+                          ? `FRAME: ${e.target.value}`
+                          : "FRAME",
+                      });
+                    }}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-theme-bg p-4 rounded-2xl border-theme-border">
+                    <label className="block text-[10px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
+                      Eye Size (A)
+                    </label>
+                    <input
+                      className="w-full bg-transparent font-black text-xl outline-none text-theme-text"
+                      placeholder="e.g. 52"
+                      value={frameA}
+                      onChange={(e) => setFrameA(e.target.value)}
+                    />
+                  </div>
+                  <div className="bg-theme-bg p-4 rounded-2xl border-theme-border">
+                    <label className="block text-[10px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
+                      DBL / Bridge
+                    </label>
+                    <input
+                      className="w-full bg-transparent font-black text-xl outline-none text-theme-text"
+                      placeholder="e.g. 18"
+                      value={frameDbl}
+                      onChange={(e) => setFrameDbl(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-theme-bg p-4 rounded-2xl border-theme-border">
+                    <label className="block text-[10px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
+                      P.D.
+                    </label>
+                    <input
+                      className="w-full bg-transparent font-black text-xl outline-none text-theme-text"
+                      value={pd}
+                      onChange={(e) => setPd(e.target.value)}
+                    />
+                  </div>
+                  <div className="bg-theme-bg p-4 rounded-2xl border-theme-border">
+                    <label className="block text-[10px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
+                      Seg Height
+                    </label>
+                    <input
+                      className="w-full bg-transparent font-black text-xl outline-none text-theme-text"
+                      value={seg}
+                      onChange={(e) => setSeg(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-theme-border space-y-4">
+                  <label className="block text-[11px] font-black uppercase text-theme-text italic">
+                    Lens Type & Color
+                  </label>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex flex-wrap gap-2 items-center">
+                                            {["CLEAR", "TINT", "POLAR", "MIRROR", "TRANS"].map((type) => (
+                        <button
+                          key={type}
+                          onClick={() => handleColorChoice(type)}
+                          className={`px-5 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all border-2 ${
+                            colorType === type
+                              ? "bg-theme-text border-theme-border text-theme-card shadow-md scale-105"
+                              : "bg-theme-card border-theme-border text-theme-text hover:bg-theme-bg"
+                          }`}
+                        >
+                          {type}
+                        </button>
+                      ))}
+
+                      {colorType !== "CLEAR" && (
+                        <motion.div
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="flex items-center gap-2 border-b-2 border-black pb-1 ml-4"
+                        >
+                          <span className="text-[11px] font-black uppercase whitespace-nowrap italic text-black">
+                            Color:
+                          </span>
+                          <input
+                            type="text"
+                            placeholder="Type color..."
+                            className="bg-transparent border-none outline-none font-black uppercase text-[12px] w-40 placeholder:text-slate-400 text-black"
+                            value={colorDetail}
+                            onChange={(e) => setColorDetail(e.target.value)}
+                          />
+                        </motion.div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* BILLING TABLE */}
+            <section className="bg-theme-card p-6 rounded-3xl border-theme-main space-y-4 text-theme-text shadow-lg">
+              <h3 className="text-xs font-black uppercase tracking-widest text-black font-bold italic">
+                Billing Summary
+              </h3>
+
+                            <div className="flex text-[8px] font-black uppercase text-theme-text border-b-theme-border pb-1 gap-2">
+                <span className="flex-[2]">Description</span>
+                <span className="flex-1">Retail</span>
+                <span className="w-16 text-right">+Tax(6%)</span>
+                <span className="w-16 text-right">Pt Owe</span>
+              </div>
+
+              <div className="space-y-2">
+                {Object.keys(billing).map((key) => (
+                  <div
+                    key={key}
+                    className="flex items-center justify-between py-2 border-b border-theme-border group/row gap-2"
+                  >
+                    <div className="flex-[2]">
+                      {key.startsWith("m") ? (
+                        <input
+                          placeholder={`Misc ${key.charAt(1)}`}
+                          className="bg-transparent border-none outline-none text-xs font-bold w-full uppercase placeholder:text-slate-400 text-black"
+                          value={billing[key].label}
+                          onChange={(e) =>
+                            updateBillingRow(key, { label: e.target.value })
+                          }
+                        />
+                      ) : (
+                        <span className="text-[10px] font-bold text-theme-text uppercase">
+                          {billing[key].label}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <input
+                        className="w-full bg-transparent text-left font-black text-xs outline-none text-theme-text"
+                        placeholder="0.00"
+                        value={billing[key].retail}
+                        onChange={(e) =>
+                          updateBillingRow(key, {
+                            retail: e.target.value,
+                            retailWithTax: (
+                              parseFloat(e.target.value || "0") * 1.06
+                            ).toFixed(2),
+                            owe: calcOwe(e.target.value, key),
+                          })
+                        }
+                      />
+                    </div>
+
+                    <div className="w-16 text-right text-[10px] font-bold text-slate-500">
+                      {billing[key].retailWithTax}
+                    </div>
+                    <div className="w-16">
+                      <input
+                        className="w-full bg-transparent text-right font-black text-xs outline-none text-red-600"
+                        value={billing[key].owe}
+                        onChange={(e) =>
+                          updateBillingRow(key, { owe: e.target.value })
+                        }
+                      />
+                    </div>
+                    <button
+                      onClick={() => {
+                        const defaultLabels: Record<string, string> = {
+                          frame: "FRAME",
+                          lens: "LENS",
+                          coat: "A/R COATING",
+                        };
+                        updateBillingRow(key, {
+                          label: defaultLabels[key] || "",
+                          retail: "",
+                          retailWithTax: "0.00",
+                          owe: "0.00",
+                        });
+                      }}
+                      className="p-1 text-black hover:text-red-500 opacity-0 group-hover/row:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {isAllowancePlan && (
+                <div className="bg-theme-bg p-3 rounded-xl border-theme-border flex justify-between items-center text-[11px]">
+                  <span className="text-black font-bold uppercase tracking-widest italic">
+                    Plan Allowance
+                  </span>
+                  <span className="font-black text-red-600">
+                    -${globalAllowance.toFixed(2)}
+                  </span>
+                </div>
+              )}
+
+              <div className="pt-6 border-t border-theme-border space-y-4">
+                <label className="block text-[10px] font-black uppercase text-theme-text tracking-widest italic">
+                  Payment Method
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    onClick={() => {
+                      setShowCardMenu(!showCardMenu);
+                      if (payMethod === "Cash" || payMethod === "Check") {
+                        setPayMethod("");
+                      }
+                    }}
+                    className={`px-4 py-2 rounded-xl border-theme-border text-[10px] font-black uppercase transition-all flex items-center gap-2 ${
+                      cardTypes.includes(payMethod)
+                        ? "bg-theme-text text-theme-card"
+                        : "bg-theme-card text-theme-text hover:bg-theme-bg"
+                    }`}
+                  >
+                    {cardTypes.includes(payMethod)
+                      ? `Card: ${payMethod}`
+                      : "Credit Card"}
+                    <ChevronDown
+                      className={`w-3 h-3 transition-transform ${showCardMenu ? "rotate-180" : ""}`}
+                    />
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setPayMethod("Cash");
+                      setShowCardMenu(false);
+                    }}
+                    className={`px-4 py-2 rounded-xl border-theme-border text-[10px] font-black uppercase transition-all ${
+                      payMethod === "Cash"
+                        ? "bg-theme-text text-theme-card shadow-lg"
+                        : "bg-theme-card text-theme-text hover:bg-theme-bg"
+                    }`}
+                  >
+                    Cash
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setPayMethod("Check");
+                      setShowCardMenu(false);
+                      const num = prompt("Enter Check Number:");
+                      setCheckNum(num || "");
+                    }}
+                    className={`px-4 py-2 rounded-xl border-theme-border text-[10px] font-black uppercase transition-all ${
+                      payMethod === "Check"
+                        ? "bg-theme-text text-theme-card shadow-lg"
+                        : "bg-theme-card text-theme-text hover:bg-theme-bg"
+                    }`}
+                  >
+                    {payMethod === "Check" && checkNum
+                      ? `Check #${checkNum}`
+                      : "Check"}
+                  </button>
+                </div>
+
+                <AnimatePresence>
+                  {showCardMenu && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="flex flex-wrap gap-2 p-4 bg-theme-bg rounded-2xl border border-dashed border-theme-border"
+                    >
+                      {cardTypes.map((c) => (
+                        <button
+                          key={c}
+                          onClick={() => {
+                            setPayMethod(c);
+                            setShowCardMenu(false);
+                          }}
+                          className={`px-3 py-1.5 rounded-lg border-theme-border text-[9px] font-black uppercase transition-all ${
+                            payMethod === c
+                              ? "bg-theme-text text-theme-card"
+                              : "bg-theme-card text-theme-text hover:bg-theme-bg"
+                          }`}
+                        >
+                          {c}
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+                              <div className="flex flex-col items-center gap-1">
+                  <button
+                    onClick={() => setShowItemizedReceipt(true)}
+                    className="w-full rounded-2xl px-6 py-2 flex items-center justify-center gap-2 font-black uppercase text-xs tracking-widest transition-all border-2 bg-blue-500 border-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30"
+                  >
+                    <FileText className="w-4 h-4" />
+                    Itemized Receipt
+                  </button>
+                </div>
+
+                <div className="pt-4 flex justify-between items-end">
+
+                <div>
+                  <label className="block text-[10px] font-black uppercase text-theme-text mb-1">
+                    Patient Total
+                  </label>
+                  <span className="text-5xl font-black italic tracking-tighter text-theme-text">
+                    ${f(finalOwe)}
+                  </span>
+                </div>
+                <div className="text-right">
+                  <p className="text-[9px] font-bold text-theme-muted uppercase tracking-wider">
+                    Optician: {user.initials}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+                                    {/* DOCTOR & PRESCRIPTION */}
             <section className="bg-theme-card p-10 rounded-3xl border-theme-main space-y-8 transition-all shadow-lg">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-black uppercase tracking-widest text-theme-text font-bold italic">
@@ -1475,6 +1815,7 @@ export default function App() {
                 </div>
               </div>
             </section>
+
 
             {/* FRAME & LENS SPECIFICATIONS */}
             <section className="bg-theme-card p-8 rounded-3xl border-theme-main space-y-6 shadow-sm">
@@ -2167,133 +2508,138 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* PATIENT INFO */}
-                <div className="space-y-1 text-[16px] font-bold uppercase">
-                  <div className="border-b border-black flex justify-between py-1">
-                    <span>Patient:</span> <span>{patient}</span>
-                  </div>
-                  {promise.mail && mailAddress && (
-                    <div className="border-b border-black flex flex-col py-1">
-                      <span className="text-[12px]">Mailing Address:</span>
-                      <span className="text-[14px] whitespace-pre-wrap leading-tight">
-                        {mailAddress}
-                      </span>
-                    </div>
-                  )}
-                  <div className="border-b border-black flex justify-between py-1">
-                    <span>Plan:</span>{" "}
-                    <span>
-                      {plan}{" "}
-                      {plan === "MEDICAID"
-                        ? `(${medicaidType} - ${medicaidCode})`
-                        : plan === "SCHOOL LETTER"
-                          ? `(${schoolName})`
-                          : ""}
-                    </span>
-                  </div>
-                  <div className="border-b border-black flex justify-between py-1">
-                    <span>Doctor:</span>{" "}
-                    <span>{dr === "Other" ? drOther : dr}</span>
-                  </div>
-                  <div className="border-b border-black flex justify-between py-1">
-                    <span>Payment:</span>{" "}
-                    <span>
-                      {payMethod} {payMethod === "Check" && `#${checkNum}`}
-                    </span>
-                  </div>
-                </div>
+                                {/* PATIENT INFO */}
+                                <div className="space-y-1 text-[16px] font-bold uppercase">
+                                  <div className="border-b border-black flex justify-between py-1">
+                                    <span>Patient:</span> <span>{patient}</span>
+                                  </div>
+                                  {promise.mail && mailAddress && (
+                                    <div className="border-b border-black flex flex-col py-1">
+                                      <span className="text-[12px]">Mailing Address:</span>
+                                      <span className="text-[14px] whitespace-pre-wrap leading-tight">
+                                        {mailAddress}
+                                      </span>
+                                    </div>
+                                  )}
+                                  <div className="border-b border-black flex justify-between py-1">
+                                    <span>Plan:</span>{" "}
+                                    <span>
+                                      {plan}{" "}
+                                      {plan === "MEDICAID"
+                                        ? `(${medicaidType} - ${medicaidCode})`
+                                        : plan === "SCHOOL LETTER"
+                                          ? `(${schoolName})`
+                                          : ""}
+                                    </span>
+                                  </div>
+                                  <div className="border-b border-black flex justify-between py-1">
+                                    <span>Payment:</span>{" "}
+                                    <span>
+                                      {payMethod} {payMethod === "Check" && `#${checkNum}`}
+                                    </span>
+                                  </div>
+                                </div>
 
-                {/* BILLING TABLE */}
-                <table className="w-full text-[14px] font-bold border-collapse border-2 border-black">
-                  <thead>
-                    <tr className="bg-slate-100 italic border-b-2 border-black">
-                      <th className="text-left p-1">ITEM</th>
-                      <th className="text-center p-1">RETAIL</th>
-                      <th className="text-right p-1">OWE</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(Object.values(billing) as BillingRow[]).map((b, i) => (
-                      <tr key={i} className="border-t border-black">
-                        <td className="p-1">{b.label}</td>
-                        <td className="p-1 text-center">${f(b.retail)}</td>
-                        <td className="p-1 text-right">${f(b.owe)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                                {/* FRAME SPECS BOX (SECOND BOX) */}
+                                <div className="border-4 border-black p-3 bg-white my-2">
+                                  <div className="grid grid-cols-2 gap-y-2 text-[14px] font-black uppercase">
+                                    <div className="col-span-2 border-b border-black pb-1 mb-1">
+                                      Frame: {frame || "___"}
+                                    </div>
+                                    <div>A: {frameA || "___"}</div>
+                                    <div>DBL: {frameDbl || "___"}</div>
+                                    <div>PD: {pd || "___"}</div>
+                                    <div>SEG: {seg || "___"}</div>
+                                    <div className="col-span-2 pt-1 border-t border-black mt-1">
+                                      Color: {colorType} {colorDetail ? `(${colorDetail})` : ""}
+                                    </div>
+                                    <div className="col-span-2 flex items-center gap-2">
+                                      <div className={`w-4 h-4 border-2 border-black flex items-center justify-center ${billing.coat.retail ? "bg-black" : ""}`}>
+                                        {billing.coat.retail && <span className="text-white text-[10px]">✓</span>}
+                                      </div>
+                                      <span>A/R Coating {billing.coat.retail ? `(${billing.coat.label})` : ""}</span>
+                                    </div>
+                                  </div>
+                                </div>
 
-                {/* TOTAL */}
-                <div className="flex justify-between items-end pt-2 mt-2">
-                  <div className="text-4xl font-black italic">
-                    TOTAL: ${f(finalOwe)}
-                  </div>
-                  <div className="text-[12px] font-bold uppercase">
-                    {promise.call && "☎ Will Call "}
-                    {promise.mail && "✉ Will Mail "}
-                    {promise.time && `⏰ ${promise.timeVal}`}
-                  </div>
-                </div>
+                                {/* BILLING TABLE */}
+                                <table className="w-full text-[14px] font-bold border-collapse border-2 border-black">
+                                  <thead>
+                                    <tr className="bg-slate-100 italic border-b-2 border-black">
+                                      <th className="text-left p-1">ITEM</th>
+                                      <th className="text-center p-1">RETAIL</th>
+                                      <th className="text-right p-1">OWE</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {(Object.values(billing) as BillingRow[]).map((b, i) => (
+                                      <tr key={i} className="border-t border-black">
+                                        <td className="p-1">{b.label}</td>
+                                        <td className="p-1 text-center">${f(b.retail)}</td>
+                                        <td className="p-1 text-right">${f(b.owe)}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
 
-                {/* RX BLOCK */}
-                <div className="border-4 border-black p-3 bg-white my-2">
-                  <div className="text-[14px] font-black border-b-2 border-black pb-2 mb-2 grid grid-cols-2 gap-4">
-                    <div>
-                      <span className="underline">OD:</span> SPH{" "}
-                      {rx.od.sph || "___"} / CYL {rx.od.cyl || "___"} x{" "}
-                      {rx.od.axis || "___"} / ADD {rx.od.add || "___"}
-                      {rx.od.hasPrism && (
-                        <span className="block text-[12px]">
-                          Prism: {rx.od.prism}Δ {rx.od.prismBase}
-                          {rx.od.hasCompoundPrism &&
-                            ` / ${rx.od.prism2}Δ ${rx.od.prismBase2}`}
-                        </span>
-                      )}
-                    </div>
-                    <div>
-                      <span className="underline">OS:</span> SPH{" "}
-                      {rx.os.sph || "___"} / CYL {rx.os.cyl || "___"} x{" "}
-                      {rx.os.axis || "___"} / ADD {rx.os.add || "___"}
-                      {rx.os.hasPrism && (
-                        <span className="block text-[12px]">
-                          Prism: {rx.os.prism}Δ {rx.os.prismBase}
-                          {rx.os.hasCompoundPrism &&
-                            ` / ${rx.os.prism2}Δ ${rx.os.prismBase2}`}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-4 gap-2 text-[14px] font-black">
-                    <div>PD: {pd || "___"}</div>
-                    <div>SEG: {seg || "___"}</div>
-                    <div className="col-span-2">
-                      FRAME: {frame || "___"} (A:{frameA || "_"} DBL:
-                      {frameDbl || "_"})
-                    </div>
-                  </div>
-                  <div className="text-[14px] font-black mt-2">
-                    LENS: {billing.lens.label || "___"}
-                  </div>
-                  <div className="text-[14px] font-black bg-black text-white px-2 py-1 mt-2 inline-block">
-                    COLOR: {colorType} {colorDetail ? `(${colorDetail})` : ""}
-                  </div>
-                  {billing.coat.retail && (
-                    <div className="text-[14px] font-black bg-gray-200 text-black px-2 py-1 mt-2 inline-block border-2 border-black">
-                      COATING: {billing.coat.label}
-                    </div>
-                  )}
-                </div>
+                                {/* TOTAL */}
+                                <div className="flex justify-between items-end pt-1 mt-1">
+                                  <div className="text-xl font-black italic">
+                                    TOTAL: ${f(finalOwe)}
+                                  </div>
+                                  <div className="text-[10px] font-bold uppercase">
+                                    {promise.call && "☎ Will Call "}
+                                    {promise.mail && "✉ Will Mail "}
+                                    {promise.time && `⏰ ${promise.timeVal}`}
+                                  </div>
+                                </div>
 
-                {/* LAB NOTES */}
-                <div className="border-2 border-dashed border-black p-3 mt-2">
-                  <p className="text-[12px] font-black uppercase mb-1">
-                    Lab Notes:
-                  </p>
-                  <p className="text-[14px] font-bold leading-tight min-h-[30px]">
-                    {labNotes ||
-                      "_______________________________________________"}
-                  </p>
-                </div>
+                                {/* RX BLOCK */}
+                                <div className="border-4 border-black p-3 bg-white my-2">
+                                  <div className="border-b-2 border-black pb-2 mb-2">
+                                    <span className="text-[12px] font-black uppercase">Prescribing Doctor: {dr === "Other" ? drOther : dr}</span>
+                                  </div>
+                                  <div className="text-[14px] font-black border-b-2 border-black pb-2 mb-2 grid grid-cols-2 gap-4">
+                                    <div>
+                                      <span className="underline">OD:</span> SPH{" "}
+                                      {rx.od.sph || "___"} / CYL {rx.od.cyl || "___"} x{" "}
+                                      {rx.od.axis || "___"} / ADD {rx.od.add || "___"}
+                                      {rx.od.hasPrism && (
+                                        <span className="block text-[12px]">
+                                          Prism: {rx.od.prism}Δ {rx.od.prismBase}
+                                          {rx.od.hasCompoundPrism &&
+                                            ` / ${rx.od.prism2}Δ ${rx.od.prismBase2}`}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div>
+                                      <span className="underline">OS:</span> SPH{" "}
+                                      {rx.os.sph || "___"} / CYL {rx.os.cyl || "___"} x{" "}
+                                      {rx.os.axis || "___"} / ADD {rx.os.add || "___"}
+                                      {rx.os.hasPrism && (
+                                        <span className="block text-[12px]">
+                                          Prism: {rx.os.prism}Δ {rx.os.prismBase}
+                                          {rx.os.hasCompoundPrism &&
+                                            ` / ${rx.os.prism2}Δ ${rx.os.prismBase2}`}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* LAB NOTES */}
+                                <div className="border-2 border-dashed border-black p-3 mt-2 flex-1">
+                                  <p className="text-[14px] font-black uppercase mb-1">
+                                    Lab Notes:
+                                  </p>
+                                  <p className="text-[18px] font-bold leading-tight min-h-[100px]">
+                                    {labNotes ||
+                                      "_______________________________________________"}
+                                  </p>
+                                </div>
+
+
+
               </div>
             ))}
           </div>
@@ -2404,13 +2750,4 @@ function ReceiptPageWrapper({ patientData }: { patientData: any }) {
           <p className="text-[10px] font-black uppercase italic tracking-widest text-slate-400">Thank you for trusting us with your vision care!</p>
           <button 
             onClick={() => window.print()}
-            className="mt-6 px-8 py-3 bg-black text-white rounded-xl font-black uppercase tracking-widest hover:bg-slate-800 transition-all print:hidden"
-          >
-            Print Itemized Receipt
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
+            className="mt-6 px-8 py-3 bg-black text-white rounded-xl font-black uppe
