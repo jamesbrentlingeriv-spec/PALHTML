@@ -1114,149 +1114,24 @@ export default function App() {
               </div>
             </section>
 
-            {/* MEASUREMENTS */}
-            <section className="bg-theme-card p-6 rounded-3xl border-theme-main space-y-4">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-xs font-black uppercase tracking-widest text-theme-text font-bold italic">
-                  Measurements
-                </h3>
-                <button
-                  onClick={() => setShowMeasureTool(true)}
-                  className="text-[10px] font-black uppercase text-theme-text flex items-center gap-1 hover:underline"
-                >
-                  <CreditCard className="w-3 h-3 text-theme-accent" /> Use
-                  Camera Grid
-                </button>
-              </div>
-              <div className="space-y-3">
-                <div className="bg-theme-bg p-3 rounded-2xl border-theme-border">
-                  <label className="block text-[9px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
-                    Frame Name
-                  </label>
-                  <input
-                    className="w-full bg-transparent font-black text-lg outline-none text-theme-text"
-                    placeholder="e.g. Ray-Ban RB5154"
-                    value={frame}
-                    onChange={(e) => {
-                      setFrame(e.target.value);
-                      updateBillingRow("frame", {
-                        label: e.target.value
-                          ? `FRAME: ${e.target.value}`
-                          : "FRAME",
-                      });
-                    }}
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-theme-bg p-3 rounded-2xl border-theme-border">
-                    <label className="block text-[9px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
-                      Eye Size (A)
-                    </label>
-                    <input
-                      className="w-full bg-transparent font-black text-lg outline-none text-theme-text"
-                      placeholder="e.g. 52"
-                      value={frameA}
-                      onChange={(e) => setFrameA(e.target.value)}
-                    />
-                  </div>
-                  <div className="bg-theme-bg p-3 rounded-2xl border-theme-border">
-                    <label className="block text-[9px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
-                      DBL / Bridge
-                    </label>
-                    <input
-                      className="w-full bg-transparent font-black text-lg outline-none text-theme-text"
-                      placeholder="e.g. 18"
-                      value={frameDbl}
-                      onChange={(e) => setFrameDbl(e.target.value)}
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-theme-bg p-3 rounded-2xl border-theme-border">
-                    <label className="block text-[9px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
-                      P.D.
-                    </label>
-                    <input
-                      className="w-full bg-transparent font-black text-lg outline-none text-theme-text"
-                      value={pd}
-                      onChange={(e) => setPd(e.target.value)}
-                    />
-                  </div>
-                  <div className="bg-theme-bg p-3 rounded-2xl border-theme-border">
-                    <label className="block text-[9px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
-                      Seg Height
-                    </label>
-                    <input
-                      className="w-full bg-transparent font-black text-lg outline-none text-theme-text"
-                      value={seg}
-                      onChange={(e) => setSeg(e.target.value)}
-                    />
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* LENS COLORS */}
-            <section className="bg-theme-card p-6 rounded-3xl border-theme-border shadow-sm space-y-4">
-              <h3 className="text-xs font-black uppercase tracking-widest text-black font-bold italic">
-                Lens Options & Colors
-              </h3>
-              <div className="flex flex-wrap items-center gap-3">
-                <div className="flex flex-wrap gap-2 items-center">
-                  {["CLEAR", "TINT", "POLAR", "MIRROR", "TRANS"].map((type) => (
-                    <button
-                      key={type}
-                      onClick={() => handleColorChoice(type)}
-                      className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${
-                        colorType === type
-                          ? "bg-theme-text border-theme-border text-theme-card shadow-md"
-                          : "bg-theme-card border-theme-border text-theme-text hover:bg-theme-bg"
-                      }`}
-                    >
-                      {type}
-                    </button>
-                  ))}
-
-                  {colorType !== "CLEAR" && (
-                    <motion.div
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="flex items-center gap-2 border-b-2 border-black pb-1 ml-2"
-                    >
-                      <span className="text-[10px] font-black uppercase whitespace-nowrap italic text-black">
-                        Color:
-                      </span>
-                      <input
-                        type="text"
-                        placeholder="Type color..."
-                        className="bg-transparent border-none outline-none font-black uppercase text-[11px] w-32 placeholder:text-slate-400 text-black"
-                        value={colorDetail}
-                        onChange={(e) => setColorDetail(e.target.value)}
-                      />
-                    </motion.div>
-                  )}
-                </div>
-              </div>
-            </section>
-
-            {/* INTEGRATED Rx & BILLING IN SINGLE COLUMN STREAM */}
-            <section className="bg-theme-card p-6 rounded-3xl border-theme-main space-y-4 transition-all">
+                        {/* DOCTOR & PRESCRIPTION */}
+            <section className="bg-theme-card p-10 rounded-3xl border-theme-main space-y-8 transition-all shadow-lg">
               <div className="flex items-center justify-between">
-                <h3 className="text-xs font-black uppercase tracking-widest text-theme-text font-bold italic">
-                  Rx Summary
+                <h3 className="text-sm font-black uppercase tracking-widest text-theme-text font-bold italic">
+                  Doctor & Prescription
                 </h3>
                 <span className="p-1 px-2 rounded bg-white text-black font-black text-[9px] uppercase flex items-center gap-1 border border-black">
                   <ShieldCheck className="w-3 h-3 text-green-600" /> Verified
                 </span>
               </div>
 
-              <div className="space-y-4">
-                <div className="flex flex-col gap-2 p-3 bg-theme-bg rounded-2xl border-theme-border transition-all">
-                  <label className="block text-[10px] font-black uppercase text-theme-text">
+              <div className="space-y-8">
+                <div className="flex flex-col gap-3 p-5 bg-theme-bg rounded-2xl border-theme-border transition-all">
+                  <label className="block text-[11px] font-black uppercase text-theme-text">
                     Prescribing Doctor
                   </label>
                   <select
-                    className="w-full bg-white border border-black rounded-xl px-4 py-2 font-bold outline-none focus:ring-1 focus:ring-black text-xs text-black"
+                    className="w-full bg-white border border-black rounded-xl px-4 py-3 font-bold outline-none focus:ring-1 focus:ring-black text-sm text-black"
                     value={dr}
                     onChange={(e) => setDr(e.target.value)}
                   >
@@ -1268,7 +1143,7 @@ export default function App() {
                   {dr === "Other" && (
                     <input
                       placeholder="Type Doctor Name..."
-                      className="w-full bg-white border border-black rounded-xl px-4 py-2 font-bold outline-none focus:ring-1 focus:ring-black text-xs text-black"
+                      className="w-full bg-white border border-black rounded-xl px-4 py-3 font-bold outline-none focus:ring-1 focus:ring-black text-sm text-black"
                       value={drOther}
                       onChange={(e) => setDrOther(e.target.value)}
                     />
@@ -1276,18 +1151,18 @@ export default function App() {
                 </div>
 
                 {["od", "os"].map((eye) => (
-                  <div key={eye} className="grid grid-cols-5 gap-2">
-                    <div className="col-span-5 text-[9px] font-black uppercase text-theme-text mb-1 italic">
+                  <div key={eye} className="grid grid-cols-5 gap-4">
+                    <div className="col-span-5 text-[11px] font-black uppercase text-theme-text mb-2 italic">
                       {eye === "od" ? "RIGHT EYE (OD)" : "LEFT EYE (OS)"}
                     </div>
                     {["sph", "cyl", "axis", "add"].map((field) => (
                       <div key={field}>
-                        <label className="block text-[8px] font-black uppercase text-theme-text mb-0.5 text-center">
+                        <label className="block text-[9px] font-black uppercase text-theme-text mb-1 text-center">
                           {field}
                         </label>
                         <input
                           placeholder="0.00"
-                          className="w-full bg-theme-bg border-b border-theme-border py-1 text-center font-bold text-xs outline-none text-theme-text"
+                          className="w-full bg-theme-bg border-b-2 border-theme-border py-2 text-center font-bold text-lg outline-none text-theme-text"
                           value={
                             (
                               rx as Record<
@@ -1306,8 +1181,8 @@ export default function App() {
                         />
                       </div>
                     ))}
-                    <div className="flex flex-col items-center">
-                      <label className="block text-[8px] font-black uppercase text-theme-text mb-0.5 text-center">
+                    <div className="flex flex-col items-center justify-center">
+                      <label className="block text-[9px] font-black uppercase text-theme-text mb-1 text-center">
                         Prism
                       </label>
                       <input
@@ -1334,7 +1209,7 @@ export default function App() {
                             },
                           })
                         }
-                        className="w-4 h-4 rounded border-theme-border text-theme-accent focus:ring-theme-accent accent-theme-accent"
+                        className="w-6 h-6 rounded border-theme-border text-theme-accent focus:ring-theme-accent accent-theme-accent"
                       />
                     </div>
 
@@ -1344,9 +1219,9 @@ export default function App() {
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
-                        className="col-span-5 flex flex-col gap-2 mt-2 p-2 bg-theme-bg rounded-xl border border-theme-border"
+                        className="col-span-5 flex flex-col gap-4 mt-2 p-4 bg-theme-bg rounded-xl border border-theme-border"
                       >
-                        <div className="flex items-end gap-2">
+                        <div className="flex items-end gap-4">
                           <button
                             type="button"
                             onClick={() =>
@@ -1368,20 +1243,20 @@ export default function App() {
                                 },
                               })
                             }
-                            className={`w-6 h-6 mb-1 shrink-0 rounded-full flex items-center justify-center transition-colors ${(rx as Record<string, Record<string, string | boolean>>)[eye].hasCompoundPrism ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"} text-white`}
+                            className={`w-8 h-8 mb-1 shrink-0 rounded-full flex items-center justify-center transition-colors ${(rx as Record<string, Record<string, string | boolean>>)[eye].hasCompoundPrism ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"} text-white`}
                             title="Toggle Compound Prism"
                           >
                             <Plus
-                              className={`w-4 h-4 transition-transform ${(rx as Record<string, Record<string, string | boolean>>)[eye].hasCompoundPrism ? "rotate-45" : ""}`}
+                              className={`w-5 h-5 transition-transform ${(rx as Record<string, Record<string, string | boolean>>)[eye].hasCompoundPrism ? "rotate-45" : ""}`}
                             />
                           </button>
                           <div className="flex-1">
-                            <label className="block text-[8px] font-black uppercase text-theme-text mb-0.5">
+                            <label className="block text-[10px] font-black uppercase text-theme-text mb-1">
                               Amount
                             </label>
                             <input
                               placeholder="0.00"
-                              className="w-full bg-white border border-theme-border rounded px-2 py-1 text-xs font-bold text-black"
+                              className="w-full bg-white border border-theme-border rounded px-3 py-2 text-sm font-bold text-black"
                               value={
                                 (
                                   rx as Record<
@@ -1400,11 +1275,11 @@ export default function App() {
                             />
                           </div>
                           <div className="flex-1">
-                            <label className="block text-[8px] font-black uppercase text-theme-text mb-0.5">
+                            <label className="block text-[10px] font-black uppercase text-theme-text mb-1">
                               Base
                             </label>
                             <select
-                              className="w-full bg-white border border-theme-border rounded px-1 py-1 text-xs font-bold text-black"
+                              className="w-full bg-white border border-theme-border rounded px-2 py-2 text-sm font-bold text-black"
                               value={
                                 (
                                   rx as Record<
@@ -1439,14 +1314,14 @@ export default function App() {
                         {(
                           rx as Record<string, Record<string, string | boolean>>
                         )[eye].hasCompoundPrism && (
-                          <div className="flex items-end gap-2 pl-8">
+                          <div className="flex items-end gap-4 pl-12">
                             <div className="flex-1">
-                              <label className="block text-[8px] font-black uppercase text-theme-text mb-0.5">
+                              <label className="block text-[10px] font-black uppercase text-theme-text mb-1">
                                 Amount 2
                               </label>
                               <input
                                 placeholder="0.00"
-                                className="w-full bg-white border border-theme-border rounded px-2 py-1 text-xs font-bold text-black"
+                                className="w-full bg-white border border-theme-border rounded px-3 py-2 text-sm font-bold text-black"
                                 value={
                                   (
                                     rx as Record<
@@ -1465,11 +1340,11 @@ export default function App() {
                               />
                             </div>
                             <div className="flex-1">
-                              <label className="block text-[8px] font-black uppercase text-theme-text mb-0.5">
+                              <label className="block text-[10px] font-black uppercase text-theme-text mb-1">
                                 Base 2
                               </label>
                               <select
-                                className="w-full bg-white border border-theme-border rounded px-1 py-1 text-xs font-bold text-black"
+                                className="w-full bg-white border border-theme-border rounded px-2 py-2 text-sm font-bold text-black"
                                 value={
                                   (
                                     rx as Record<
@@ -1506,7 +1381,7 @@ export default function App() {
                   </div>
                 ))}
 
-                <div className="flex gap-2">
+                <div className="flex gap-4">
                   {["dvo", "nvo", "ivo"].map((flag) => (
                     <button
                       key={flag}
@@ -1516,11 +1391,138 @@ export default function App() {
                           [flag]: !(rxFlags as Record<string, boolean>)[flag],
                         })
                       }
-                      className={`flex-1 p-2 rounded-xl text-[10px] font-black uppercase transition-all border-theme-border ${(rxFlags as Record<string, boolean>)[flag] ? "bg-theme-text text-theme-card" : "bg-theme-card text-theme-text hover:bg-theme-bg"}`}
+                      className={`flex-1 p-3 rounded-xl text-[11px] font-black uppercase transition-all border-theme-border ${(rxFlags as Record<string, boolean>)[flag] ? "bg-theme-text text-theme-card" : "bg-theme-card text-theme-text hover:bg-theme-bg"}`}
                     >
                       {flag}
                     </button>
                   ))}
+                </div>
+              </div>
+            </section>
+
+            {/* FRAME & LENS SPECIFICATIONS */}
+            <section className="bg-theme-card p-8 rounded-3xl border-theme-main space-y-6 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-sm font-black uppercase tracking-widest text-theme-text font-bold italic">
+                  Frame & Lens Specifications
+                </h3>
+                <button
+                  onClick={() => setShowMeasureTool(true)}
+                  className="text-[10px] font-black uppercase text-theme-text flex items-center gap-1 hover:underline"
+                >
+                  <CreditCard className="w-3 h-3 text-theme-accent" /> Use
+                  Camera Grid
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-theme-bg p-4 rounded-2xl border-theme-border">
+                  <label className="block text-[10px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
+                    Frame Name
+                  </label>
+                  <input
+                    className="w-full bg-transparent font-black text-xl outline-none text-theme-text"
+                    placeholder="e.g. Ray-Ban RB5154"
+                    value={frame}
+                    onChange={(e) => {
+                      setFrame(e.target.value);
+                      updateBillingRow("frame", {
+                        label: e.target.value
+                          ? `FRAME: ${e.target.value}`
+                          : "FRAME",
+                      });
+                    }}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-theme-bg p-4 rounded-2xl border-theme-border">
+                    <label className="block text-[10px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
+                      Eye Size (A)
+                    </label>
+                    <input
+                      className="w-full bg-transparent font-black text-xl outline-none text-theme-text"
+                      placeholder="e.g. 52"
+                      value={frameA}
+                      onChange={(e) => setFrameA(e.target.value)}
+                    />
+                  </div>
+                  <div className="bg-theme-bg p-4 rounded-2xl border-theme-border">
+                    <label className="block text-[10px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
+                      DBL / Bridge
+                    </label>
+                    <input
+                      className="w-full bg-transparent font-black text-xl outline-none text-theme-text"
+                      placeholder="e.g. 18"
+                      value={frameDbl}
+                      onChange={(e) => setFrameDbl(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-theme-bg p-4 rounded-2xl border-theme-border">
+                    <label className="block text-[10px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
+                      P.D.
+                    </label>
+                    <input
+                      className="w-full bg-transparent font-black text-xl outline-none text-theme-text"
+                      value={pd}
+                      onChange={(e) => setPd(e.target.value)}
+                    />
+                  </div>
+                  <div className="bg-theme-bg p-4 rounded-2xl border-theme-border">
+                    <label className="block text-[10px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
+                      Seg Height
+                    </label>
+                    <input
+                      className="w-full bg-transparent font-black text-xl outline-none text-theme-text"
+                      value={seg}
+                      onChange={(e) => setSeg(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-theme-border space-y-4">
+                  <label className="block text-[11px] font-black uppercase text-theme-text italic">
+                    Lens Type & Color
+                  </label>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex flex-wrap gap-2 items-center">
+                      {["CLEAR", "TINT", "POLAR", "MIRROR", "TRANS"].map((type) => (
+                        <button
+                          key={type}
+                          onClick={() => handleColorChoice(type)}
+                          className={`px-5 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all border ${
+                            colorType === type
+                              ? "bg-theme-text border-theme-border text-theme-card shadow-md"
+                              : "bg-theme-card border-theme-border text-theme-text hover:bg-theme-bg"
+                          }`}
+                        >
+                          {type}
+                        </button>
+                      ))}
+
+                      {colorType !== "CLEAR" && (
+                        <motion.div
+                          initial={{ opacity: 0, x: -10 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className="flex items-center gap-2 border-b-2 border-black pb-1 ml-4"
+                        >
+                          <span className="text-[11px] font-black uppercase whitespace-nowrap italic text-black">
+                            Color:
+                          </span>
+                          <input
+                            type="text"
+                            placeholder="Type color..."
+                            className="bg-transparent border-none outline-none font-black uppercase text-[12px] w-40 placeholder:text-slate-400 text-black"
+                            value={colorDetail}
+                            onChange={(e) => setColorDetail(e.target.value)}
+                          />
+                        </motion.div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </section>
@@ -1725,14 +1727,14 @@ export default function App() {
                 </div>
               </div>
             </section>
-            {/* LAB NOTES */}
+                        {/* LAB NOTES */}
             <section className="bg-theme-card p-6 rounded-3xl border-theme-main space-y-4 shadow-sm">
               <h3 className="text-xs font-black uppercase tracking-widest text-theme-accent font-bold italic">
                 Lab Notes
               </h3>
               <textarea
                 placeholder="Enter any special instructions for the lab..."
-                className="w-full bg-theme-bg border-theme-border rounded-xl px-4 py-3 font-bold outline-none focus:ring-1 focus:ring-theme-accent text-sm text-theme-text min-h-[80px] resize-y"
+                className="w-full bg-theme-bg border-theme-border rounded-xl px-4 py-3 font-bold outline-none focus:ring-1 focus:ring-theme-accent text-sm text-theme-text min-h-[300px] resize-y"
                 value={labNotes}
                 onChange={(e) => setLabNotes(e.target.value)}
               />
