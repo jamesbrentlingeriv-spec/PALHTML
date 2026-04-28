@@ -235,11 +235,13 @@ export default function App() {
   const [globalAllowance, setGlobalAllowance] = useState(0);
   const [frameAllowance, setFrameAllowance] = useState(0);
 
-  // UI State
+    // UI State
   const [showMeasureTool, setShowMeasureTool] = useState(false);
   const [showPatientForm, setShowPatientForm] = useState(false);
   const [showCatalog, setShowCatalog] = useState(false);
   const [isPrinting, setIsPrinting] = useState(false);
+  const [showItemizedReceipt, setShowItemizedReceipt] = useState(false);
+
 
   // --- INITIALIZATION & FIREBASE ---
   useEffect(() => {
@@ -257,7 +259,79 @@ export default function App() {
 
   // --- CORE LOGIC FUNCTIONS ---
 
+  const resetForm = () => {
+    setPatient("");
+    setPhone("");
+    setPlan("None");
+    setDr("");
+    setDrOther("");
+    setFrame("");
+    setFrameA("");
+    setFrameDbl("");
+    setPd("");
+    setSeg("");
+    setMedicaidType("Regular");
+    setMedicaidCode("92340");
+    setSchoolName("");
+    setColorType("CLEAR");
+    setColorDetail("");
+    setLabNotes("");
+    setRx({
+      od: {
+        sph: "",
+        cyl: "",
+        axis: "",
+        add: "",
+        prism: "",
+        prismBase: "BO",
+        prism2: "",
+        prismBase2: "BO",
+        hasPrism: false,
+        hasCompoundPrism: false,
+      },
+      os: {
+        sph: "",
+        cyl: "",
+        axis: "",
+        add: "",
+        prism: "",
+        prismBase: "BO",
+        prism2: "",
+        prismBase2: "BO",
+        hasPrism: false,
+        hasCompoundPrism: false,
+      },
+    });
+    setBilling({
+      frame: { label: "FRAME", retail: "", retailWithTax: "0.00", owe: "0.00" },
+      lens: { label: "LENS", retail: "", retailWithTax: "0.00", owe: "0.00" },
+      coat: {
+        label: "A/R COATING",
+        retail: "",
+        retailWithTax: "0.00",
+        owe: "0.00",
+      },
+      m1: { label: "MISC 1", retail: "", retailWithTax: "0.00", owe: "0.00" },
+      m2: { label: "MISC 2", retail: "", retailWithTax: "0.00", owe: "0.00" },
+      m3: { label: "MISC 3", retail: "", retailWithTax: "0.00", owe: "0.00" },
+    });
+    setPayMethod("");
+    setCheckNum("");
+    setPromise({
+      call: false,
+      text: false,
+      mail: false,
+      time: false,
+      timeVal: "",
+    });
+    setIsAllowancePlan(false);
+    setGlobalAllowance(0);
+    setFrameAllowance(0);
+    autoChargesRef.current.clear();
+  };
+
   const handleLogin = (e: React.FormEvent) => {
+
     e.preventDefault();
     const u = USERS[loginForm.name.toUpperCase()];
     if (u && u.pass === loginForm.pass) {
@@ -726,7 +800,7 @@ export default function App() {
     };
 
     try {
-      await push(ref(database, "jobHistory"), snapshot);
+            await push(ref(database, "jobHistory"), snapshot);
       await set(ref(database, "lastJobNumber"), jobNum + 1);
 
       // Visual feedback
@@ -734,10 +808,12 @@ export default function App() {
       setTimeout(() => {
         window.print();
         setIsPrinting(false);
+        resetForm();
       }, 500);
     } catch (err) {
       alert("Database error: " + err);
     }
+
   };
 
   // --- SPLASH SCREEN ---
@@ -1489,13 +1565,13 @@ export default function App() {
                   </label>
                   <div className="flex flex-wrap items-center gap-3">
                     <div className="flex flex-wrap gap-2 items-center">
-                      {["CLEAR", "TINT", "POLAR", "MIRROR", "TRANS"].map((type) => (
+                                            {["CLEAR", "TINT", "POLAR", "MIRROR", "TRANS"].map((type) => (
                         <button
                           key={type}
                           onClick={() => handleColorChoice(type)}
-                          className={`px-5 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all border ${
+                          className={`px-5 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all border-2 ${
                             colorType === type
-                              ? "bg-theme-text border-theme-border text-theme-card shadow-md"
+                              ? "bg-theme-text border-theme-border text-theme-card shadow-md scale-105"
                               : "bg-theme-card border-theme-border text-theme-text hover:bg-theme-bg"
                           }`}
                         >
@@ -1533,9 +1609,9 @@ export default function App() {
                 Billing Summary
               </h3>
 
-              <div className="flex text-[8px] font-black uppercase text-theme-text border-b-theme-border pb-1 gap-2">
-                <span className="flex-1">Description</span>
-                <span className="w-16 text-right">Retail</span>
+                            <div className="flex text-[8px] font-black uppercase text-theme-text border-b-theme-border pb-1 gap-2">
+                <span className="flex-[2]">Description</span>
+                <span className="flex-1">Retail</span>
                 <span className="w-16 text-right">+Tax(6%)</span>
                 <span className="w-16 text-right">Pt Owe</span>
               </div>
@@ -1546,7 +1622,7 @@ export default function App() {
                     key={key}
                     className="flex items-center justify-between py-2 border-b border-theme-border group/row gap-2"
                   >
-                    <div className="flex-1">
+                    <div className="flex-[2]">
                       {key.startsWith("m") ? (
                         <input
                           placeholder={`Misc ${key.charAt(1)}`}
@@ -1562,9 +1638,9 @@ export default function App() {
                         </span>
                       )}
                     </div>
-                    <div className="w-16">
+                    <div className="flex-1">
                       <input
-                        className="w-full bg-transparent text-right font-black text-xs outline-none text-theme-text"
+                        className="w-full bg-transparent text-left font-black text-xs outline-none text-theme-text"
                         placeholder="0.00"
                         value={billing[key].retail}
                         onChange={(e) =>
@@ -1578,6 +1654,7 @@ export default function App() {
                         }
                       />
                     </div>
+
                     <div className="w-16 text-right text-[10px] font-bold text-slate-500">
                       {billing[key].retailWithTax}
                     </div>
@@ -1711,7 +1788,18 @@ export default function App() {
                 </AnimatePresence>
               </div>
 
-              <div className="pt-4 flex justify-between items-end">
+                              <div className="flex flex-col items-center gap-1">
+                  <button
+                    onClick={() => setShowItemizedReceipt(true)}
+                    className="w-full rounded-2xl px-6 py-2 flex items-center justify-center gap-2 font-black uppercase text-xs tracking-widest transition-all border-2 bg-blue-500 border-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30"
+                  >
+                    <FileText className="w-4 h-4" />
+                    Itemized Receipt
+                  </button>
+                </div>
+
+                <div className="pt-4 flex justify-between items-end">
+
                 <div>
                   <label className="block text-[10px] font-black uppercase text-theme-text mb-1">
                     Patient Total
@@ -1911,11 +1999,13 @@ export default function App() {
                   <X className="w-6 h-6" />
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto">
+                            <div className="flex-1 overflow-y-auto">
                 <Catalog
                   currentPlan={plan}
                   onSelectItem={handleCatalogSelect}
+                  selectedItemName={billing.lens.label}
                 />
+
 
                 {/* RECENT ACTIVITY MOVED HERE */}
                 <div className="p-6 border-t-4 border-theme-main bg-theme-card">
@@ -1993,7 +2083,167 @@ export default function App() {
         </button>
       </nav>
 
-      {/* HIDDEN PRINT LAYOUT — LANDSCAPE, TWO WRITE-UPS, ONE PAGE */}
+      {/* ITEMIZED RECEIPT OVERLAY */}
+      <AnimatePresence>
+        {showItemizedReceipt && (
+          <div className="fixed inset-0 z-[3000] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+              onClick={() => setShowItemizedReceipt(false)}
+            />
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="relative bg-white text-black p-0 rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-y-auto shadow-2xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sticky top-0 bg-white p-4 border-b flex justify-between items-center z-10">
+                <h2 className="text-lg font-black uppercase italic">Itemized Receipt Generator</h2>
+                <button 
+                  onClick={() => setShowItemizedReceipt(false)}
+                  className="p-2 hover:bg-slate-100 rounded-full transition-colors"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="p-8">
+                <ReceiptPageWrapper 
+                  patientData={{
+                    name: patient,
+                    phone: phone,
+                    plan: plan,
+                    billing: billing,
+                    totals: totals,
+                    finalOwe: finalOwe,
+                    payMethod: payMethod,
+                    checkNum: checkNum
+                  }} 
+                />
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// Wrapper component to inject patient data into a simplified ReceiptPage
+function ReceiptPageWrapper({ patientData }: { patientData: any }) {
+  // Map billing rows to line items for the receipt
+  const initialItems = Object.values(patientData.billing)
+    .filter((b: any) => b.retail && parseFloat(b.retail) > 0)
+    .map((b: any, idx: number) => ({
+      id: idx,
+      code: "",
+      desc: b.label,
+      qty: 1,
+      price: parseFloat(b.retail)
+    }));
+
+  const [items] = useState(initialItems);
+  const [amtPaid] = useState(patientData.finalOwe);
+  const [patName] = useState(patientData.name);
+  const [patPhone] = useState(patientData.phone);
+  const [insPlan] = useState(patientData.plan);
+  const [date] = useState(new Date().toLocaleDateString());
+
+  const subtotal = items.reduce((s: number, i: any) => s + i.qty * i.price, 0);
+  const tax = subtotal * 0.06;
+  const grandTotal = subtotal + tax;
+  const balance = grandTotal - amtPaid;
+
+  return (
+    <div className="receipt-content bg-white">
+      <div className="max-w-3xl mx-auto border-2 border-black p-10 print:border-none print:p-0">
+        <div className="flex justify-between items-start border-b-2 border-black pb-5 mb-5">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-black italic">PAL OPTICAL</h1>
+            <p className="text-sm font-bold">1555 E New Circle Rd, Suite 146</p>
+            <p className="text-sm font-bold">Lexington, KY 40509</p>
+            <p className="text-sm font-bold">Phone: (859) 266-3003</p>
+          </div>
+          <div className="text-right">
+            <h2 className="text-3xl font-black text-slate-300 italic">RECEIPT</h2>
+            <p className="font-bold">DATE: {date}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-8 mb-8">
+          <div>
+            <h3 className="text-[10px] font-black uppercase text-slate-400 border-b border-slate-200 mb-2">Patient Info</h3>
+            <p className="font-black text-sm uppercase">{patName || "____________________"}</p>
+            <p className="font-bold text-sm">{patPhone || "____________________"}</p>
+          </div>
+          <div>
+            <h3 className="text-[10px] font-black uppercase text-slate-400 border-b border-slate-200 mb-2">Insurance Plan</h3>
+            <p className="font-black text-sm uppercase">{insPlan}</p>
+          </div>
+        </div>
+
+        <table className="w-full text-sm mb-6">
+          <thead>
+            <tr className="border-b-2 border-black">
+              <th className="text-left py-2 font-black uppercase">Description</th>
+              <th className="text-right py-2 font-black uppercase">Qty</th>
+              <th className="text-right py-2 font-black uppercase">Price</th>
+              <th className="text-right py-2 font-black uppercase">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item: any) => (
+              <tr key={item.id} className="border-b border-slate-100">
+                <td className="py-3 font-bold uppercase">{item.desc}</td>
+                <td className="py-3 text-right font-bold">{item.qty}</td>
+                <td className="py-3 text-right font-bold">${item.price.toFixed(2)}</td>
+                <td className="py-3 text-right font-black">${(item.qty * item.price).toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <div className="ml-auto w-64 space-y-2">
+          <div className="flex justify-between font-bold">
+            <span>SUBTOTAL:</span>
+            <span>${subtotal.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between font-bold">
+            <span>TAX (6%):</span>
+            <span>${tax.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between font-black text-xl border-t-2 border-black pt-2">
+            <span>TOTAL:</span>
+            <span>${grandTotal.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between font-black text-green-600 bg-green-50 p-1 px-2 rounded">
+            <span>PAID ({patientData.payMethod}):</span>
+            <span>-${parseFloat(amtPaid).toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between font-black border-t border-black pt-2">
+            <span>BALANCE:</span>
+            <span>${balance.toFixed(2)}</span>
+          </div>
+        </div>
+
+        <div className="mt-16 text-center">
+          <p className="text-[10px] font-black uppercase italic tracking-widest text-slate-400">Thank you for trusting us with your vision care!</p>
+          <button 
+            onClick={() => window.print()}
+            className="mt-6 px-8 py-3 bg-black text-white rounded-xl font-black uppercase tracking-widest hover:bg-slate-800 transition-all print:hidden"
+          >
+            Print Itemized Receipt
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
       <div
         className={`fixed inset-0 bg-white z-[99999] pointer-events-none opacity-0 ${isPrinting ? "opacity-100" : "hidden"}`}
       >
