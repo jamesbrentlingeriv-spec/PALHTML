@@ -2064,6 +2064,38 @@ export default function App() {
                   </div>
                 </div>
 
+                {/* BILLING TABLE */}
+                <table className="w-full text-[10px] font-bold border-collapse border border-black">
+                  <thead>
+                    <tr className="bg-slate-100 italic">
+                      <th className="text-left p-1">ITEM</th>
+                      <th className="text-center p-1">RETAIL</th>
+                      <th className="text-right p-1">OWE</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(Object.values(billing) as BillingRow[]).map((b, i) => (
+                      <tr key={i} className="border-t border-black">
+                        <td className="p-0.5">{b.label}</td>
+                        <td className="p-0.5 text-center">${f(b.retail)}</td>
+                        <td className="p-0.5 text-right">${f(b.owe)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+
+                {/* TOTAL */}
+                <div className="flex justify-between items-end pt-2 mt-2">
+                  <div className="text-2xl font-black italic">
+                    TOTAL: ${f(finalOwe)}
+                  </div>
+                  <div className="text-[9px] font-bold uppercase">
+                    {promise.call && "☎ Will Call "}
+                    {promise.mail && "✉ Will Mail "}
+                    {promise.time && `⏰ ${promise.timeVal}`}
+                  </div>
+                </div>
+
                 {/* RX BLOCK */}
                 <div className="border-2 border-black p-2 bg-white my-2">
                   <div className="text-[10px] font-black border-b border-black pb-1 mb-1 grid grid-cols-2 gap-4">
@@ -2106,50 +2138,22 @@ export default function App() {
                   <div className="text-[10px] font-black bg-black text-white px-2 py-0.5 mt-1 inline-block">
                     COLOR: {colorType} {colorDetail ? `(${colorDetail})` : ""}
                   </div>
+                  {billing.coat.retail && (
+                    <div className="text-[10px] font-black bg-gray-200 text-black px-2 py-0.5 mt-1 inline-block border border-black">
+                      COATING: {billing.coat.label}
+                    </div>
+                  )}
                 </div>
 
-                {/* BILLING TABLE */}
-                <table className="w-full text-[10px] font-bold border-collapse border border-black">
-                  <thead>
-                    <tr className="bg-slate-100 italic">
-                      <th className="text-left p-1">ITEM</th>
-                      <th className="text-center p-1">RETAIL</th>
-                      <th className="text-right p-1">OWE</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(Object.values(billing) as BillingRow[]).map((b, i) => (
-                      <tr key={i} className="border-t border-black">
-                        <td className="p-0.5">{b.label}</td>
-                        <td className="p-0.5 text-center">${f(b.retail)}</td>
-                        <td className="p-0.5 text-right">${f(b.owe)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
                 {/* LAB NOTES */}
-                {labNotes && (
-                  <div className="border-2 border-dashed border-black p-2 mt-2">
-                    <p className="text-[9px] font-black uppercase mb-1">
-                      Lab Notes:
-                    </p>
-                    <p className="text-[10px] font-bold leading-tight">
-                      {labNotes}
-                    </p>
-                  </div>
-                )}
-
-                {/* TOTAL */}
-                <div className="flex justify-between items-end pt-2 mt-auto">
-                  <div className="text-2xl font-black italic">
-                    TOTAL: ${f(finalOwe)}
-                  </div>
-                  <div className="text-[9px] font-bold uppercase">
-                    {promise.call && "☎ Will Call "}
-                    {promise.mail && "✉ Will Mail "}
-                    {promise.time && `⏰ ${promise.timeVal}`}
-                  </div>
+                <div className="border-2 border-dashed border-black p-2 mt-2">
+                  <p className="text-[9px] font-black uppercase mb-1">
+                    Lab Notes:
+                  </p>
+                  <p className="text-[10px] font-bold leading-tight min-h-[20px]">
+                    {labNotes ||
+                      "_______________________________________________"}
+                  </p>
                 </div>
               </div>
             ))}

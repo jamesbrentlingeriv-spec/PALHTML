@@ -16,7 +16,7 @@ export default function Opticalc3DApp() {
         </span>
       </div>
       <iframe
-        src="/opticalc-3d/index.html"
+        src="https://opticalc-3d-lens-thickness-preview-443610928945.us-west1.run.app"
         className="flex-1 w-full border-none"
         title="Opticalc Pro 3D"
         allow="fullscreen"
