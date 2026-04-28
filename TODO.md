@@ -1,16 +1,11 @@
-# Fix paldocs.html Waiver Links Issue
+# Integration Fix TODO
 
-## Steps:
-
-- [ ] Step 1: Create TODO.md with plan breakdown (current)
-- [x] Step 2: Update paldocs.html - Replace printDoc() calls with simple
-      window.open() navigation for all waiver/patient-info buttons
-- [x] Step 3: Remove the problematic printDoc() JS function from paldocs.html
-- [x] Step 4: Add user guidance note in paldocs.html about viewing/printing from
-      opened docs
-- [x] Step 5: Update this TODO.md with completion status
-- [x] Step 6: Test by running `start paldocs.html` and clicking waiver buttons
-- [x] Step 7: Attempt completion
-
-✅ Task complete: paldocs.html waivers open in new tabs (no popup block). Run
-`start paldocs.html` to verify.
+- [x] Step 1: Copy optitrack-remake-manager to
+      pal-optical-react/public/optitrack/
+- [x] Step 2: Build OPTIVIEW and copy dist to pal-optical-react/public/optiview/
+- [x] Step 3: Build opticalc-3d and copy dist to
+      pal-optical-react/public/opticalc-3d/
+- [x] Step 4: Update OptiViewApp.tsx wrapper (absolute path + full viewport)
+- [x] Step 5: Update Opticalc3DApp.tsx wrapper (absolute path + full viewport)
+- [x] Step 6: Update OptiTrakApp.tsx wrapper (absolute path + full viewport)
+- [x] Step 7: Test by running dev server

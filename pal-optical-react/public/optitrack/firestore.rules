@@ -1,0 +1,19 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Allow all authenticated shop users to read/write
+    // This supports the shared shop model with custom local auth
+    match /remakes/{remakeId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /technicians/{techId} {
+      allow read, write: if isAuthenticated();
+    }
+  }
+}

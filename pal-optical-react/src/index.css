@@ -1,0 +1,32 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --theme-bg: #f8fafc;
+  --theme-card: #ffffff;
+  --theme-text: #010101;
+  --theme-border: #000000;
+  --theme-accent: #ef4444;
+  --theme-muted: #64748b;
+}
+
+.theme-dark {
+  --theme-bg: #000000;
+  --theme-card: #000000;
+  --theme-text: #ffffff;
+  --theme-border: #ffffff;
+  --theme-accent: #ef4444;
+  --theme-muted: #94a3b8;
+}
+
+@layer utilities {
+  .bg-theme-bg { background-color: var(--theme-bg); }
+  .bg-theme-card { background-color: var(--theme-card); }
+  .text-theme-text { color: var(--theme-text); }
+  .text-theme-muted { color: var(--theme-muted); }
+  .text-theme-accent { color: var(--theme-accent); }
+  .border-theme-border { border-color: var(--theme-border); border-width: 2px; }
+  .border-theme-main { border-color: var(--theme-border); border-width: 4px; border-style: solid; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+}
