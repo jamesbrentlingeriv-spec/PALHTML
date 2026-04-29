@@ -1,41 +1,24 @@
-# Fix VSCode TS/ESLint Errors in src/pages/post/App.tsx & Components
+# Task Progress: Fix TS/ESLint errors and implement features in PALHTML project
 
-## Progress Tracking
+## Plan Breakdown
 
-### 1. ✅ Plan approved by user
+1. [x] ~~Read relevant files (App.tsx, Catalog.tsx, types.ts, Dashboard.tsx)~~
+2. [ ] Fix Dashboard.tsx P.O.S.T. card: full post.png background, no text
+       overlay
+3. [ ] Run ESLint/TS checks on src/pages/post/App.tsx (user confirmed no
+       duplicates)
+4. [ ] Add missing JobSnapshot/ReceiptItem types if needed (types.ts already has
+       them)
+5. [ ] Implement frameAllowance as proper state in App.tsx (currently hardcoded)
+6. [ ] Fix useEffect ESLint deps warning in App.tsx l197 (mailAddress)
+7. [ ] Fix sync setState cascading renders in mail effect
+8. [ ] Add post autofill mailing prompt logic
+9. [ ] Verify Catalog.tsx allowance logic (no copay/full retail) and green bg
+       selection
+10. [ ] Test `npm run dev` - 0 errors
 
-### 2. ✅ Fixed App.tsx duplication & declarations
+## Next Step
 
-- ✅ Removed duplicated Frame/Lens + Billing sections
-- ✅ Declared autoChargesRef at top
-- ✅ Removed unused frameAllowance vars
+Fix Dashboard.tsx POST card background.
 
-**Next: App.tsx useEffect fixes**
-
-### 3. 📋 Fix Catalog.tsx
-
-- [ ] Add missing imports (useState, Search/Check/Tag, motion)
-- [ ] Add `className?: string` prop
-- [ ] Extend LensItem with category
-
-### 4. 📋 Fix PatientForm.tsx
-
-- [ ] Add motion import
-- [ ] Export PatientFormData interface
-
-### 5. 📋 Update types.ts
-
-- [ ] Add export PatientFormData interface
-- [ ] Add export ReceiptItem interface
-- [ ] Update RxValue to match usage
-
-### 6. 🔍 Verification
-
-- [ ] Run `npx eslint src/pages/post/**/*.tsx --fix`
-- [ ] Run `npx tsc --noEmit` (0 errors)
-- [ ] Test workflow: login → patient → catalog → Rx/billing → print
-- [ ] Check Firebase integration
-
-### 7. ✅ Complete (attempt_completion)
-
-**Next: Step 2 - App.tsx fixes**
+**Status:** Starting edits after plan approval.

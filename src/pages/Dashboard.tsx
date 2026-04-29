@@ -135,30 +135,12 @@ export default function Dashboard() {
         {/* P.O.S.T. Flagship Card */}
         <Link
           to="/post"
-          className="block mb-6 p-6 rounded-2xl hover:-translate-y-1 transition-transform shadow-lg relative overflow-hidden"
-        >
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-            src="/POST.mp4"
-          />
-          <div className="absolute inset-0 bg-black/40" />
-          <div className="relative flex items-center gap-3">
-            <div>
-              <h2 className="text-xl font-bold text-white">
-                P.O.S.T. Write-Ups
-              </h2>
-              <p className="text-sm text-white/80">
-                Flagship — New digital write-up system for store efficiency.
-                Camera PD/Seg, 400+ lens catalog, Firebase sync.
-              </p>
-            </div>
-            <span className="ml-auto text-white text-2xl">→</span>
-          </div>
-        </Link>
+          className="block mb-6 rounded-2xl hover:-translate-y-1 transition-transform shadow-lg relative overflow-hidden border-8 border-black h-80 w-full bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: "url('/post.png')",
+          }}
+          aria-label="P.O.S.T. Optical Slip Tool"
+        />
 
         {/* Tool Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

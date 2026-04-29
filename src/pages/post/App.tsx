@@ -668,7 +668,7 @@ export default function App() {
           className="flex flex-col items-center gap-6"
         >
           <img
-            src="/android-chrome-512x512.png"
+            src="/post2.png"
             alt="POST"
             className="w-48 h-48 object-contain"
           />
@@ -704,14 +704,12 @@ export default function App() {
           animate={{ opacity: 1, scale: 1 }}
           className="bg-theme-card rounded-2xl shadow-sm p-8 w-full max-w-sm border-theme-main"
         >
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-black italic tracking-tighter text-theme-text transition-all">
-              P.O.S.T.
-            </h1>
-            <p className="text-xs font-black text-theme-muted uppercase tracking-widest">
-              Pal Optical Slip Tool
-            </p>
-          </div>
+          <div
+            className="text-center mb-8 h-48 w-48 bg-cover bg-center bg-no-repeat rounded-2xl shadow-2xl border-8 border-black mx-auto"
+            style={{
+              backgroundImage: "url('/post2.png')",
+            }}
+          />
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
@@ -2181,6 +2179,7 @@ export default function App() {
               <div className="flex-1 overflow-y-auto">
                 <Catalog
                   currentPlan={plan}
+                  isAllowancePlan={isAllowancePlan}
                   onSelectItem={handleCatalogSelect}
                   selectedItemName={billing.lens.label}
                 />
