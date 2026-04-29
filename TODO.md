@@ -1,11 +1,41 @@
-# Integration Fix TODO
+# Fix VSCode TS/ESLint Errors in src/pages/post/App.tsx & Components
 
-- [x] Step 1: Copy optitrack-remake-manager to
-      pal-optical-react/public/optitrack/
-- [x] Step 2: Build OPTIVIEW and copy dist to pal-optical-react/public/optiview/
-- [x] Step 3: Build opticalc-3d and copy dist to
-      pal-optical-react/public/opticalc-3d/
-- [x] Step 4: Update OptiViewApp.tsx wrapper (absolute path + full viewport)
-- [x] Step 5: Update Opticalc3DApp.tsx wrapper (absolute path + full viewport)
-- [x] Step 6: Update OptiTrakApp.tsx wrapper (absolute path + full viewport)
-- [x] Step 7: Test by running dev server
+## Progress Tracking
+
+### 1. ✅ Plan approved by user
+
+### 2. ✅ Fixed App.tsx duplication & declarations
+
+- ✅ Removed duplicated Frame/Lens + Billing sections
+- ✅ Declared autoChargesRef at top
+- ✅ Removed unused frameAllowance vars
+
+**Next: App.tsx useEffect fixes**
+
+### 3. 📋 Fix Catalog.tsx
+
+- [ ] Add missing imports (useState, Search/Check/Tag, motion)
+- [ ] Add `className?: string` prop
+- [ ] Extend LensItem with category
+
+### 4. 📋 Fix PatientForm.tsx
+
+- [ ] Add motion import
+- [ ] Export PatientFormData interface
+
+### 5. 📋 Update types.ts
+
+- [ ] Add export PatientFormData interface
+- [ ] Add export ReceiptItem interface
+- [ ] Update RxValue to match usage
+
+### 6. 🔍 Verification
+
+- [ ] Run `npx eslint src/pages/post/**/*.tsx --fix`
+- [ ] Run `npx tsc --noEmit` (0 errors)
+- [ ] Test workflow: login → patient → catalog → Rx/billing → print
+- [ ] Check Firebase integration
+
+### 7. ✅ Complete (attempt_completion)
+
+**Next: Step 2 - App.tsx fixes**

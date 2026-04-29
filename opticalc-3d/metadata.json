@@ -1,6 +1,0 @@
-{
-  "name": "OptiCalc 3D: Lens Thickness Preview",
-  "description": "Calculate eyeglass lens thickness based on frame style, material, and decentration with a live 3D visualization.",
-  "requestFramePermissions": [],
-  "majorCapabilities": []
-}

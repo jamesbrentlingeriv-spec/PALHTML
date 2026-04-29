@@ -37,12 +37,12 @@ export function MeasurementTool({ onSave, onClose }: MeasurementToolProps) {
     "Measurements Complete!"
   ];
 
-  const stopCamera = () => {
+  const stopCamera = useCallback(() => {
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
       setStream(null);
     }
-  };
+  }, [stream]);
 
   const startCamera = async () => {
     try {
@@ -147,7 +147,7 @@ export function MeasurementTool({ onSave, onClose }: MeasurementToolProps) {
 
   useEffect(() => {
     return () => stopCamera();
-  }, [stream]);
+  }, [stream, stopCamera]);
 
   return (
     <div className="fixed inset-0 z-[1000] bg-black/95 backdrop-blur-sm flex flex-col items-center p-4 overflow-y-auto">

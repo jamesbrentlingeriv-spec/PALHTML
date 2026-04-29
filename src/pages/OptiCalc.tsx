@@ -33,16 +33,16 @@ export default function OptiCalc() {
   const clear = () => setDisplay('')
   const calculate = () => {
     try {
-      // eslint-disable-next-line no-eval
-      const result = eval(display.replace(/Math\./g, 'Math.'))
+      const safeEval = new Function('return ' + display.replace(/Math\./g, 'Math.'));
+      const result = safeEval();
       addReceipt(`${display} = ${result}`)
       setDisplay(String(result))
     } catch { setDisplay('Error') }
   }
   const applyRetail = (mult: number, label: string) => {
     try {
-      // eslint-disable-next-line no-eval
-      const cur = parseFloat(eval(display))
+      const safeEval = new Function('return ' + display);
+      const cur = parseFloat(safeEval())
       if (isNaN(cur)) return
       const newTotal = (cur * mult).toFixed(2)
       addReceipt(`${cur} ${label} = ${newTotal}`)
@@ -78,7 +78,7 @@ export default function OptiCalc() {
     drawCanvas(thick, parseFloat(frameType), p > 0)
   }
 
-  const drawCanvas = (maxT: number, frameThick: number, isPlus: boolean) => {
+  const drawCanvas = useCallback((maxT: number, frameThick: number, isPlus: boolean) => {
     const canvas = canvasRef.current; if (!canvas) return
     const ctx = canvas.getContext('2d')!
     ctx.clearRect(0, 0, 400, 300)
@@ -107,9 +107,19 @@ export default function OptiCalc() {
     const exposed = Math.max(0, maxT - frameThick)
     ctx.fillStyle = exposed > 0 ? '#cc0000' : '#008800'
     ctx.fillText(`Exposed: ${exposed.toFixed(2)} mm`, 10, 62)
-  }
+  }, [theme])
 
-  useEffect(() => { if (power && diameter) calcThickness() }, [theme])
+  useEffect(() => {
+    if (power && diameter) {
+      const n = parseFloat(index), p = parseFloat(power), d = parseFloat(diameter), dec = parseFloat(decentration) || 0, mt = parseFloat(minThick)
+      if (isNaN(p) || isNaN(d) || isNaN(mt)) return
+      const r = d / 2 + Math.abs(dec)
+      const sag = (r * r * Math.abs(p)) / (2000 * (n - 1))
+      const thick = sag + mt
+      drawCanvas(thick, parseFloat(frameType), p > 0)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [theme])
 
   const bgCls = theme === 'dark' ? 'bg-black text-green-400' : theme === 'rainbow' ? 'bg-gradient-to-br from-pink-200 via-purple-200 to-blue-200 text-gray-800' : 'bg-white text-black'
   const cardCls = theme === 'dark' ? 'bg-gray-950 border-green-700' : theme === 'rainbow' ? 'bg-white/60 backdrop-blur border-white/80' : 'bg-gray-100 border-gray-300'

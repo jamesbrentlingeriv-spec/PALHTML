@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import BackButton from '../components/BackButton'
+import { useState, useEffect } from 'react';
+import BackButton from '../components/BackButton';
 
 interface LensRow { content: string[]; mat: string }
 interface DBData { 'table-pal': LensRow[]; 'table-multi': LensRow[] }
@@ -23,8 +23,11 @@ export default function LensAvail() {
     const saved = localStorage.getItem(STORAGE_KEY)
     if (saved) {
       const data: DBData = JSON.parse(saved)
-      if (data['table-pal']) setPalRows(data['table-pal'])
-      if (data['table-multi']) setMultiRows(data['table-multi'])
+      // Using setTimeout to defer the state updates to the next render cycle
+      setTimeout(() => {
+        if (data['table-pal']) setPalRows(data['table-pal'])
+        if (data['table-multi']) setMultiRows(data['table-multi'])
+      }, 0);
     }
   }, [])
 

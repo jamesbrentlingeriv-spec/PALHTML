@@ -1,16 +1,40 @@
-import { useState } from 'react';
-import { Search, Tag, Check } from 'lucide-react';
-import { motion } from 'motion/react';
-import { MASTER_PRICE_LIST } from '../constants';
-import type { InsurancePlan } from '../types';
+import React from 'react';
+import type { LensItem } from '../types';
 
 interface CatalogProps {
-  currentPlan: InsurancePlan;
-  onSelectItem: (itemName: string, itemPrice: number, category: string) => void;
+  onSelect: (item: LensItem) => void;
+  currentPlan: string;
+  onSelectItem?: (name: string, price: number, cat: string) => void;
   selectedItemName?: string;
-  className?: string;
 }
 
+const MASTER_PRICE_LIST: Record<string, LensItem[]> = {
+  "Single Vision": [
+    { name: "Standard w/ AR", price: 79.99 },
+    { name: "Hi-Index 1.67", price: 129.99 },
+    { name: "Photochromic Transitions", price: 139.99 },
+  ],
+  "Bifocal": [
+    { name: "Standard w/ AR", price: 89.99 },
+    { name: "Hi-Index 1.67", price: 139.99 },
+    { name: "Photochromic Transitions", price: 149.99 },
+  ],
+  "Progressive": [
+    { name: "Standard w/ AR", price: 119.99 },
+    { name: "Hi-Index 1.67", price: 169.99 },
+    { name: "Photochromic Transitions", price: 179.99 },
+  ],
+  "Coatings": [
+    { name: "Anti-Reflective", price: 29.99 },
+    { name: "Scratch Resistant", price: 19.99 },
+    { name: "UV Protection", price: 9.99 },
+  ],
+  "Miscellaneous": [
+    { name: "Lens Cleaning Kit", price: 9.99 },
+    { name: "Lens Case", price: 19.99 },
+    { name: "Lens Holder", price: 4.99 },
+  ],
+};
 
 const MEDICAID_LENSES = [
   "Single Vision Plastic",
@@ -21,7 +45,7 @@ const MEDICAID_LENSES = [
   "Younger Image POLY",
 ];
 
-export function Catalog({ currentPlan, onSelectItem, selectedItemName, className }: CatalogProps) {
+export function Catalog({ currentPlan, onSelectItem, selectedItemName }: CatalogProps) {
 
   const [activeCat, setActiveCat] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
@@ -31,7 +55,7 @@ export function Catalog({ currentPlan, onSelectItem, selectedItemName, className
   const isMedicalPlan = currentPlan === "MEDICAID" || currentPlan === "SCHOOL LETTER";
   const isCommercial = !isMedicalPlan && currentPlan !== "None";
 
-  const getPriceDisplay = (item: any) => {
+  const getPriceDisplay = (item: LensItem) => {
     if (isMedicalPlan) return "$0.00";
     if (isCommercial) return "Copay Applies";
     return `$${item.price.toFixed(2)}`;

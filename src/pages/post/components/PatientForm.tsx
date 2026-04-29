@@ -3,8 +3,29 @@ import { X, Save } from 'lucide-react';
 import { motion } from 'motion/react';
 import { TRANSLATIONS } from '../constants';
 
+interface PatientFormData {
+  name: string;
+  dob: string;
+  gender: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  ssn: string;
+  phone: string;
+  email: string;
+  guardianName: string;
+  guardianPhone: string;
+  guardianRel: string;
+  insName: string;
+  insId: string;
+  insHolder: string;
+  insDob: string;
+  hipaa: boolean;
+}
+
 interface PatientFormProps {
-  onSave: (data: any) => void;
+  onSave: (data: PatientFormData) => void;
   onClose: () => void;
   initialName?: string;
 }
