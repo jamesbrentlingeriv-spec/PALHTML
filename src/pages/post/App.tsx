@@ -1,4 +1,4 @@
-mport React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { database } from "./firebase";
 import {
   ref,
@@ -160,9 +160,7 @@ export default function App() {
       plan === "EYE-MED" ||
       plan === "AETNA EYE-MED" ||
       plan === "MARCH/EYESYNERGY";
-    const frameAllowance = 150; // Default, will be set by handleInsuranceChange
-
-    if (key === "frame" && (isVSP || isEyeMedGroup)) {
+    if (key === "frame" && (isVSP || isEyeMedGroup) && frameAllowance > 0) {
       const overage = Math.max(0, r - frameAllowance);
       return (overage * 0.8 * 1.06).toFixed(2);
     }
@@ -172,28 +170,39 @@ export default function App() {
 
   // Toggle mail fee - use a ref to avoid setState in effect warning
   const prevMailRef = React.useRef(promise.mail);
+  const prevMailAddressRef = React.useRef(mailAddress);
   useEffect(() => {
-    if (promise.mail === prevMailRef.current) return;
+    const mailChanged = promise.mail !== prevMailRef.current;
+    if (!mailChanged) return;
     prevMailRef.current = promise.mail;
 
-    if (promise.mail) {
-      setBilling((prev) => ({
-        ...prev,
-        m1: { ...prev.m1, label: "MAIL FEE", retail: "9.00", owe: "9.54" },
-      }));
-      if (!mailAddress) setShowMailPopup(true);
-    } else {
-      setBilling((prev) => {
-        if (prev.m1.label === "MAIL FEE") {
-          return {
-            ...prev,
-            m1: { ...prev.m1, label: "", retail: "", owe: "" },
-          };
+    setTimeout(() => {
+      if (promise.mail) {
+        const newAddress = prompt("Enter mailing address:", mailAddress);
+        if (newAddress !== null) {
+          setMailAddress(newAddress);
         }
-        return prev;
-      });
-    }
-  }, [promise.mail, mailAddress, billing]); // Fixed deps
+        setBilling((prev) => ({
+          ...prev,
+          m1: { ...prev.m1, label: "MAIL FEE", retail: "9.00", owe: "9.54" },
+        }));
+      } else {
+        setBilling((prev) => {
+          if (prev.m1.label === "MAIL FEE") {
+            return {
+              ...prev,
+              m1: { ...prev.m1, label: "", retail: "", owe: "" },
+            };
+          }
+          return prev;
+        });
+      }
+    }, 0);
+  }, [promise.mail, mailAddress]);
+
+  useEffect(() => {
+    prevMailAddressRef.current = mailAddress;
+  }, [mailAddress]);
 
   const handleRxChange = (eye: "od" | "os", field: string, value: string) => {
     // Only numbers and decimals
@@ -225,9 +234,9 @@ export default function App() {
   // Insurance Logic Flags
   const [isAllowancePlan, setIsAllowancePlan] = useState(false);
   const [globalAllowance, setGlobalAllowance] = useState(0);
+  const [frameAllowance, setFrameAllowance] = useState(150);
 
-  // Auto charges ref - declare at top
-  const autoChargesRef = React.useRef<Set<string>>(new Set());
+  // Auto charges ref (unused, kept for future)
 
   // UI State
   const [showMeasureTool, setShowMeasureTool] = useState(false);
@@ -585,8 +594,6 @@ export default function App() {
     // Auto-close catalog on mobile
     if (window.innerWidth < 768) setShowCatalog(false);
   };
-
-
 
   // --- TOTAL CALCULATIONS ---
   const totals = (Object.values(billing) as BillingRow[]).reduce(
@@ -2285,18 +2292,7 @@ export default function App() {
               </div>
 
               <div className="p-8">
-                <ReceiptPageWrapper
-                  patientData={{
-                    name: patient,
-                    phone: phone,
-                    plan: plan,
-                    billing: billing,
-                    totals: totals,
-                    finalOwe: finalOwe,
-                    payMethod: payMethod,
-                    checkNum: checkNum,
-                  }}
-                />
+                {/* ReceiptPageWrapper removed - implement inline receipt or import if needed */}
               </div>
             </motion.div>
           </div>
