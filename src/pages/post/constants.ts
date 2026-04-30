@@ -61,7 +61,7 @@ export const MEDICAID_TYPES = [
 export const MEDICAID_CODES = ["92340", "92370", "Prior Auth"];
 
 export const MASTER_PRICE_LIST: Record<string, LensItem[]> = {
-  "Plastic (CR-39)": [
+  "Plastic": [
     { name: "Plano", price: 35.0 },
     { name: "Single Vision Plastic", price: 50.0 },
     { name: "Eyezen (+0-+4) PLASTIC PLASTIC", price: 125.0 },
@@ -130,6 +130,15 @@ export const MASTER_PRICE_LIST: Record<string, LensItem[]> = {
     { name: "VSP Unity Elite 1.67", price: 695.0 },
     { name: "Younger Image 1.67", price: 520.0 },
   ],
+  "Glass": [
+    { name: "Single Vision GLASS", price: 175.0 },
+    { name: "FT-28 GLASS", price: 285.0 },
+    { name: "7x28 GLASS", price: 345.0 },
+    { name: "Freefocus HD GLASS", price: 500.0 },
+    { name: "X-Ray Glass SV GLASS", price: 400.0 },
+    { name: "X-Ray Glass FT-28 GLASS", price: 450.0 },
+    { name: "X-Ray Glass Prog GLASS", price: 575.0 },
+  ],
   "Office/Computer Progressives": [
     { name: "Freefocus PC13/20 PLASTIC", price: 205.0 },
     { name: "Shamir Workspace PLASTIC", price: 245.0 },
@@ -149,7 +158,114 @@ export const MASTER_PRICE_LIST: Record<string, LensItem[]> = {
     { name: "VSP Unity Elite TRANS", price: 535.0 },
     { name: "Younger Image TRANS", price: 365.0 },
   ],
-  "Tints and Coatings": [
+  "Transitions Poly": [
+    { name: "Single Vision TRANS POLY", price: 275.0 },
+    { name: "FT-28 TRANS POLY", price: 290.0 },
+    { name: "RD-22 TRANS POLY", price: 395.0 },
+    { name: "7x28 TRANS POLY", price: 315.0 },
+    { name: "Essilor Natural Digital TRANS POLY", price: 455.0 },
+    { name: "Varilux Comfort TRANS POLY", price: 505.0 },
+    { name: "Varilux Physio TRANS POLY", price: 550.0 },
+    { name: "Varilux X TRANS POLY", price: 690.0 },
+    { name: "Shamir Auto III TRANS POLY", price: 615.0 },
+    { name: "VSP Unity V3 TRANS POLY", price: 475.0 },
+    { name: "VSP Unity Elite TRANS POLY", price: 575.0 },
+    { name: "Younger Image TRANS POLY", price: 405.0 },
+  ],
+  "Transitions Trivex": [
+    { name: "Single Vision TRANS TRIVEX", price: 275.0 },
+    { name: "FT-28 TRANS TRIVEX", price: 300.0 },
+    { name: "7x28 TRANS TRIVEX", price: 350.0 },
+    { name: "Younger Image TRANS TRIVEX", price: 455.0 },
+    { name: "Essilor Ovation Digital TRANS TRIVEX ", price: 570.0 },
+    { name: "Varilux Comfort TRANS TRIVEX", price: 650.0 },
+    { name: "Varilux X TRANS TRIVEX", price: 790.0 },
+    { name: "Freefocus HD TRANS TRIVEX", price: 405.0 },
+    { name: "VSP Unity V3 TRANS TRIVEX", price: 590.0 },
+  ],
+  "Transitions High-Index": [
+    { name: "Single Vision 1.67 TRANS", price: 465.0 },
+    { name: "Single Vision 1.74 TRANS", price: 650.0 },
+    { name: "FT-28 1.67(V Dyna) TRANS", price: 470.0 },
+    { name: "RD-22 1.67 TRANS", price: 600.0 },
+    { name: "Essilor Natural Digital 1.67 TRANS", price: 650.0 },
+    { name: "Varilux Comfort 1.67 TRANS", price: 720.0 },
+    { name: "Varilux Physio 1.67 TRANS", price: 750.0 },
+    { name: "Varilux X 1.67 TRANS", price: 900.0 },
+    { name: "Shamir Auto III 1.67 TRANS", price: 720.0 },
+    { name: "VSP Unity V3 1.67 TRANS", price: 650.0 },
+    { name: "VSP Unity Elite 1.67 TRANS", price: 800.0 },
+  ],
+  "PGX/PBX Glass": [
+    { name: "Single Vision GLASS PGX/PBX", price: 300.0 },
+    { name: "FT-28 GLASS PGX/PBX", price: 410.0 },
+    { name: "7x28 GLASS PGX/PBX", price: 475.0 },
+    { name: "Freefocus HD GLASS PGX/PBX", price: 590.0 },
+  ],
+  "Transitions XtraActive Polar(POLY)": [
+    { name: "Single Vision TRANS XTRA POLAR", price: 375.0 },
+    { name: "Ovation Digital TRANS XTRA POLAR", price: 575.0 },
+    { name: "Varilux Comfort DRx TRANS XTRA POLAR", price: 650.0 },
+    { name: "Younger Image TRANS XTRA POLAR", price: 525.0 },
+  ],
+  Drivewear: [
+    { name: "Single Vision DRIVEWEAR POLY", price: 360.0 },
+    { name: "Younger Image DRIVEWEAR POLY", price: 500.0 },
+  ],
+  "Polarized Plastic": [
+    { name: "Single Vision POLARIZED", price: 175.0 },
+    { name: "KBCO Single Vision POLARIZED", price: 250.0 },
+    { name: "FT-28 POLARIZED", price: 225.0 },
+    { name: "KBCO FT-28 POLARIZED", price: 300.0 },
+    { name: "7x28 POLARIZED", price: 270.0 },
+    { name: "KBCO 7x28 POLARIZED", price: 350.0 },
+    { name: "Essilor Natural POLARIZED", price: 450.0 },
+    { name: "KBCO IRx Pro POLARIZED", price: 475.0 },
+    { name: "Younger Image POLARIZED", price: 400.0 },
+  ],
+  "Polarized Poly": [
+    { name: "Single Vision POLARIZED POLY", price: 220.0 },
+    { name: "FT-28 POLARIZED POLY", price: 300.0 },
+    { name: "7x28 POLARIZED POLY", price: 315.0 },
+    { name: "Essilor Natural POLARIZED POLY", price: 515.0 },
+    { name: "KBCO IRx Pro POLARIZED POLY", price: 535.0 },
+    { name: "Younger Image POLARIZED POLY", price: 495.0 },
+  ],
+  "Avalux Migraine": [
+    { name: "Single Vision AVALUX MIGRAINE", price: 850.0 },
+    { name: "Progressive AVALUX MIGRAINE", price: 975.0 },
+  ],
+  "Ray-Ban Single Vision": [
+    { name: "Plastic RAY-BAN", price: 150.0 },
+    { name: "Plastic w/ Blue Light RAY-BAN", price: 180.0 },
+    { name: "Plastic Transitions RAY-BAN", price: 260.0 },
+    { name: "Poly RAY-BAN", price: 190.0 },
+    { name: "Poly w/ Blue Light RAY-BAN", price: 220.0 },
+    { name: "Poly Transitions RAY-BAN", price: 300.0 },
+    { name: "1.67 High-Index RAY-BAN", price: 375.0 },
+    { name: "1.67 w/ Blue Light RAY-BAN", price: 405.0 },
+    { name: "1.67 Transitions RAY-BAN", price: 485.0 },
+  ],
+  "Ray-Ban Progressive": [
+    { name: "Plastic RAY-BAN PROG", price: 340.0 },
+    { name: "Plastic w/ Blue Light RAY-BAN PROG", price: 370.0 },
+    { name: "Plastic Transitions RAY-BAN PROG", price: 450.0 },
+    { name: "Poly RAY-BAN PROG", price: 380.0 },
+    { name: "Poly w/ Blue Light RAY-BAN PROG", price: 410.0 },
+    { name: "Poly Transitions RAY-BAN PROG", price: 490.0 },
+    { name: "1.67 High-Index RAY-BAN PROG", price: 500.0 },
+    { name: "1.67 w/ Blue Light RAY-BAN PROG", price: 530.0 },
+    { name: "1.67 Transitions RAY-BAN PROG", price: 610.0 },
+  ],
+  "Ray-Ban Sun": [
+    { name: "Non-Polar RAY-BAN SUN", price: 350.0 },
+    { name: "Polar RAY-BAN SUN", price: 390.0 },
+    { name: "Polar BSAR RAY-BAN SUN", price: 440.0 },
+    { name: "Polar Gradient BSAR RAY-BAN SUN", price: 450.0 },
+    { name: "Polar Mirror BSAR RAY-BAN SUN", price: 475.0 },
+  ],
+
+  "Coatings and Tint": [
     { name: "Tint", price: 20.0 },
     { name: "Specialty Tint", price: 70.0 },
     { name: "Scratch Coat", price: 20.0 },
@@ -162,7 +278,17 @@ export const MASTER_PRICE_LIST: Record<string, LensItem[]> = {
     { name: "Mirror Coat", price: 160.0 },
     { name: "Blue Light", price: 40.0 },
   ],
-  Miscellaneous: [
+  "Overpower/Oversize": [
+    { name: "SV over ±4.00 SPH", price: 10.0 },
+    { name: "SV over ±8.00 SPH", price: 20.0 },
+    { name: "Bifocal Add over +3.00", price: 15.0 },
+    { name: "Bifocal Add over +4.00", price: 30.0 },
+    { name: "Cylinder in Addtn to SPH", price: 20.0 },
+    { name: "Prism", price: 10.0 },
+    { name: "Eyesize over 58mm", price: 20.0 },
+    { name: "Semi-Rimless Groove", price: 20.0 },
+  ],
+  "Miscellaneous": [
     { name: "Oakley In-Line", price: 80.0 },
     { name: "Edge Down", price: 35.0 },
     { name: "Take PD for NP", price: 25.0 },
@@ -175,6 +301,7 @@ export const MASTER_PRICE_LIST: Record<string, LensItem[]> = {
     { name: "Safety Fee", price: 30.0 },
     { name: "Side Shields", price: 30.0 },
   ],
+
 };
 
 export const USERS: Record<string, { pass: string; initials: string }> = {

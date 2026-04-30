@@ -1,24 +1,58 @@
-# Task Progress: Fix TS/ESLint errors and implement features in PALHTML project
+# P.O.S.T. React Improvements - TODO
 
-## Plan Breakdown
+## Current Task Status
 
-1. [x] ~~Read relevant files (App.tsx, Catalog.tsx, types.ts, Dashboard.tsx)~~
-2. [ ] Fix Dashboard.tsx P.O.S.T. card: full post.png background, no text
-       overlay
-3. [ ] Run ESLint/TS checks on src/pages/post/App.tsx (user confirmed no
-       duplicates)
-4. [ ] Add missing JobSnapshot/ReceiptItem types if needed (types.ts already has
-       them)
-5. [ ] Implement frameAllowance as proper state in App.tsx (currently hardcoded)
-6. [ ] Fix useEffect ESLint deps warning in App.tsx l197 (mailAddress)
-7. [ ] Fix sync setState cascading renders in mail effect
-8. [ ] Add post autofill mailing prompt logic
-9. [ ] Verify Catalog.tsx allowance logic (no copay/full retail) and green bg
-       selection
-10. [ ] Test `npm run dev` - 0 errors
+✅ Plan approved & created  
+🔄 Breakdown into steps complete  
+⏳ **Ready for implementation**
 
-## Next Step
+## Implementation Steps (Sequential)
 
-Fix Dashboard.tsx POST card background.
+### Step 1: Consolidate Pricing Data ✓
 
-**Status:** Starting edits after plan approval.
+- ✅ **constants.ts**: MASTER_PRICE_LIST complete source
+- ✅ **Catalog.tsx**: Duplicate removed → imports from constants, compiles
+- ✅ Catalog data consolidation complete
+
+### Step 2: Single Allowance/Frame Allowance Prompt (App.tsx)
+
+- ✅ handleInsuranceChange(): Single allowance/frame prompts implemented
+- ✅ Removed duplicate prompts from handleCatalogSelect(), handleColorChoice()
+- ✅ State management confirmed (isAllowancePlan, globalAllowance,
+  frameAllowance)
+
+**Progress**: 3/6 complete
+
+**Next**: Step 4 - Add waivers section to App.tsx
+
+### Step 3: Fix Catalog Behavior (Catalog.tsx)
+
+- [ ] Allowance plans: Show **retail price** (no "Copay Applies")
+- [ ] onSelectItem(): **Always** add full retail to billing row (lens/coat/misc)
+  - tax = retail \* 1.06
+  - owe = tax (no prompts)
+- [ ] Colors/tints → misc row with retail
+
+### Step 4: Add Waivers Section (App.tsx)
+
+- ✅ New state: waivers: Record<string, boolean> (7 waivers matching HTML)
+- ✅ UI: Checkbox section styled like original (red styling)
+- ✅ Print: Generate waiver text in LAB NOTES section ✓
+
+### Step 5: Billing & Totals Logic (App.tsx)
+
+- [ ] Frame row: If frameAllowance → owe = max(0, retail-allowance) _ 0.8 _ 1.06
+- [ ] Totals: Sum owes (already retail-based)
+- [ ] Validation: Print enabled when required fields complete
+
+### Step 6: Testing & Polish
+
+- [ ] Test allowance flow (single prompt, frame-specific)
+- [ ] Test waivers (checkbox → print waiver page)
+- [ ] Test catalog (retail adds, no prompts)
+- [ ] `npm run dev` → Full app test
+- [ ] ✅ attempt_completion
+
+**Next Action**: Edit constants.ts → Catalog.tsx (data consolidation)
+
+**Progress**: 0/6 complete

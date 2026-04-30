@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import BackButton from '../components/BackButton';
+import { useSearchParams } from 'react-router-dom';
+import BackButton from '../components/BackButton'
 
 interface LensRow { content: string[]; mat: string }
 interface DBData { 'table-pal': LensRow[]; 'table-multi': LensRow[] }

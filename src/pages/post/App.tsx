@@ -155,14 +155,23 @@ export default function App() {
     if (plan === "MEDICAID" || plan === "SCHOOL LETTER") return "0.00";
     if (plan === "None") return (r * 1.06).toFixed(2);
 
+    if (isAllowancePlan && globalAllowance > 0) {
+      return (r * 1.06).toFixed(2);
+    }
+
     const isVSP = plan === "VSP";
     const isEyeMedGroup =
       plan === "EYE-MED" ||
       plan === "AETNA EYE-MED" ||
       plan === "MARCH/EYESYNERGY";
-    if (key === "frame" && (isVSP || isEyeMedGroup) && frameAllowance > 0) {
+
+    if (key === "frame" && (isVSP || (isEyeMedGroup && !isAllowancePlan))) {
       const overage = Math.max(0, r - frameAllowance);
       return (overage * 0.8 * 1.06).toFixed(2);
+    }
+
+    if (isAllowancePlan && isEyeMedGroup) {
+      return (r * 1.06).toFixed(2);
     }
 
     return (r * 1.06).toFixed(2);
@@ -170,39 +179,29 @@ export default function App() {
 
   // Toggle mail fee - use a ref to avoid setState in effect warning
   const prevMailRef = React.useRef(promise.mail);
-  const prevMailAddressRef = React.useRef(mailAddress);
   useEffect(() => {
-    const mailChanged = promise.mail !== prevMailRef.current;
-    if (!mailChanged) return;
+    if (promise.mail === prevMailRef.current) return;
     prevMailRef.current = promise.mail;
 
-    setTimeout(() => {
-      if (promise.mail) {
-        const newAddress = prompt("Enter mailing address:", mailAddress);
-        if (newAddress !== null) {
-          setMailAddress(newAddress);
+    if (promise.mail) {
+      setBilling((prev) => ({
+        ...prev,
+        m1: { ...prev.m1, label: "MAIL FEE", retail: "9.00", owe: "9.54" },
+      }));
+      if (!mailAddress) setShowMailPopup(true);
+    } else {
+      setBilling((prev) => {
+        if (prev.m1.label === "MAIL FEE") {
+          return {
+            ...prev,
+            m1: { ...prev.m1, label: "", retail: "", owe: "" },
+          };
         }
-        setBilling((prev) => ({
-          ...prev,
-          m1: { ...prev.m1, label: "MAIL FEE", retail: "9.00", owe: "9.54" },
-        }));
-      } else {
-        setBilling((prev) => {
-          if (prev.m1.label === "MAIL FEE") {
-            return {
-              ...prev,
-              m1: { ...prev.m1, label: "", retail: "", owe: "" },
-            };
-          }
-          return prev;
-        });
-      }
-    }, 0);
-  }, [promise.mail, mailAddress]);
-
-  useEffect(() => {
-    prevMailAddressRef.current = mailAddress;
-  }, [mailAddress]);
+        return prev;
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [promise.mail]);
 
   const handleRxChange = (eye: "od" | "os", field: string, value: string) => {
     // Only numbers and decimals
@@ -234,11 +233,81 @@ export default function App() {
   // Insurance Logic Flags
   const [isAllowancePlan, setIsAllowancePlan] = useState(false);
   const [globalAllowance, setGlobalAllowance] = useState(0);
-  const [frameAllowance, setFrameAllowance] = useState(150);
+  const [frameAllowance, setFrameAllowance] = useState(0);
 
-  // Auto charges ref (unused, kept for future)
+  // --- AUTO CALCULATE INSURANCE CHARGES ---
+  useEffect(() => {
+    if (!isAllowancePlan) return;
 
-  // UI State
+    // Calculate new charges based on insurance plan
+    const newCharges = [];
+    for (const [row, charge] of [
+      ["l1", { retail: globalAllowance, owe: globalAllowance }],
+      ["f1", { retail: frameAllowance, owe: frameAllowance }],
+    ] as const) {
+      const b = billing[row];
+      if (b.retail === "" || b.label.includes("MISC")) continue;
+      
+      // Only adjust if retail price is higher than allowance
+      if (parseFloat(b.retail) > charge.retail) {
+        const newOwe = parseFloat(b.owe) - (parseFloat(b.retail) - charge.retail);
+        newCharges.push({ 
+          row, 
+          data: { ...b, retail: charge.retail.toFixed(2), owe: Math.max(0, newOwe).toFixed(2) } 
+        });
+      }
+    }
+
+    // Only update state if there are changes
+    if (newCharges.length > 0) {
+      setBilling(prev => {
+        const next = { ...prev };
+        newCharges.forEach(({ row, data }) => {
+          next[row] = data;
+        });
+        return next;
+      });
+    }
+    // Added dependencies to the dependency array
+  }, [billing, isAllowancePlan, globalAllowance, frameAllowance]);
+
+  // --- SYNC PROMISE FLAGS ---
+  useEffect(() => {
+    const prevMailRef = { current: null };
+    
+    const updateBillingWithMailFee = (shouldAddMailFee) => {
+      setBilling(prev => {
+        if (shouldAddMailFee) {
+          return {
+            ...prev,
+            m1: { ...prev.m1, label: "MAIL FEE", retail: "9.00", owe: "9.54" },
+          };
+        } else {
+          if (prev.m1.label === "MAIL FEE") {
+            return {
+              ...prev,
+              m1: { ...prev.m1, label: "", retail: "", owe: "" },
+            };
+          }
+          return prev;
+        }
+      });
+    };
+
+    if (promise.mail !== prevMailRef.current) {
+      prevMailRef.current = promise.mail;
+
+      if (promise.mail) {
+        updateBillingWithMailFee(true);
+        if (!mailAddress) setShowMailPopup(true);
+      } else {
+        updateBillingWithMailFee(false);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [promise.mail, mailAddress]); // Added mailAddress to dependency array
+
+    // UI State
   const [showMeasureTool, setShowMeasureTool] = useState(false);
   const [showPatientForm, setShowPatientForm] = useState(false);
   const [showCatalog, setShowCatalog] = useState(false);
@@ -328,10 +397,12 @@ export default function App() {
     });
     setIsAllowancePlan(false);
     setGlobalAllowance(0);
-    // autoChargesRef.current.clear(); // Safe now after dedup
+    setFrameAllowance(0);
+    autoChargesRef.current.clear();
   };
 
   const handleLogin = (e: React.FormEvent) => {
+
     e.preventDefault();
     const u = USERS[loginForm.name.toUpperCase()];
     if (u && u.pass === loginForm.pass) {
@@ -424,10 +495,10 @@ export default function App() {
         "Enter WELLCARE MEDICARE Total Allowance Amount (e.g. 350):",
         "0",
       );
-      const parsedAllowance = parseFloat(input || "0") || 0;
-      setGlobalAllowance(parsedAllowance);
+      const localGlobalAllowance = parseFloat(input || "0") || 0;
+      setGlobalAllowance(localGlobalAllowance);
       alert(
-        `Allowance Plan Active. $${parsedAllowance} will be deducted from the Retail cost of the glasses.`,
+        `Allowance Plan Active. $${localGlobalAllowance} will be deducted from the Retail cost of the glasses.`,
       );
     } else if (
       newPlan !== "MEDICAID" &&
@@ -443,10 +514,10 @@ export default function App() {
         localIsAllowance = true;
         setIsAllowancePlan(true);
         const input = prompt("Enter Total Allowance Amount (e.g. 350):", "0");
-        const parsedAllowance = parseFloat(input || "0") || 0;
-        setGlobalAllowance(parsedAllowance);
+        const localGlobalAllowance = parseFloat(input || "0") || 0;
+        setGlobalAllowance(localGlobalAllowance);
         alert(
-          `Allowance Plan Active. $${parsedAllowance} will be deducted from the Retail cost of the glasses.`,
+          `Allowance Plan Active. $${localGlobalAllowance} will be deducted from the Retail cost of the glasses.`,
         );
       } else {
         // CHECK FOR FRAME ALLOWANCE CONDITION
@@ -595,6 +666,167 @@ export default function App() {
     if (window.innerWidth < 768) setShowCatalog(false);
   };
 
+  // --- AUTOMATIC REASONING (The "If" Functions) ---
+  const autoChargesRef = React.useRef<Set<string>>(new Set());
+  useEffect(() => {
+    const newCharges: Array<{ key: string; row: string; data: BillingRow }> =
+      [];
+
+    // 1. Oversize Check
+    const size = parseFloat(frameA) || 0;
+    if (size >= 58 && !autoChargesRef.current.has("oversize")) {
+      autoChargesRef.current.add("oversize");
+      const row =
+        billing.m1.retail === ""
+          ? "m1"
+          : billing.m2.retail === ""
+            ? "m2"
+            : "m3";
+      newCharges.push({
+        key: "oversize",
+        row,
+        data: {
+          label: "EYESIZE 58+",
+          retail: "20.00",
+          retailWithTax: "21.20",
+          owe: plan === "None" ? "21.20" : "0.00",
+          autoChargeKey: "oversize",
+        },
+      });
+    }
+
+    // 2. RX Evaluation (Prism Check)
+    const hasPrism = rx.od.hasPrism || rx.os.hasPrism;
+    if (hasPrism && !autoChargesRef.current.has("prism")) {
+      autoChargesRef.current.add("prism");
+      const row =
+        billing.m1.retail === ""
+          ? "m1"
+          : billing.m2.retail === ""
+            ? "m2"
+            : "m3";
+      newCharges.push({
+        key: "prism",
+        row,
+        data: {
+          label: "PRISM CHARGE",
+          retail: "10.00",
+          retailWithTax: "10.60",
+          owe: plan === "None" ? "10.60" : "0.00",
+          autoChargeKey: "prism",
+        },
+      });
+    }
+
+    // 3. SPH Check
+    const parseRx = (val: string) =>
+      Math.abs(parseFloat(val.replace(/[^0-9.-]/g, "")) || 0);
+    const maxSph = Math.max(parseRx(rx.od.sph), parseRx(rx.os.sph));
+    if (maxSph >= 8 && !autoChargesRef.current.has("sph8")) {
+      autoChargesRef.current.add("sph8");
+      const row =
+        billing.m1.retail === ""
+          ? "m1"
+          : billing.m2.retail === ""
+            ? "m2"
+            : "m3";
+      newCharges.push({
+        key: "sph8",
+        row,
+        data: {
+          label: "OVER ±8.00 SPH",
+          retail: "20.00",
+          retailWithTax: "21.20",
+          owe: plan === "None" ? "21.20" : "0.00",
+          autoChargeKey: "sph8",
+        },
+      });
+    } else if (
+      maxSph >= 4 &&
+      maxSph < 8 &&
+      !autoChargesRef.current.has("sph4")
+    ) {
+      autoChargesRef.current.add("sph4");
+      const row =
+        billing.m1.retail === ""
+          ? "m1"
+          : billing.m2.retail === ""
+            ? "m2"
+            : "m3";
+      newCharges.push({
+        key: "sph4",
+        row,
+        data: {
+          label: "OVER ±4.00 SPH",
+          retail: "10.00",
+          retailWithTax: "10.60",
+          owe: plan === "None" ? "10.60" : "0.00",
+          autoChargeKey: "sph4",
+        },
+      });
+    }
+
+    // 4. ADD Check
+    const maxAdd = Math.max(parseRx(rx.od.add), parseRx(rx.os.add));
+    if (maxAdd >= 4 && !autoChargesRef.current.has("add4")) {
+      autoChargesRef.current.add("add4");
+      const row =
+        billing.m1.retail === ""
+          ? "m1"
+          : billing.m2.retail === ""
+            ? "m2"
+            : "m3";
+      newCharges.push({
+        key: "add4",
+        row,
+        data: {
+          label: "ADD OVER +4.00",
+          retail: "30.00",
+          retailWithTax: "31.80",
+          owe: plan === "None" ? "31.80" : "0.00",
+          autoChargeKey: "add4",
+        },
+      });
+    } else if (
+      maxAdd >= 3 &&
+      maxAdd < 4 &&
+      !autoChargesRef.current.has("add3")
+    ) {
+      autoChargesRef.current.add("add3");
+      const row =
+        billing.m1.retail === ""
+          ? "m1"
+          : billing.m2.retail === ""
+            ? "m2"
+            : "m3";
+      newCharges.push({
+        key: "add3",
+        row,
+        data: {
+          label: "ADD OVER +3.00",
+          retail: "15.00",
+          retailWithTax: "15.90",
+          owe: plan === "None" ? "15.90" : "0.00",
+          autoChargeKey: "add3",
+        },
+      });
+    }
+
+    if (newCharges.length > 0) {
+      // eslint-disable-next-line react-hooks/no-set-state-in-effect
+      setBilling((prev) => {
+        const next = { ...prev };
+        newCharges.forEach(({ row, data }) => {
+          if (next[row].retail === "" || next[row].label.includes("MISC")) {
+            next[row] = data;
+          }
+        });
+        return next;
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [frameA, rx]);
+
   // --- TOTAL CALCULATIONS ---
   const totals = (Object.values(billing) as BillingRow[]).reduce(
     (acc, b) => {
@@ -638,7 +870,7 @@ export default function App() {
     };
 
     try {
-      await push(ref(database, "jobHistory"), snapshot);
+            await push(ref(database, "jobHistory"), snapshot);
       await set(ref(database, "lastJobNumber"), jobNum + 1);
 
       // Visual feedback
@@ -651,6 +883,7 @@ export default function App() {
     } catch (err) {
       alert("Database error: " + err);
     }
+
   };
 
   // --- SPLASH SCREEN ---
@@ -668,7 +901,7 @@ export default function App() {
           className="flex flex-col items-center gap-6"
         >
           <img
-            src="/post2.png"
+            src="/android-chrome-512x512.png"
             alt="POST"
             className="w-48 h-48 object-contain"
           />
@@ -704,12 +937,14 @@ export default function App() {
           animate={{ opacity: 1, scale: 1 }}
           className="bg-theme-card rounded-2xl shadow-sm p-8 w-full max-w-sm border-theme-main"
         >
-          <div
-            className="text-center mb-8 h-48 w-48 bg-cover bg-center bg-no-repeat rounded-2xl shadow-2xl border-8 border-black mx-auto"
-            style={{
-              backgroundImage: "url('/post2.png')",
-            }}
-          />
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-black italic tracking-tighter text-theme-text transition-all">
+              P.O.S.T.
+            </h1>
+            <p className="text-xs font-black text-theme-muted uppercase tracking-widest">
+              Pal Optical Slip Tool
+            </p>
+          </div>
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
@@ -852,7 +1087,7 @@ export default function App() {
             </div>
           </header>
 
-          <div className="flex flex-col gap-8 pb-32">
+                    <div className="flex flex-col gap-8 pb-32">
             {/* SINGLE COLUMN: ALL TOGETHER ON LEFT */}
             <section className="bg-theme-card p-6 rounded-3xl border-theme-main space-y-4 transition-all shadow-sm">
               <button
@@ -1114,21 +1349,19 @@ export default function App() {
                   </label>
                   <div className="flex flex-wrap items-center gap-3">
                     <div className="flex flex-wrap gap-2 items-center">
-                      {["CLEAR", "TINT", "POLAR", "MIRROR", "TRANS"].map(
-                        (type) => (
-                          <button
-                            key={type}
-                            onClick={() => handleColorChoice(type)}
-                            className={`px-5 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all border-2 ${
-                              colorType === type
-                                ? "bg-theme-text border-theme-border text-theme-card shadow-md scale-105"
-                                : "bg-theme-card border-theme-border text-theme-text hover:bg-theme-bg"
-                            }`}
-                          >
-                            {type}
-                          </button>
-                        ),
-                      )}
+                                            {["CLEAR", "TINT", "POLAR", "MIRROR", "TRANS"].map((type) => (
+                        <button
+                          key={type}
+                          onClick={() => handleColorChoice(type)}
+                          className={`px-5 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all border-2 ${
+                            colorType === type
+                              ? "bg-theme-text border-theme-border text-theme-card shadow-md scale-105"
+                              : "bg-theme-card border-theme-border text-theme-text hover:bg-theme-bg"
+                          }`}
+                        >
+                          {type}
+                        </button>
+                      ))}
 
                       {colorType !== "CLEAR" && (
                         <motion.div
@@ -1160,7 +1393,7 @@ export default function App() {
                 Billing Summary
               </h3>
 
-              <div className="flex text-[8px] font-black uppercase text-theme-text border-b-theme-border pb-1 gap-2">
+                            <div className="flex text-[8px] font-black uppercase text-theme-text border-b-theme-border pb-1 gap-2">
                 <span className="flex-[2]">Description</span>
                 <span className="flex-1">Retail</span>
                 <span className="w-16 text-right">+Tax(6%)</span>
@@ -1339,17 +1572,18 @@ export default function App() {
                 </AnimatePresence>
               </div>
 
-              <div className="flex flex-col items-center gap-1">
-                <button
-                  onClick={() => setShowItemizedReceipt(true)}
-                  className="w-full rounded-2xl px-6 py-2 flex items-center justify-center gap-2 font-black uppercase text-xs tracking-widest transition-all border-2 bg-blue-500 border-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30"
-                >
-                  <FileText className="w-4 h-4" />
-                  Itemized Receipt
-                </button>
-              </div>
+                              <div className="flex flex-col items-center gap-1">
+                  <button
+                    onClick={() => setShowItemizedReceipt(true)}
+                    className="w-full rounded-2xl px-6 py-2 flex items-center justify-center gap-2 font-black uppercase text-xs tracking-widest transition-all border-2 bg-blue-500 border-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30"
+                  >
+                    <FileText className="w-4 h-4" />
+                    Itemized Receipt
+                  </button>
+                </div>
 
-              <div className="pt-4 flex justify-between items-end">
+                <div className="pt-4 flex justify-between items-end">
+
                 <div>
                   <label className="block text-[10px] font-black uppercase text-theme-text mb-1">
                     Patient Total
@@ -1366,7 +1600,7 @@ export default function App() {
               </div>
             </section>
 
-            {/* DOCTOR & PRESCRIPTION */}
+                                    {/* DOCTOR & PRESCRIPTION */}
             <section className="bg-theme-card p-10 rounded-3xl border-theme-main space-y-8 transition-all shadow-lg">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-black uppercase tracking-widest text-theme-text font-bold italic">
@@ -1652,347 +1886,9 @@ export default function App() {
               </div>
             </section>
 
-            {/* FRAME & LENS SPECIFICATIONS */}
-            <section className="bg-theme-card p-8 rounded-3xl border-theme-main space-y-6 shadow-sm">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-sm font-black uppercase tracking-widest text-theme-text font-bold italic">
-                  Frame & Lens Specifications
-                </h3>
-                <button
-                  onClick={() => setShowMeasureTool(true)}
-                  className="text-[10px] font-black uppercase text-theme-text flex items-center gap-1 hover:underline"
-                >
-                  <CreditCard className="w-3 h-3 text-theme-accent" /> Use
-                  Camera Grid
-                </button>
-              </div>
 
-              <div className="space-y-4">
-                <div className="bg-theme-bg p-4 rounded-2xl border-theme-border">
-                  <label className="block text-[10px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
-                    Frame Name
-                  </label>
-                  <input
-                    className="w-full bg-transparent font-black text-xl outline-none text-theme-text"
-                    placeholder="e.g. Ray-Ban RB5154"
-                    value={frame}
-                    onChange={(e) => {
-                      setFrame(e.target.value);
-                      updateBillingRow("frame", {
-                        label: e.target.value
-                          ? `FRAME: ${e.target.value}`
-                          : "FRAME",
-                      });
-                    }}
-                  />
-                </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-theme-bg p-4 rounded-2xl border-theme-border">
-                    <label className="block text-[10px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
-                      Eye Size (A)
-                    </label>
-                    <input
-                      className="w-full bg-transparent font-black text-xl outline-none text-theme-text"
-                      placeholder="e.g. 52"
-                      value={frameA}
-                      onChange={(e) => setFrameA(e.target.value)}
-                    />
-                  </div>
-                  <div className="bg-theme-bg p-4 rounded-2xl border-theme-border">
-                    <label className="block text-[10px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
-                      DBL / Bridge
-                    </label>
-                    <input
-                      className="w-full bg-transparent font-black text-xl outline-none text-theme-text"
-                      placeholder="e.g. 18"
-                      value={frameDbl}
-                      onChange={(e) => setFrameDbl(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-theme-bg p-4 rounded-2xl border-theme-border">
-                    <label className="block text-[10px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
-                      P.D.
-                    </label>
-                    <input
-                      className="w-full bg-transparent font-black text-xl outline-none text-theme-text"
-                      value={pd}
-                      onChange={(e) => setPd(e.target.value)}
-                    />
-                  </div>
-                  <div className="bg-theme-bg p-4 rounded-2xl border-theme-border">
-                    <label className="block text-[10px] font-black uppercase text-theme-text font-bold mb-1 tracking-wider">
-                      Seg Height
-                    </label>
-                    <input
-                      className="w-full bg-transparent font-black text-xl outline-none text-theme-text"
-                      value={seg}
-                      onChange={(e) => setSeg(e.target.value)}
-                    />
-                  </div>
-                </div>
-
-                <div className="pt-4 border-t border-theme-border space-y-4">
-                  <label className="block text-[11px] font-black uppercase text-theme-text italic">
-                    Lens Type & Color
-                  </label>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex flex-wrap gap-2 items-center">
-                      {["CLEAR", "TINT", "POLAR", "MIRROR", "TRANS"].map(
-                        (type) => (
-                          <button
-                            key={type}
-                            onClick={() => handleColorChoice(type)}
-                            className={`px-5 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all border-2 ${
-                              colorType === type
-                                ? "bg-theme-text border-theme-border text-theme-card shadow-md scale-105"
-                                : "bg-theme-card border-theme-border text-theme-text hover:bg-theme-bg"
-                            }`}
-                          >
-                            {type}
-                          </button>
-                        ),
-                      )}
-
-                      {colorType !== "CLEAR" && (
-                        <motion.div
-                          initial={{ opacity: 0, x: -10 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          className="flex items-center gap-2 border-b-2 border-black pb-1 ml-4"
-                        >
-                          <span className="text-[11px] font-black uppercase whitespace-nowrap italic text-black">
-                            Color:
-                          </span>
-                          <input
-                            type="text"
-                            placeholder="Type color..."
-                            className="bg-transparent border-none outline-none font-black uppercase text-[12px] w-40 placeholder:text-slate-400 text-black"
-                            value={colorDetail}
-                            onChange={(e) => setColorDetail(e.target.value)}
-                          />
-                        </motion.div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            {/* BILLING TABLE */}
-            <section className="bg-theme-card p-6 rounded-3xl border-theme-main space-y-4 text-theme-text shadow-lg">
-              <h3 className="text-xs font-black uppercase tracking-widest text-black font-bold italic">
-                Billing Summary
-              </h3>
-
-              <div className="flex text-[8px] font-black uppercase text-theme-text border-b-theme-border pb-1 gap-2">
-                <span className="flex-[2]">Description</span>
-                <span className="flex-1">Retail</span>
-                <span className="w-16 text-right">+Tax(6%)</span>
-                <span className="w-16 text-right">Pt Owe</span>
-              </div>
-
-              <div className="space-y-2">
-                {Object.keys(billing).map((key) => (
-                  <div
-                    key={key}
-                    className="flex items-center justify-between py-2 border-b border-theme-border group/row gap-2"
-                  >
-                    <div className="flex-[2]">
-                      {key.startsWith("m") ? (
-                        <input
-                          placeholder={`Misc ${key.charAt(1)}`}
-                          className="bg-transparent border-none outline-none text-xs font-bold w-full uppercase placeholder:text-slate-400 text-black"
-                          value={billing[key].label}
-                          onChange={(e) =>
-                            updateBillingRow(key, { label: e.target.value })
-                          }
-                        />
-                      ) : (
-                        <span className="text-[10px] font-bold text-theme-text uppercase">
-                          {billing[key].label}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <input
-                        className="w-full bg-transparent text-left font-black text-xs outline-none text-theme-text"
-                        placeholder="0.00"
-                        value={billing[key].retail}
-                        onChange={(e) =>
-                          updateBillingRow(key, {
-                            retail: e.target.value,
-                            retailWithTax: (
-                              parseFloat(e.target.value || "0") * 1.06
-                            ).toFixed(2),
-                            owe: calcOwe(e.target.value, key),
-                          })
-                        }
-                      />
-                    </div>
-
-                    <div className="w-16 text-right text-[10px] font-bold text-slate-500">
-                      {billing[key].retailWithTax}
-                    </div>
-                    <div className="w-16">
-                      <input
-                        className="w-full bg-transparent text-right font-black text-xs outline-none text-red-600"
-                        value={billing[key].owe}
-                        onChange={(e) =>
-                          updateBillingRow(key, { owe: e.target.value })
-                        }
-                      />
-                    </div>
-                    <button
-                      onClick={() => {
-                        const defaultLabels: Record<string, string> = {
-                          frame: "FRAME",
-                          lens: "LENS",
-                          coat: "A/R COATING",
-                        };
-                        updateBillingRow(key, {
-                          label: defaultLabels[key] || "",
-                          retail: "",
-                          retailWithTax: "0.00",
-                          owe: "0.00",
-                        });
-                      }}
-                      className="p-1 text-black hover:text-red-500 opacity-0 group-hover/row:opacity-100 transition-opacity"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {isAllowancePlan && (
-                <div className="bg-theme-bg p-3 rounded-xl border-theme-border flex justify-between items-center text-[11px]">
-                  <span className="text-black font-bold uppercase tracking-widest italic">
-                    Plan Allowance
-                  </span>
-                  <span className="font-black text-red-600">
-                    -${globalAllowance.toFixed(2)}
-                  </span>
-                </div>
-              )}
-
-              <div className="pt-6 border-t border-theme-border space-y-4">
-                <label className="block text-[10px] font-black uppercase text-theme-text tracking-widest italic">
-                  Payment Method
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  <button
-                    onClick={() => {
-                      setShowCardMenu(!showCardMenu);
-                      if (payMethod === "Cash" || payMethod === "Check") {
-                        setPayMethod("");
-                      }
-                    }}
-                    className={`px-4 py-2 rounded-xl border-theme-border text-[10px] font-black uppercase transition-all flex items-center gap-2 ${
-                      cardTypes.includes(payMethod)
-                        ? "bg-theme-text text-theme-card"
-                        : "bg-theme-card text-theme-text hover:bg-theme-bg"
-                    }`}
-                  >
-                    {cardTypes.includes(payMethod)
-                      ? `Card: ${payMethod}`
-                      : "Credit Card"}
-                    <ChevronDown
-                      className={`w-3 h-3 transition-transform ${showCardMenu ? "rotate-180" : ""}`}
-                    />
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setPayMethod("Cash");
-                      setShowCardMenu(false);
-                    }}
-                    className={`px-4 py-2 rounded-xl border-theme-border text-[10px] font-black uppercase transition-all ${
-                      payMethod === "Cash"
-                        ? "bg-theme-text text-theme-card shadow-lg"
-                        : "bg-theme-card text-theme-text hover:bg-theme-bg"
-                    }`}
-                  >
-                    Cash
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setPayMethod("Check");
-                      setShowCardMenu(false);
-                      const num = prompt("Enter Check Number:");
-                      setCheckNum(num || "");
-                    }}
-                    className={`px-4 py-2 rounded-xl border-theme-border text-[10px] font-black uppercase transition-all ${
-                      payMethod === "Check"
-                        ? "bg-theme-text text-theme-card shadow-lg"
-                        : "bg-theme-card text-theme-text hover:bg-theme-bg"
-                    }`}
-                  >
-                    {payMethod === "Check" && checkNum
-                      ? `Check #${checkNum}`
-                      : "Check"}
-                  </button>
-                </div>
-
-                <AnimatePresence>
-                  {showCardMenu && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="flex flex-wrap gap-2 p-4 bg-theme-bg rounded-2xl border border-dashed border-theme-border"
-                    >
-                      {cardTypes.map((c) => (
-                        <button
-                          key={c}
-                          onClick={() => {
-                            setPayMethod(c);
-                            setShowCardMenu(false);
-                          }}
-                          className={`px-3 py-1.5 rounded-lg border-theme-border text-[9px] font-black uppercase transition-all ${
-                            payMethod === c
-                              ? "bg-theme-text text-theme-card"
-                              : "bg-theme-card text-theme-text hover:bg-theme-bg"
-                          }`}
-                        >
-                          {c}
-                        </button>
-                      ))}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              <div className="flex flex-col items-center gap-1">
-                <button
-                  onClick={() => setShowItemizedReceipt(true)}
-                  className="w-full rounded-2xl px-6 py-2 flex items-center justify-center gap-2 font-black uppercase text-xs tracking-widest transition-all border-2 bg-blue-500 border-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30"
-                >
-                  <FileText className="w-4 h-4" />
-                  Itemized Receipt
-                </button>
-              </div>
-
-              <div className="pt-4 flex justify-between items-end">
-                <div>
-                  <label className="block text-[10px] font-black uppercase text-theme-text mb-1">
-                    Patient Total
-                  </label>
-                  <span className="text-5xl font-black italic tracking-tighter text-theme-text">
-                    ${f(finalOwe)}
-                  </span>
-                </div>
-                <div className="text-right">
-                  <p className="text-[9px] font-bold text-theme-muted uppercase tracking-wider">
-                    Optician: {user.initials}
-                  </p>
-                </div>
-              </div>
-            </section>
-            {/* LAB NOTES */}
+                        {/* LAB NOTES */}
             <section className="bg-theme-card p-6 rounded-3xl border-theme-main space-y-4 shadow-sm">
               <h3 className="text-xs font-black uppercase tracking-widest text-theme-accent font-bold italic">
                 Lab Notes
@@ -2176,13 +2072,13 @@ export default function App() {
                   <X className="w-6 h-6" />
                 </button>
               </div>
-              <div className="flex-1 overflow-y-auto">
+                            <div className="flex-1 overflow-y-auto">
                 <Catalog
                   currentPlan={plan}
-                  isAllowancePlan={isAllowancePlan}
                   onSelectItem={handleCatalogSelect}
                   selectedItemName={billing.lens.label}
                 />
+
 
                 {/* RECENT ACTIVITY MOVED HERE */}
                 <div className="p-6 border-t-4 border-theme-main bg-theme-card">
@@ -2279,10 +2175,8 @@ export default function App() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="sticky top-0 bg-white p-4 border-b flex justify-between items-center z-10">
-                <h2 className="text-lg font-black uppercase italic">
-                  Itemized Receipt Generator
-                </h2>
-                <button
+                <h2 className="text-lg font-black uppercase italic">Itemized Receipt Generator</h2>
+                <button 
                   onClick={() => setShowItemizedReceipt(false)}
                   className="p-2 hover:bg-slate-100 rounded-full transition-colors"
                 >
@@ -2291,7 +2185,18 @@ export default function App() {
               </div>
 
               <div className="p-8">
-                {/* ReceiptPageWrapper removed - implement inline receipt or import if needed */}
+                <ReceiptPageWrapper 
+                  patientData={{
+                    name: patient,
+                    phone: phone,
+                    plan: plan,
+                    billing: billing,
+                    totals: totals,
+                    finalOwe: finalOwe,
+                    payMethod: payMethod,
+                    checkNum: checkNum
+                  }}
+                />
               </div>
             </motion.div>
           </div>
@@ -2317,7 +2222,7 @@ export default function App() {
                 key={n}
                 className={`flex flex-col justify-between h-full ${n === 1 ? "border-r-2 border-dashed border-black pr-4" : "pl-4"}`}
               >
-                {/* HEADER */}
+                                {/* HEADER */}
                 <div className="flex justify-between items-start mb-2">
                   <h1 className="text-4xl font-black border-4 border-black px-4 py-1">
                     P.O.S.T.
@@ -2335,144 +2240,138 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* PATIENT INFO */}
-                <div className="space-y-1 text-[16px] font-bold uppercase">
-                  <div className="border-b border-black flex justify-between py-1">
-                    <span>Patient:</span> <span>{patient}</span>
-                  </div>
-                  {promise.mail && mailAddress && (
-                    <div className="border-b border-black flex flex-col py-1">
-                      <span className="text-[12px]">Mailing Address:</span>
-                      <span className="text-[14px] whitespace-pre-wrap leading-tight">
-                        {mailAddress}
-                      </span>
-                    </div>
-                  )}
-                  <div className="border-b border-black flex justify-between py-1">
-                    <span>Plan:</span>{" "}
-                    <span>
-                      {plan}{" "}
-                      {plan === "MEDICAID"
-                        ? `(${medicaidType} - ${medicaidCode})`
-                        : plan === "SCHOOL LETTER"
-                          ? `(${schoolName})`
-                          : ""}
-                    </span>
-                  </div>
-                  <div className="border-b border-black flex justify-between py-1">
-                    <span>Payment:</span>{" "}
-                    <span>
-                      {payMethod} {payMethod === "Check" && `#${checkNum}`}
-                    </span>
-                  </div>
-                </div>
+                                {/* PATIENT INFO */}
+                                <div className="space-y-1 text-[16px] font-bold uppercase">
+                                  <div className="border-b border-black flex justify-between py-1">
+                                    <span>Patient:</span> <span>{patient}</span>
+                                  </div>
+                                  {promise.mail && mailAddress && (
+                                    <div className="border-b border-black flex flex-col py-1">
+                                      <span className="text-[12px]">Mailing Address:</span>
+                                      <span className="text-[14px] whitespace-pre-wrap leading-tight">
+                                        {mailAddress}
+                                      </span>
+                                    </div>
+                                  )}
+                                  <div className="border-b border-black flex justify-between py-1">
+                                    <span>Plan:</span>{" "}
+                                    <span>
+                                      {plan}{" "}
+                                      {plan === "MEDICAID"
+                                        ? `(${medicaidType} - ${medicaidCode})`
+                                        : plan === "SCHOOL LETTER"
+                                          ? `(${schoolName})`
+                                          : ""}
+                                    </span>
+                                  </div>
+                                  <div className="border-b border-black flex justify-between py-1">
+                                    <span>Payment:</span>{" "}
+                                    <span>
+                                      {payMethod} {payMethod === "Check" && `#${checkNum}`}
+                                    </span>
+                                  </div>
+                                </div>
 
-                {/* FRAME SPECS BOX (SECOND BOX) */}
-                <div className="border-4 border-black p-3 bg-white my-2">
-                  <div className="grid grid-cols-2 gap-y-2 text-[14px] font-black uppercase">
-                    <div className="col-span-2 border-b border-black pb-1 mb-1">
-                      Frame: {frame || "___"}
-                    </div>
-                    <div>A: {frameA || "___"}</div>
-                    <div>DBL: {frameDbl || "___"}</div>
-                    <div>PD: {pd || "___"}</div>
-                    <div>SEG: {seg || "___"}</div>
-                    <div className="col-span-2 pt-1 border-t border-black mt-1">
-                      Color: {colorType} {colorDetail ? `(${colorDetail})` : ""}
-                    </div>
-                    <div className="col-span-2 flex items-center gap-2">
-                      <div
-                        className={`w-4 h-4 border-2 border-black flex items-center justify-center ${billing.coat.retail ? "bg-black" : ""}`}
-                      >
-                        {billing.coat.retail && (
-                          <span className="text-white text-[10px]">✓</span>
-                        )}
-                      </div>
-                      <span>
-                        A/R Coating{" "}
-                        {billing.coat.retail ? `(${billing.coat.label})` : ""}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                                {/* FRAME SPECS BOX (SECOND BOX) */}
+                                <div className="border-4 border-black p-3 bg-white my-2">
+                                  <div className="grid grid-cols-2 gap-y-2 text-[14px] font-black uppercase">
+                                    <div className="col-span-2 border-b border-black pb-1 mb-1">
+                                      Frame: {frame || "___"}
+                                    </div>
+                                    <div>A: {frameA || "___"}</div>
+                                    <div>DBL: {frameDbl || "___"}</div>
+                                    <div>PD: {pd || "___"}</div>
+                                    <div>SEG: {seg || "___"}</div>
+                                    <div className="col-span-2 pt-1 border-t border-black mt-1">
+                                      Color: {colorType} {colorDetail ? `(${colorDetail})` : ""}
+                                    </div>
+                                    <div className="col-span-2 flex items-center gap-2">
+                                      <div className={`w-4 h-4 border-2 border-black flex items-center justify-center ${billing.coat.retail ? "bg-black" : ""}`}>
+                                        {billing.coat.retail && <span className="text-white text-[10px]">✓</span>}
+                                      </div>
+                                      <span>A/R Coating {billing.coat.retail ? `(${billing.coat.label})` : ""}</span>
+                                    </div>
+                                  </div>
+                                </div>
 
-                {/* BILLING TABLE */}
-                <table className="w-full text-[14px] font-bold border-collapse border-2 border-black">
-                  <thead>
-                    <tr className="bg-slate-100 italic border-b-2 border-black">
-                      <th className="text-left p-1">ITEM</th>
-                      <th className="text-center p-1">RETAIL</th>
-                      <th className="text-right p-1">OWE</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(Object.values(billing) as BillingRow[]).map((b, i) => (
-                      <tr key={i} className="border-t border-black">
-                        <td className="p-1">{b.label}</td>
-                        <td className="p-1 text-center">${f(b.retail)}</td>
-                        <td className="p-1 text-right">${f(b.owe)}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                                {/* BILLING TABLE */}
+                                <table className="w-full text-[14px] font-bold border-collapse border-2 border-black">
+                                  <thead>
+                                    <tr className="bg-slate-100 italic border-b-2 border-black">
+                                      <th className="text-left p-1">ITEM</th>
+                                      <th className="text-center p-1">RETAIL</th>
+                                      <th className="text-right p-1">OWE</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    {(Object.values(billing) as BillingRow[]).map((b, i) => (
+                                      <tr key={i} className="border-t border-black">
+                                        <td className="p-1">{b.label}</td>
+                                        <td className="p-1 text-center">${f(b.retail)}</td>
+                                        <td className="p-1 text-right">${f(b.owe)}</td>
+                                      </tr>
+                                    ))}
+                                  </tbody>
+                                </table>
 
-                {/* TOTAL */}
-                <div className="flex justify-between items-end pt-1 mt-1">
-                  <div className="text-xl font-black italic">
-                    TOTAL: ${f(finalOwe)}
-                  </div>
-                  <div className="text-[10px] font-bold uppercase">
-                    {promise.call && "☎ Will Call "}
-                    {promise.mail && "✉ Will Mail "}
-                    {promise.time && `⏰ ${promise.timeVal}`}
-                  </div>
-                </div>
+                                {/* TOTAL */}
+                                <div className="flex justify-between items-end pt-1 mt-1">
+                                  <div className="text-xl font-black italic">
+                                    TOTAL: ${f(finalOwe)}
+                                  </div>
+                                  <div className="text-[10px] font-bold uppercase">
+                                    {promise.call && "☎ Will Call "}
+                                    {promise.mail && "✉ Will Mail "}
+                                    {promise.time && `⏰ ${promise.timeVal}`}
+                                  </div>
+                                </div>
 
-                {/* RX BLOCK */}
-                <div className="border-4 border-black p-3 bg-white my-2">
-                  <div className="border-b-2 border-black pb-2 mb-2">
-                    <span className="text-[12px] font-black uppercase">
-                      Prescribing Doctor: {dr === "Other" ? drOther : dr}
-                    </span>
-                  </div>
-                  <div className="text-[14px] font-black border-b-2 border-black pb-2 mb-2 grid grid-cols-2 gap-4">
-                    <div>
-                      <span className="underline">OD:</span> SPH{" "}
-                      {rx.od.sph || "___"} / CYL {rx.od.cyl || "___"} x{" "}
-                      {rx.od.axis || "___"} / ADD {rx.od.add || "___"}
-                      {rx.od.hasPrism && (
-                        <span className="block text-[12px]">
-                          Prism: {rx.od.prism}Δ {rx.od.prismBase}
-                          {rx.od.hasCompoundPrism &&
-                            ` / ${rx.od.prism2}Δ ${rx.od.prismBase2}`}
-                        </span>
-                      )}
-                    </div>
-                    <div>
-                      <span className="underline">OS:</span> SPH{" "}
-                      {rx.os.sph || "___"} / CYL {rx.os.cyl || "___"} x{" "}
-                      {rx.os.axis || "___"} / ADD {rx.os.add || "___"}
-                      {rx.os.hasPrism && (
-                        <span className="block text-[12px]">
-                          Prism: {rx.os.prism}Δ {rx.os.prismBase}
-                          {rx.os.hasCompoundPrism &&
-                            ` / ${rx.os.prism2}Δ ${rx.os.prismBase2}`}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                                {/* RX BLOCK */}
+                                <div className="border-4 border-black p-3 bg-white my-2">
+                                  <div className="border-b-2 border-black pb-2 mb-2">
+                                    <span className="text-[12px] font-black uppercase">Prescribing Doctor: {dr === "Other" ? drOther : dr}</span>
+                                  </div>
+                                  <div className="text-[14px] font-black border-b-2 border-black pb-2 mb-2 grid grid-cols-2 gap-4">
+                                    <div>
+                                      <span className="underline">OD:</span> SPH{" "}
+                                      {rx.od.sph || "___"} / CYL {rx.od.cyl || "___"} x{" "}
+                                      {rx.od.axis || "___"} / ADD {rx.od.add || "___"}
+                                      {rx.od.hasPrism && (
+                                        <span className="block text-[12px]">
+                                          Prism: {rx.od.prism}Δ {rx.od.prismBase}
+                                          {rx.od.hasCompoundPrism &&
+                                            ` / ${rx.od.prism2}Δ ${rx.od.prismBase2}`}
+                                        </span>
+                                      )}
+                                    </div>
+                                    <div>
+                                      <span className="underline">OS:</span> SPH{" "}
+                                      {rx.os.sph || "___"} / CYL {rx.os.cyl || "___"} x{" "}
+                                      {rx.os.axis || "___"} / ADD {rx.os.add || "___"}
+                                      {rx.os.hasPrism && (
+                                        <span className="block text-[12px]">
+                                          Prism: {rx.os.prism}Δ {rx.os.prismBase}
+                                          {rx.os.hasCompoundPrism &&
+                                            ` / ${rx.os.prism2}Δ ${rx.os.prismBase2}`}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
 
-                {/* LAB NOTES */}
-                <div className="border-2 border-dashed border-black p-3 mt-2 flex-1">
-                  <p className="text-[14px] font-black uppercase mb-1">
-                    Lab Notes:
-                  </p>
-                  <p className="text-[18px] font-bold leading-tight min-h-[100px]">
-                    {labNotes ||
-                      "_______________________________________________"}
-                  </p>
-                </div>
+                                {/* LAB NOTES */}
+                                <div className="border-2 border-dashed border-black p-3 mt-2 flex-1">
+                                  <p className="text-[14px] font-black uppercase mb-1">
+                                    Lab Notes:
+                                  </p>
+                                  <p className="text-[18px] font-bold leading-tight min-h-[100px]">
+                                    {labNotes ||
+                                      "_______________________________________________"}
+                                  </p>
+                                </div>
+
+
+
               </div>
             ))}
           </div>
@@ -2482,5 +2381,158 @@ export default function App() {
   );
 }
 
-// ReceiptItem interface moved to types.ts
-// ReceiptPageWrapper removed - not used after dedup
+// Wrapper component to inject patient data into a simplified ReceiptPage
+function ReceiptPageWrapper({ patientData }: { patientData: {
+  name: string;
+  phone: string;
+  plan: string;
+  billing: Record<string, BillingRow>;
+  totals: {
+    retail: number;
+    owe: number;
+  };
+  finalOwe: number;
+  payMethod: string;
+  checkNum: string;
+} }) {
+  // Define types for the receipt items
+  type ReceiptItem = {
+    id: number;
+    code: string;
+    desc: string;
+    qty: number;
+    price: number;
+  };
+
+  // Map billing rows to line items for the receipt
+  const initialItems = Object.values(patientData.billing)
+    .filter((b) => b.retail && parseFloat(b.retail) > 0)
+    .map((b, idx: number) => ({
+      id: idx,
+      code: "",
+      desc: b.label,
+      qty: 1,
+      price: parseFloat(b.retail)
+    }));
+
+  const [items] = useState<ReceiptItem[]>(initialItems);
+  const [amtPaid] = useState<number>(patientData.finalOwe);
+  const [patName] = useState<string>(patientData.name);
+  const [patPhone] = useState<string>(patientData.phone);
+  const [patAddress, setPatAddress] = useState<string>("");
+  const [insPlan] = useState<string>(patientData.plan);
+  const [date] = useState<string>(new Date().toLocaleDateString());
+
+  const subtotal = items.reduce((s: number, i: ReceiptItem) => s + i.qty * i.price, 0);
+  const tax = subtotal * 0.06;
+  const grandTotal = subtotal + tax;
+  const balance = grandTotal - amtPaid;
+
+  return (
+    <div className="receipt-content bg-white">
+      <style>{`
+        @media print {
+          @page { size: portrait; margin: 0.5in; }
+          body * { visibility: hidden !important; }
+          .receipt-content, .receipt-content * { visibility: visible !important; }
+          .receipt-content { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; z-index: 999999; }
+          .print-only { display: none !important; }
+          .print\\:hidden { display: none !important; }
+          .print\\:block { display: block !important; }
+        }
+      `}</style>
+      <div className="max-w-3xl mx-auto border-2 border-black p-10 print:border-none print:p-0">
+        <div className="flex justify-between items-start border-b-2 border-black pb-5 mb-5">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-black italic">PAL OPTICAL</h1>
+            <p className="text-sm font-bold">1555 E New Circle Rd, Suite 146</p>
+            <p className="text-sm font-bold">Lexington, KY 40509</p>
+            <p className="text-sm font-bold">Phone: (859) 266-3003</p>
+          </div>
+          <div className="text-right">
+            <h2 className="text-3xl font-black text-slate-300 italic">RECEIPT</h2>
+            <p className="font-bold">DATE: {date}</p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-8 mb-8">
+          <div>
+            <h3 className="text-[10px] font-black uppercase text-slate-400 border-b border-slate-200 mb-2">Patient Info</h3>
+            <p className="font-black text-sm uppercase">{patName || "____________________"}</p>
+            <p className="font-bold text-sm">{patPhone || "____________________"}</p>
+            <textarea
+               className="w-full mt-2 text-sm font-bold bg-transparent border border-dashed border-slate-300 p-2 resize-none outline-none text-black placeholder:text-slate-400 print:hidden"
+               placeholder="Enter Patient Address..."
+               value={patAddress}
+               onChange={(e) => setPatAddress(e.target.value)}
+               rows={3}
+            />
+            {patAddress && (
+               <p className="font-bold text-sm hidden print:block whitespace-pre-wrap mt-1">{patAddress}</p>
+            )}
+          </div>
+          <div>
+            <h3 className="text-[10px] font-black uppercase text-slate-400 border-b border-slate-200 mb-2">Insurance Plan</h3>
+            <p className="font-black text-sm uppercase">{insPlan}</p>
+          </div>
+        </div>
+
+        <table className="w-full text-sm mb-6">
+          <thead>
+            <tr className="border-b-2 border-black">
+              <th className="text-left py-2 font-black uppercase">Description</th>
+              <th className="text-right py-2 font-black uppercase">Qty</th>
+              <th className="text-right py-2 font-black uppercase">Price</th>
+              <th className="text-right py-2 font-black uppercase">Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {items.map((item: ReceiptItem) => (
+              <tr key={item.id} className="border-b border-slate-100">
+                <td className="py-3 font-bold uppercase">{item.desc}</td>
+                <td className="py-3 text-right font-bold">{item.qty}</td>
+                <td className="py-3 text-right font-bold">${item.price.toFixed(2)}</td>
+                <td className="py-3 text-right font-black">${(item.qty * item.price).toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <div className="ml-auto w-64 space-y-2">
+          <div className="flex justify-between font-bold">
+            <span>SUBTOTAL:</span>
+            <span>${subtotal.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between font-bold">
+            <span>TAX (6%):</span>
+            <span>${tax.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between font-black text-xl border-t-2 border-black pt-2">
+            <span>TOTAL:</span>
+            <span>${grandTotal.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between font-black text-green-600 bg-green-50 p-1 px-2 rounded">
+            <span>PAID ({patientData.payMethod}):</span>
+            <span>-${parseFloat(amtPaid).toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between font-black border-t border-black pt-2">
+            <span>BALANCE:</span>
+            <span>${balance.toFixed(2)}</span>
+          </div>
+        </div>
+
+        <div className="mt-16 text-center">
+          <p className="text-[10px] font-black uppercase italic tracking-widest text-slate-400">Thank you for trusting us with your vision care!</p>
+          <button 
+            onClick={() => window.print()}
+            className="mt-6 px-8 py-3 bg-black text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-gray-800 transition-all print:hidden">
+            Print Receipt
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Wrapper component to inject patient data into a simplified ReceiptPage
+

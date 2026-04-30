@@ -11,7 +11,6 @@ export default function OptiCalc() {
   const [bridge, setBridge] = useState('')
   const [decPd, setDecPd] = useState('')
   const [ed, setEd] = useState('')
-  const [framePd, setFramePd] = useState('')
   const [patPd, setPatPd] = useState('')
   const [index, setIndex] = useState('1.59')
   const [frameType, setFrameType] = useState('2.5')
@@ -29,20 +28,48 @@ export default function OptiCalc() {
     setReceipt(r => [...r, `[${time}] ${text}`])
   }
 
+  // Safe math expression evaluator function
+  const safeEval = (expression: string): number => {
+    // Remove whitespace and convert operators
+    const sanitizedExpression = expression.replace(/\s+/g, '').replace(/×/g, '*').replace(/÷/g, '/');
+    
+    // Validate expression only contains allowed characters (numbers, operators, parentheses, Math functions)
+    if (!/^[\d+\-*/.()sqrtlnabsceilfloormaxminroundPIE\s]+$/.test(sanitizedExpression.replace(/Math\.[a-zA-Z]+/g, ''))) {
+      throw new Error('Invalid characters in expression');
+    }
+
+    // Replace Math functions with their actual names
+    const processedExpression = sanitizedExpression
+      .replace(/Math\.([a-zA-Z]+)/g, 'Math.$1')
+      .replace(/sqrt/g, 'Math.sqrt')
+      .replace(/ln/g, 'Math.log')
+      .replace(/abs/g, 'Math.abs')
+      .replace(/ceil/g, 'Math.ceil')
+      .replace(/floor/g, 'Math.floor')
+      .replace(/max/g, 'Math.max')
+      .replace(/min/g, 'Math.min')
+      .replace(/round/g, 'Math.round')
+      .replace(/PI/g, 'Math.PI')
+      .replace(/E/g, 'Math.E');
+
+    // Evaluate using Function constructor instead of eval (safer but still limited)
+    return Function('"use strict"; return (' + processedExpression + ')')();
+  };
+
   const append = (ch: string) => setDisplay(d => d + ch)
   const clear = () => setDisplay('')
   const calculate = () => {
     try {
-      const safeEval = new Function('return ' + display.replace(/Math\./g, 'Math.'));
-      const result = safeEval();
+      // Use safe evaluator instead of eval
+      const result = safeEval(display.replace(/Math\./g, 'Math.'))
       addReceipt(`${display} = ${result}`)
       setDisplay(String(result))
     } catch { setDisplay('Error') }
   }
   const applyRetail = (mult: number, label: string) => {
     try {
-      const safeEval = new Function('return ' + display);
-      const cur = parseFloat(safeEval())
+      // Use safe evaluator instead of eval
+      const cur = parseFloat(safeEval(display).toString())
       if (isNaN(cur)) return
       const newTotal = (cur * mult).toFixed(2)
       addReceipt(`${cur} ${label} = ${newTotal}`)
@@ -56,12 +83,12 @@ export default function OptiCalc() {
     const fp = a + b, dec = (fp - pd) / 2
     addReceipt(`Decentration: (A:${a} + DBL:${b} - PD:${pd}) / 2 = ${dec.toFixed(2)}mm`)
     setDecentration(Math.abs(dec).toFixed(2))
-    setFramePd(fp.toFixed(1))
+    setEdPd(fp.toFixed(1))
     setPatPd(pd.toFixed(1))
   }
 
   const calcMBS = () => {
-    const e = parseFloat(ed), fp = parseFloat(framePd), pp = parseFloat(patPd)
+    const e = parseFloat(ed), fp = parseFloat(edPd), pp = parseFloat(patPd)
     if (isNaN(e) || isNaN(fp) || isNaN(pp)) { alert('Fill all MBS fields.'); return }
     const mbs = e + (fp - pp) + 2
     addReceipt(`MBS: ED(${e}) + F.PD(${fp}) - P.PD(${pp}) + 2 = ${mbs.toFixed(1)}mm`)
@@ -78,7 +105,7 @@ export default function OptiCalc() {
     drawCanvas(thick, parseFloat(frameType), p > 0)
   }
 
-  const drawCanvas = useCallback((maxT: number, frameThick: number, isPlus: boolean) => {
+  const drawCanvas = (maxT: number, frameThick: number, isPlus: boolean) => {
     const canvas = canvasRef.current; if (!canvas) return
     const ctx = canvas.getContext('2d')!
     ctx.clearRect(0, 0, 400, 300)
@@ -107,19 +134,13 @@ export default function OptiCalc() {
     const exposed = Math.max(0, maxT - frameThick)
     ctx.fillStyle = exposed > 0 ? '#cc0000' : '#008800'
     ctx.fillText(`Exposed: ${exposed.toFixed(2)} mm`, 10, 62)
-  }, [theme])
+  }
 
   useEffect(() => {
     if (power && diameter) {
-      const n = parseFloat(index), p = parseFloat(power), d = parseFloat(diameter), dec = parseFloat(decentration) || 0, mt = parseFloat(minThick)
-      if (isNaN(p) || isNaN(d) || isNaN(mt)) return
-      const r = d / 2 + Math.abs(dec)
-      const sag = (r * r * Math.abs(p)) / (2000 * (n - 1))
-      const thick = sag + mt
-      drawCanvas(thick, parseFloat(frameType), p > 0)
+      calcThickness();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [theme])
+  }, [power, diameter, theme, index, frameType, minThick, frameA, bridge, decPd, ed, patPd, calcThickness]); // Removed edPd which is not a dependency
 
   const bgCls = theme === 'dark' ? 'bg-black text-green-400' : theme === 'rainbow' ? 'bg-gradient-to-br from-pink-200 via-purple-200 to-blue-200 text-gray-800' : 'bg-white text-black'
   const cardCls = theme === 'dark' ? 'bg-gray-950 border-green-700' : theme === 'rainbow' ? 'bg-white/60 backdrop-blur border-white/80' : 'bg-gray-100 border-gray-300'
@@ -182,7 +203,7 @@ export default function OptiCalc() {
             <h4 className="font-semibold text-sm mb-2">Minimum Blank Size (MBS)</h4>
             <div className="grid grid-cols-3 gap-2 mb-2">
               <div><label className="text-xs block mb-1">ED (mm)</label><input className={inp} value={ed} onChange={e => setEd(e.target.value)} /></div>
-              <div><label className="text-xs block mb-1">Frame PD (mm)</label><input className={inp} value={framePd} onChange={e => setFramePd(e.target.value)} /></div>
+              <div><label className="text-xs block mb-1">Frame PD (mm)</label><input className={inp} value={edPd} onChange={e => setEdPd(e.target.value)} /></div>
               <div><label className="text-xs block mb-1">Patient PD (mm)</label><input className={inp} value={patPd} onChange={e => setPatPd(e.target.value)} /></div>
             </div>
             <button onClick={calcMBS} className={`w-full py-2 rounded font-bold text-sm ${btnCls}`}>Calculate MBS</button>
