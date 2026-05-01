@@ -2171,182 +2171,182 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* HIDDEN PRINT LAYOUT — LANDSCAPE, TWO WRITE-UPS, ONE PAGE */}
-      <div
-        className={`fixed inset-0 bg-white z-[99999] pointer-events-none opacity-0 ${isPrinting ? "opacity-100" : "hidden"}`}
-      >
-        {isPrinting && (
-          <style>{`
-            @media print {
-              @page { size: landscape; margin: 0.25in; }
-              body * { visibility: hidden; }
-              .print-only, .print-only * { visibility: visible; }
-              .print-only { position: absolute; left: 0; top: 0; width: 100%; }
-            }
-          `}</style>
-        )}
-        <div className="print-only w-full h-full bg-white text-black p-4 flex flex-col justify-center">
-          <div className="grid grid-cols-2 gap-4 h-full">
-            {[1, 2].map((n) => (
-              <div
-                key={n}
-                className={`flex flex-col justify-between h-full ${n === 1 ? "border-r-2 border-dashed border-black pr-4" : "pl-4"}`}
-              >
-                                {/* HEADER */}
-                <div className="flex justify-between items-start mb-2">
-                  <h1 className="text-4xl font-black border-4 border-black px-4 py-1">
-                    P.O.S.T.
-                  </h1>
-                  <div className="text-right">
-                    <p className="text-[14px] font-bold uppercase">
-                      Write-Up # {jobNum}
+            {/* HIDDEN PRINT LAYOUT — LANDSCAPE, TWO WRITE-UPS, ONE PAGE */}
+      {!showItemizedReceipt && (
+        <div
+          className={`fixed inset-0 bg-white z-[99999] pointer-events-none opacity-0 ${isPrinting ? "opacity-100" : "hidden"}`}
+        >
+          {isPrinting && (
+            <style>{`
+              @media print {
+                @page { size: landscape; margin: 0.25in; }
+                body * { visibility: hidden; }
+                .print-only, .print-only * { visibility: visible; }
+                .print-only { position: absolute; left: 0; top: 0; width: 100%; }
+              }
+            `}</style>
+          )}
+          <div className="print-only w-full h-full bg-white text-black p-4 flex flex-col justify-center">
+            <div className="grid grid-cols-2 gap-4 h-full">
+              {[1, 2].map((n) => (
+                <div
+                  key={n}
+                  className={`flex flex-col justify-between h-full ${n === 1 ? "border-r-2 border-dashed border-black pr-4" : "pl-4"}`}
+                >
+                  {/* HEADER */}
+                  <div className="flex justify-between items-start mb-2">
+                    <h1 className="text-4xl font-black border-4 border-black px-4 py-1">
+                      P.O.S.T.
+                    </h1>
+                    <div className="text-right">
+                      <p className="text-[14px] font-bold uppercase">
+                        Write-Up # {jobNum}
+                      </p>
+                      <p className="text-[14px] font-bold uppercase">
+                        Date: {new Date().toLocaleDateString()}
+                      </p>
+                      <p className="text-[14px] font-bold uppercase">
+                        Optician: {user.initials}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* PATIENT INFO */}
+                  <div className="space-y-1 text-[16px] font-bold uppercase">
+                    <div className="border-b border-black flex justify-between py-1">
+                      <span>Patient:</span> <span>{patient}</span>
+                    </div>
+                    {promise.mail && mailAddress && (
+                      <div className="border-b border-black flex flex-col py-1">
+                        <span className="text-[12px]">Mailing Address:</span>
+                        <span className="text-[14px] whitespace-pre-wrap leading-tight">
+                          {mailAddress}
+                        </span>
+                      </div>
+                    )}
+                    <div className="border-b border-black flex justify-between py-1">
+                      <span>Plan:</span>{" "}
+                      <span>
+                        {plan}{" "}
+                        {plan === "MEDICAID"
+                          ? `(${medicaidType} - ${medicaidCode})`
+                          : plan === "SCHOOL LETTER"
+                            ? `(${schoolName})`
+                            : ""}
+                      </span>
+                    </div>
+                    <div className="border-b border-black flex justify-between py-1">
+                      <span>Payment:</span>{" "}
+                      <span>
+                        {payMethod} {payMethod === "Check" && `#${checkNum}`}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* FRAME SPECS BOX (SECOND BOX) */}
+                  <div className="border-4 border-black p-3 bg-white my-2">
+                    <div className="grid grid-cols-2 gap-y-2 text-[14px] font-black uppercase">
+                      <div className="col-span-2 border-b border-black pb-1 mb-1">
+                        Frame: {frame || "___"}
+                      </div>
+                      <div>A: {frameA || "___"}</div>
+                      <div>DBL: {frameDbl || "___"}</div>
+                      <div>PD: {pd || "___"}</div>
+                      <div>SEG: {seg || "___"}</div>
+                      <div className="col-span-2 pt-1 border-t border-black mt-1">
+                        Color: {colorType} {colorDetail ? `(${colorDetail})` : ""}
+                      </div>
+                      <div className="col-span-2 flex items-center gap-2">
+                        <div className={`w-4 h-4 border-2 border-black flex items-center justify-center ${billing.coat.retail ? "bg-black" : ""}`}>
+                          {billing.coat.retail && <span className="text-white text-[10px]">✓</span>}
+                        </div>
+                        <span>A/R Coating {billing.coat.retail ? `(${billing.coat.label})` : ""}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* BILLING TABLE */}
+                  <table className="w-full text-[14px] font-bold border-collapse border-2 border-black">
+                    <thead>
+                      <tr className="bg-slate-100 italic border-b-2 border-black">
+                        <th className="text-left p-1">ITEM</th>
+                        <th className="text-center p-1">RETAIL</th>
+                        <th className="text-right p-1">OWE</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(Object.values(billing) as BillingRow[]).map((b, i) => (
+                        <tr key={i} className="border-t border-black">
+                          <td className="p-1">{b.label}</td>
+                          <td className="p-1 text-center">${f(b.retail)}</td>
+                          <td className="p-1 text-right">${f(b.owe)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
+                  {/* TOTAL */}
+                  <div className="flex justify-between items-end pt-1 mt-1">
+                    <div className="text-xl font-black italic">
+                      TOTAL: ${f(finalOwe)}
+                    </div>
+                    <div className="text-[10px] font-bold uppercase">
+                      {promise.call && "☎ Will Call "}
+                      {promise.mail && "✉ Will Mail "}
+                      {promise.time && `⏰ ${promise.timeVal}`}
+                    </div>
+                  </div>
+
+                  {/* RX BLOCK */}
+                  <div className="border-4 border-black p-3 bg-white my-2">
+                    <div className="border-b-2 border-black pb-2 mb-2">
+                      <span className="text-[12px] font-black uppercase">Prescribing Doctor: {dr === "Other" ? drOther : dr}</span>
+                    </div>
+                    <div className="text-[14px] font-black border-b-2 border-black pb-2 mb-2 grid grid-cols-2 gap-4">
+                      <div>
+                        <span className="underline">OD:</span> SPH{" "}
+                        {rx.od.sph || "___"} / CYL {rx.od.cyl || "___"} x{" "}
+                        {rx.od.axis || "___"} / ADD {rx.od.add || "___"}
+                        {rx.od.hasPrism && (
+                          <span className="block text-[12px]">
+                            Prism: {rx.od.prism}Δ {rx.od.prismBase}
+                            {rx.od.hasCompoundPrism &&
+                              ` / ${rx.od.prism2}Δ ${rx.od.prismBase2}`}
+                          </span>
+                        )}
+                      </div>
+                      <div>
+                        <span className="underline">OS:</span> SPH{" "}
+                        {rx.os.sph || "___"} / CYL {rx.os.cyl || "___"} x{" "}
+                        {rx.os.axis || "___"} / ADD {rx.os.add || "___"}
+                        {rx.os.hasPrism && (
+                          <span className="block text-[12px]">
+                            Prism: {rx.os.prism}Δ {rx.os.prismBase}
+                            {rx.os.hasCompoundPrism &&
+                              ` / ${rx.os.prism2}Δ ${rx.os.prismBase2}`}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* LAB NOTES */}
+                  <div className="border-2 border-dashed border-black p-3 mt-2 flex-1">
+                    <p className="text-[14px] font-black uppercase mb-1">
+                      Lab Notes:
                     </p>
-                    <p className="text-[14px] font-bold uppercase">
-                      Date: {new Date().toLocaleDateString()}
-                    </p>
-                    <p className="text-[14px] font-bold uppercase">
-                      Optician: {user.initials}
+                    <p className="text-[18px] font-bold leading-tight min-h-[100px]">
+                      {labNotes ||
+                        "_______________________________________________"}
                     </p>
                   </div>
                 </div>
-
-                                {/* PATIENT INFO */}
-                                <div className="space-y-1 text-[16px] font-bold uppercase">
-                                  <div className="border-b border-black flex justify-between py-1">
-                                    <span>Patient:</span> <span>{patient}</span>
-                                  </div>
-                                  {promise.mail && mailAddress && (
-                                    <div className="border-b border-black flex flex-col py-1">
-                                      <span className="text-[12px]">Mailing Address:</span>
-                                      <span className="text-[14px] whitespace-pre-wrap leading-tight">
-                                        {mailAddress}
-                                      </span>
-                                    </div>
-                                  )}
-                                  <div className="border-b border-black flex justify-between py-1">
-                                    <span>Plan:</span>{" "}
-                                    <span>
-                                      {plan}{" "}
-                                      {plan === "MEDICAID"
-                                        ? `(${medicaidType} - ${medicaidCode})`
-                                        : plan === "SCHOOL LETTER"
-                                          ? `(${schoolName})`
-                                          : ""}
-                                    </span>
-                                  </div>
-                                  <div className="border-b border-black flex justify-between py-1">
-                                    <span>Payment:</span>{" "}
-                                    <span>
-                                      {payMethod} {payMethod === "Check" && `#${checkNum}`}
-                                    </span>
-                                  </div>
-                                </div>
-
-                                {/* FRAME SPECS BOX (SECOND BOX) */}
-                                <div className="border-4 border-black p-3 bg-white my-2">
-                                  <div className="grid grid-cols-2 gap-y-2 text-[14px] font-black uppercase">
-                                    <div className="col-span-2 border-b border-black pb-1 mb-1">
-                                      Frame: {frame || "___"}
-                                    </div>
-                                    <div>A: {frameA || "___"}</div>
-                                    <div>DBL: {frameDbl || "___"}</div>
-                                    <div>PD: {pd || "___"}</div>
-                                    <div>SEG: {seg || "___"}</div>
-                                    <div className="col-span-2 pt-1 border-t border-black mt-1">
-                                      Color: {colorType} {colorDetail ? `(${colorDetail})` : ""}
-                                    </div>
-                                    <div className="col-span-2 flex items-center gap-2">
-                                      <div className={`w-4 h-4 border-2 border-black flex items-center justify-center ${billing.coat.retail ? "bg-black" : ""}`}>
-                                        {billing.coat.retail && <span className="text-white text-[10px]">✓</span>}
-                                      </div>
-                                      <span>A/R Coating {billing.coat.retail ? `(${billing.coat.label})` : ""}</span>
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {/* BILLING TABLE */}
-                                <table className="w-full text-[14px] font-bold border-collapse border-2 border-black">
-                                  <thead>
-                                    <tr className="bg-slate-100 italic border-b-2 border-black">
-                                      <th className="text-left p-1">ITEM</th>
-                                      <th className="text-center p-1">RETAIL</th>
-                                      <th className="text-right p-1">OWE</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {(Object.values(billing) as BillingRow[]).map((b, i) => (
-                                      <tr key={i} className="border-t border-black">
-                                        <td className="p-1">{b.label}</td>
-                                        <td className="p-1 text-center">${f(b.retail)}</td>
-                                        <td className="p-1 text-right">${f(b.owe)}</td>
-                                      </tr>
-                                    ))}
-                                  </tbody>
-                                </table>
-
-                                {/* TOTAL */}
-                                <div className="flex justify-between items-end pt-1 mt-1">
-                                  <div className="text-xl font-black italic">
-                                    TOTAL: ${f(finalOwe)}
-                                  </div>
-                                  <div className="text-[10px] font-bold uppercase">
-                                    {promise.call && "☎ Will Call "}
-                                    {promise.mail && "✉ Will Mail "}
-                                    {promise.time && `⏰ ${promise.timeVal}`}
-                                  </div>
-                                </div>
-
-                                {/* RX BLOCK */}
-                                <div className="border-4 border-black p-3 bg-white my-2">
-                                  <div className="border-b-2 border-black pb-2 mb-2">
-                                    <span className="text-[12px] font-black uppercase">Prescribing Doctor: {dr === "Other" ? drOther : dr}</span>
-                                  </div>
-                                  <div className="text-[14px] font-black border-b-2 border-black pb-2 mb-2 grid grid-cols-2 gap-4">
-                                    <div>
-                                      <span className="underline">OD:</span> SPH{" "}
-                                      {rx.od.sph || "___"} / CYL {rx.od.cyl || "___"} x{" "}
-                                      {rx.od.axis || "___"} / ADD {rx.od.add || "___"}
-                                      {rx.od.hasPrism && (
-                                        <span className="block text-[12px]">
-                                          Prism: {rx.od.prism}Δ {rx.od.prismBase}
-                                          {rx.od.hasCompoundPrism &&
-                                            ` / ${rx.od.prism2}Δ ${rx.od.prismBase2}`}
-                                        </span>
-                                      )}
-                                    </div>
-                                    <div>
-                                      <span className="underline">OS:</span> SPH{" "}
-                                      {rx.os.sph || "___"} / CYL {rx.os.cyl || "___"} x{" "}
-                                      {rx.os.axis || "___"} / ADD {rx.os.add || "___"}
-                                      {rx.os.hasPrism && (
-                                        <span className="block text-[12px]">
-                                          Prism: {rx.os.prism}Δ {rx.os.prismBase}
-                                          {rx.os.hasCompoundPrism &&
-                                            ` / ${rx.os.prism2}Δ ${rx.os.prismBase2}`}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-
-                                {/* LAB NOTES */}
-                                <div className="border-2 border-dashed border-black p-3 mt-2 flex-1">
-                                  <p className="text-[14px] font-black uppercase mb-1">
-                                    Lab Notes:
-                                  </p>
-                                  <p className="text-[18px] font-bold leading-tight min-h-[100px]">
-                                    {labNotes ||
-                                      "_______________________________________________"}
-                                  </p>
-                                </div>
-
-
-
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
     </div>
   );
 }
