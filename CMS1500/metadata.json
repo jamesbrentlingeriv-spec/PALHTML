@@ -1,0 +1,6 @@
+{
+  "name": "CMS-1500 Pro Form Filler",
+  "description": "A professional medical billing tool that guides users through CMS-1500 data entry and generates precise, background-free print layouts for pre-printed red forms.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
