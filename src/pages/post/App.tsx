@@ -2470,12 +2470,12 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
   const [amtPaid] = useState<number>(patientOwes);
   const balance = patientOwes - amtPaid;
 
-  return (
+    return (
     <div className="receipt-content bg-white">
       <style>{`
-        .print-address-text { display: none; }
         @media print {
           @page { size: portrait; margin: 0.5in; }
+          body { background: white !important; }
           body * { visibility: hidden !important; }
           .receipt-content, .receipt-content * { visibility: visible !important; }
           .receipt-content { 
@@ -2484,17 +2484,25 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
             top: 0 !important; 
             width: 100% !important; 
             margin: 0 !important; 
-            padding: 20px !important; 
+            padding: 0 !important; 
             z-index: 999999 !important; 
-            overflow: visible !important;
             background: white !important;
+            height: auto !important;
+            overflow: visible !important;
           }
-          .print-only { display: none !important; }
           .print\\:hidden { display: none !important; }
-          .print-address-text { display: block !important; }
+          input, textarea { 
+            border: none !important; 
+            background: transparent !important; 
+            padding: 0 !important;
+            appearance: none !important;
+            -webkit-appearance: none !important;
+          }
+          .no-print-border { border: none !important; }
         }
       `}</style>
-      <div className="max-w-3xl mx-auto border-2 border-black p-10 print:border-none print:p-0">
+      <div className="max-w-3xl mx-auto border-2 border-black p-10 no-print-border">
+
         <div className="flex justify-between items-start border-b-2 border-black pb-5 mb-5">
           <div className="space-y-1">
             <h1 className="text-3xl font-black italic">PAL OPTICAL</h1>
@@ -2509,21 +2517,31 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
         </div>
 
         <div className="grid grid-cols-2 gap-8 mb-8">
-          <div>
+                    <div>
             <h3 className="text-[10px] font-black uppercase text-slate-400 border-b border-slate-200 mb-2">Patient Info</h3>
-            <p className="font-black text-sm uppercase">{patName || "____________________"}</p>
-            <p className="font-bold text-sm">{patPhone || "____________________"}</p>
+            <div className="font-black text-sm uppercase">
+              <input 
+                className="w-full bg-transparent border-none outline-none uppercase"
+                value={patName}
+                readOnly
+              />
+            </div>
+            <div className="font-bold text-sm">
+              <input 
+                className="w-full bg-transparent border-none outline-none"
+                value={patPhone}
+                readOnly
+              />
+            </div>
             <textarea
-               className="w-full mt-2 text-sm font-bold bg-transparent border border-dashed border-slate-300 p-2 resize-none outline-none text-black placeholder:text-slate-400 print:hidden"
+               className="w-full mt-2 text-sm font-bold bg-transparent border border-dashed border-slate-300 p-2 resize-none outline-none text-black placeholder:text-slate-400 print:border-none print:p-0"
                placeholder="Enter Patient Address..."
                value={patAddress}
                onChange={(e) => setPatAddress(e.target.value)}
                rows={3}
             />
-            {patAddress && (
-               <p className="font-bold text-sm whitespace-pre-wrap mt-1 print-address-text">{patAddress}</p>
-            )}
           </div>
+
           <div>
             <h3 className="text-[10px] font-black uppercase text-slate-400 border-b border-slate-200 mb-2">Insurance Plan</h3>
             <p className="font-black text-sm uppercase">{insPlan}</p>
