@@ -15,9 +15,10 @@
   --theme-card: #000000;
   --theme-text: #ffffff;
   --theme-border: #ffffff;
-  --theme-accent: #ef4444;
-  --theme-muted: #94a3b8;
+  --theme-accent: #ffffff;
+  --theme-muted: #888888;
 }
+
 
 @layer utilities {
   .bg-theme-bg { background-color: var(--theme-bg); }
