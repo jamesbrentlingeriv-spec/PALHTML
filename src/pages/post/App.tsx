@@ -184,6 +184,7 @@ export default function App() {
     prevMailRef.current = promise.mail;
 
     if (promise.mail) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setBilling((prev) => ({
         ...prev,
         m1: { ...prev.m1, label: "MAIL FEE", retail: "9.00", owe: "9.54" },
@@ -240,7 +241,7 @@ export default function App() {
     if (!isAllowancePlan) return;
 
     // Calculate new charges based on insurance plan
-    const newCharges = [];
+    const newCharges: Array<{ row: string; data: BillingRow }> = [];
     for (const [row, charge] of [
       ["l1", { retail: globalAllowance, owe: globalAllowance }],
       ["f1", { retail: frameAllowance, owe: frameAllowance }],
@@ -260,6 +261,7 @@ export default function App() {
 
     // Only update state if there are changes
     if (newCharges.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setBilling(prev => {
         const next = { ...prev };
         newCharges.forEach(({ row, data }) => {
@@ -270,42 +272,6 @@ export default function App() {
     }
     // Added dependencies to the dependency array
   }, [billing, isAllowancePlan, globalAllowance, frameAllowance]);
-
-  // --- SYNC PROMISE FLAGS ---
-  useEffect(() => {
-    const prevMailRef = { current: null };
-    
-    const updateBillingWithMailFee = (shouldAddMailFee) => {
-      setBilling(prev => {
-        if (shouldAddMailFee) {
-          return {
-            ...prev,
-            m1: { ...prev.m1, label: "MAIL FEE", retail: "9.00", owe: "9.54" },
-          };
-        } else {
-          if (prev.m1.label === "MAIL FEE") {
-            return {
-              ...prev,
-              m1: { ...prev.m1, label: "", retail: "", owe: "" },
-            };
-          }
-          return prev;
-        }
-      });
-    };
-
-    if (promise.mail !== prevMailRef.current) {
-      prevMailRef.current = promise.mail;
-
-      if (promise.mail) {
-        updateBillingWithMailFee(true);
-        if (!mailAddress) setShowMailPopup(true);
-      } else {
-        updateBillingWithMailFee(false);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [promise.mail, mailAddress]); // Added mailAddress to dependency array
 
     // UI State
   const [showMeasureTool, setShowMeasureTool] = useState(false);
@@ -569,7 +535,7 @@ export default function App() {
 
   const handleCatalogSelect = (name: string, price: number, cat: string) => {
     const isMiscCat =
-      cat === "Tints and Coatings" ||
+      cat === "Coatings and Tint" ||
       cat === "Overpower/Oversize" ||
       cat === "Miscellaneous";
     const isAntiGlare =
@@ -813,7 +779,7 @@ export default function App() {
     }
 
     if (newCharges.length > 0) {
-      // eslint-disable-next-line react-hooks/no-set-state-in-effect
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setBilling((prev) => {
         const next = { ...prev };
         newCharges.forEach(({ row, data }) => {
@@ -2075,6 +2041,7 @@ export default function App() {
                             <div className="flex-1 overflow-y-auto">
                 <Catalog
                   currentPlan={plan}
+                  isAllowancePlan={isAllowancePlan}
                   onSelectItem={handleCatalogSelect}
                   selectedItemName={billing.lens.label}
                 />
@@ -2189,6 +2156,7 @@ export default function App() {
                   patientData={{
                     name: patient,
                     phone: phone,
+                    address: mailAddress,
                     plan: plan,
                     billing: billing,
                     totals: totals,
@@ -2385,6 +2353,7 @@ export default function App() {
 function ReceiptPageWrapper({ patientData }: { patientData: {
   name: string;
   phone: string;
+  address: string;
   plan: string;
   billing: Record<string, BillingRow>;
   totals: {
@@ -2419,7 +2388,7 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
   const [amtPaid] = useState<number>(patientData.finalOwe);
   const [patName] = useState<string>(patientData.name);
   const [patPhone] = useState<string>(patientData.phone);
-  const [patAddress, setPatAddress] = useState<string>("");
+  const [patAddress, setPatAddress] = useState<string>(patientData.address || "");
   const [insPlan] = useState<string>(patientData.plan);
   const [date] = useState<string>(new Date().toLocaleDateString());
 
@@ -2431,6 +2400,7 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
   return (
     <div className="receipt-content bg-white">
       <style>{`
+        .print-address-text { display: none; }
         @media print {
           @page { size: portrait; margin: 0.5in; }
           body * { visibility: hidden !important; }
@@ -2438,7 +2408,7 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
           .receipt-content { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; z-index: 999999; }
           .print-only { display: none !important; }
           .print\\:hidden { display: none !important; }
-          .print\\:block { display: block !important; }
+          .print-address-text { display: block !important; }
         }
       `}</style>
       <div className="max-w-3xl mx-auto border-2 border-black p-10 print:border-none print:p-0">
@@ -2468,7 +2438,7 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
                rows={3}
             />
             {patAddress && (
-               <p className="font-bold text-sm hidden print:block whitespace-pre-wrap mt-1">{patAddress}</p>
+               <p className="font-bold text-sm whitespace-pre-wrap mt-1 print-address-text">{patAddress}</p>
             )}
           </div>
           <div>
@@ -2513,7 +2483,7 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
           </div>
           <div className="flex justify-between font-black text-green-600 bg-green-50 p-1 px-2 rounded">
             <span>PAID ({patientData.payMethod}):</span>
-            <span>-${parseFloat(amtPaid).toFixed(2)}</span>
+            <span>-${amtPaid.toFixed(2)}</span>
           </div>
           <div className="flex justify-between font-black border-t border-black pt-2">
             <span>BALANCE:</span>

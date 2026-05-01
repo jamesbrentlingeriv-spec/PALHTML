@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Search, Check, Tag } from "lucide-react";
 import { MASTER_PRICE_LIST } from "../constants";
 import type { LensItem } from "../types";
@@ -28,6 +28,12 @@ export function Catalog({
 }: CatalogProps) {
   const [activeCat, setActiveCat] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
+  
+  // Drag to scroll state
+  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [scrollLeft, setScrollLeft] = useState(0);
 
   const categories = ["All", ...Object.keys(MASTER_PRICE_LIST)];
 
@@ -36,6 +42,25 @@ export function Catalog({
   const getPriceDisplay = (item: LensItem) => {
     if (isMedicalPlan) return "$0.00";
     return "$" + item.price.toFixed(2);
+  };
+
+  const onMouseDown = (e: React.MouseEvent) => {
+    setIsDragging(true);
+    if (scrollRef.current) {
+      setStartX(e.pageX - scrollRef.current.offsetLeft);
+      setScrollLeft(scrollRef.current.scrollLeft);
+    }
+  };
+
+  const onMouseLeave = () => setIsDragging(false);
+  const onMouseUp = () => setIsDragging(false);
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (!isDragging || !scrollRef.current) return;
+    e.preventDefault();
+    const x = e.pageX - scrollRef.current.offsetLeft;
+    const walk = (x - startX) * 2; // Scroll-fast
+    scrollRef.current.scrollLeft = scrollLeft - walk;
   };
 
   const filteredItems = Object.entries(MASTER_PRICE_LIST).flatMap(
@@ -76,6 +101,11 @@ export function Catalog({
         </div>
 
         <div
+          ref={scrollRef}
+          onMouseDown={onMouseDown}
+          onMouseLeave={onMouseLeave}
+          onMouseUp={onMouseUp}
+          onMouseMove={onMouseMove}
           className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide snap-x select-none cursor-grab active:cursor-grabbing"
           style={{
             WebkitOverflowScrolling: "touch",
