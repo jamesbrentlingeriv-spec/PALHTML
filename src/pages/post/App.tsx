@@ -2375,20 +2375,58 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
     price: number;
   };
 
-    const getVCode = (label: string) => {
+        const getVCode = (label: string) => {
     const l = label.toUpperCase();
     if (l.includes("FRAME")) return "V2020";
     if (l.includes("SINGLE VISION") || l.includes("SV ") || l.includes("PLANO")) return "V2100";
     if (l.includes("BIFOCAL") || l.includes("FT-28") || l.includes("FT-35") || l.includes("RD-22") || l.includes("BIF")) return "V2200";
     if (l.includes("TRIFOCAL") || l.includes("7X28") || l.includes("TRIF")) return "V2300";
+    
+    // Aspherical / Progressives
     if (l.includes("PROGRESSIVE") || l.includes("PROG") || l.includes("VARILUX") || l.includes("OVATION") || l.includes("COMFORT") || l.includes("PHYSIO") || l.includes("SHAMIR") || l.includes("UNITY") || l.includes("IMAGE") || l.includes("OFFICELENS") || l.includes("FREEFOCUS") || l.includes("NATURAL")) return "V2410";
+    
+    // Contact Lenses
     if (l.includes("CONTACT")) return "V2500";
+    
+    // Low Vision
     if (l.includes("LOW VISION") || l.includes("NEAR VISION")) return "V2600";
+    
+    // Prosthetics / Intraocular
     if (l.includes("PROSTHETIC")) return "V2623";
     if (l.includes("INTRAOCULAR")) return "V2630";
-    if (l.includes("A/R") || l.includes("COATING") || l.includes("TINT") || l.includes("UV") || l.includes("SCRATCH") || l.includes("MIRROR") || l.includes("BLUE LIGHT") || l.includes("PRISM") || l.includes("TRANS") || l.includes("POLAR") || l.includes("MISC") || l.includes("FEE") || l.includes("SLAB OFF") || l.includes("DRILL") || l.includes("ROLL") || l.includes("POLISH") || l.includes("SAFETY") || l.includes("SHIELD") || l.includes("EDGE") || l.includes("OAKLEY") || l.includes("PRESS-ON")) return "V2700";
+    
+    // Specific Vision Services (V2700 range)
+    if (l.includes("BALANCE LENS")) return "V2700";
+    if (l.includes("DELUXE")) return "V2702";
+    if (l.includes("SLAB OFF")) return "V2710";
+    if (l.includes("PRISM") && !l.includes("PRESS-ON")) return "V2715";
+    if (l.includes("PRESS-ON") || l.includes("FRESNELL")) return "V2718";
+    if (l.includes("SPECIAL BASE")) return "V2730";
+    if (l.includes("PHOTOCHROMATIC") || l.includes("TRANSITIONS") || l.includes("TRANS")) return "V2744";
+    if (l.includes("TINT")) return "V2745";
+    if (l.includes("ANTI-REFLECTIVE") || l.includes("A/R") || l.includes("AR COAT") || l.includes("CRIZAL") || l.includes("GLARE")) return "V2750";
+    if (l.includes("U-V") || l.includes("UV")) return "V2755";
+    if (l.includes("CASE")) return "V2756";
+    if (l.includes("SCRATCH")) return "V2760";
+    if (l.includes("MIRROR")) return "V2761";
+    if (l.includes("POLARIZED") || l.includes("POLAR")) return "V2762";
+    if (l.includes("OCCLUDER")) return "V2770";
+    if (l.includes("OVERSIZE") || l.includes("58MM")) return "V2780";
+    if (l.includes("PROGRESSIVE LENS")) return "V2781";
+    if (l.includes("1.60") || l.includes("1.67") || l.includes("1.54") || l.includes("1.65")) return "V2782";
+    if (l.includes("1.74") || l.includes("1.80")) return "V2783";
+    if (l.includes("POLYCARBONATE") || l.includes("POLY")) return "V2784";
+    if (l.includes("CORNEAL TISSUE")) return "V2785";
+    if (l.includes("OCCUPATIONAL")) return "V2786";
+    if (l.includes("ASTIGMATISM CORRECT")) return "V2787";
+    if (l.includes("PRESBYOPIA CORRECT")) return "V2788";
+    
+    // Miscellaneous
+    if (l.includes("COATING") || l.includes("MISC") || l.includes("FEE") || l.includes("DRILL") || l.includes("ROLL") || l.includes("POLISH") || l.includes("SAFETY") || l.includes("SHIELD") || l.includes("EDGE") || l.includes("OAKLEY")) return "V2799";
+    
     return "";
   };
+
 
   // Map billing rows to line items for the receipt
   const initialItems = Object.values(patientData.billing)
