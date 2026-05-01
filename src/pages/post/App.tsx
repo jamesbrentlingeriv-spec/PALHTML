@@ -2385,7 +2385,6 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
     }));
 
   const [items] = useState<ReceiptItem[]>(initialItems);
-  const [amtPaid] = useState<number>(patientData.finalOwe);
   const [patName] = useState<string>(patientData.name);
   const [patPhone] = useState<string>(patientData.phone);
   const [patAddress, setPatAddress] = useState<string>(patientData.address || "");
@@ -2395,7 +2394,12 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
   const subtotal = items.reduce((s: number, i: ReceiptItem) => s + i.qty * i.price, 0);
   const tax = subtotal * 0.06;
   const grandTotal = subtotal + tax;
-  const balance = grandTotal - amtPaid;
+  
+  const patientOwes = patientData.finalOwe;
+  const insuranceDiscount = grandTotal > patientOwes ? grandTotal - patientOwes : 0;
+  
+  const [amtPaid] = useState<number>(patientOwes);
+  const balance = patientOwes - amtPaid;
 
   return (
     <div className="receipt-content bg-white">
@@ -2405,7 +2409,18 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
           @page { size: portrait; margin: 0.5in; }
           body * { visibility: hidden !important; }
           .receipt-content, .receipt-content * { visibility: visible !important; }
-          .receipt-content { position: absolute; left: 0; top: 0; width: 100%; margin: 0; padding: 0; z-index: 999999; }
+          .receipt-content { 
+            position: fixed !important; 
+            left: 0 !important; 
+            top: 0 !important; 
+            width: 100vw !important; 
+            height: 100vh !important;
+            margin: 0 !important; 
+            padding: 20px !important; 
+            z-index: 999999 !important; 
+            overflow: visible !important;
+            background: white !important;
+          }
           .print-only { display: none !important; }
           .print\\:hidden { display: none !important; }
           .print-address-text { display: block !important; }
@@ -2481,11 +2496,21 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
             <span>TOTAL:</span>
             <span>${grandTotal.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between font-black text-green-600 bg-green-50 p-1 px-2 rounded">
+          {insuranceDiscount > 0 && (
+            <div className="flex justify-between font-bold text-red-600 pt-2">
+              <span>INSURANCE DISCOUNTS:</span>
+              <span>-${insuranceDiscount.toFixed(2)}</span>
+            </div>
+          )}
+          <div className="flex justify-between font-black border-t-2 border-black pt-2 mt-2">
+            <span>PATIENT OWES:</span>
+            <span>${patientOwes.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between font-black text-green-600 bg-green-50 p-1 px-2 rounded mt-2">
             <span>PAID ({patientData.payMethod}):</span>
             <span>-${amtPaid.toFixed(2)}</span>
           </div>
-          <div className="flex justify-between font-black border-t border-black pt-2">
+          <div className="flex justify-between font-black border-t border-black pt-2 mt-2">
             <span>BALANCE:</span>
             <span>${balance.toFixed(2)}</span>
           </div>
