@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import BackButton from '../components/BackButton'
 
 interface LensRow { content: string[]; mat: string }

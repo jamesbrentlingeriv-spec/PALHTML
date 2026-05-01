@@ -2175,14 +2175,16 @@ export default function App() {
       <div
         className={`fixed inset-0 bg-white z-[99999] pointer-events-none opacity-0 ${isPrinting ? "opacity-100" : "hidden"}`}
       >
-        <style>{`
-          @media print {
-            @page { size: landscape; margin: 0.25in; }
-            body * { visibility: hidden; }
-            .print-only, .print-only * { visibility: visible; }
-            .print-only { position: absolute; left: 0; top: 0; width: 100%; }
-          }
-        `}</style>
+        {isPrinting && (
+          <style>{`
+            @media print {
+              @page { size: landscape; margin: 0.25in; }
+              body * { visibility: hidden; }
+              .print-only, .print-only * { visibility: visible; }
+              .print-only { position: absolute; left: 0; top: 0; width: 100%; }
+            }
+          `}</style>
+        )}
         <div className="print-only w-full h-full bg-white text-black p-4 flex flex-col justify-center">
           <div className="grid grid-cols-2 gap-4 h-full">
             {[1, 2].map((n) => (
@@ -2410,11 +2412,10 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
           body * { visibility: hidden !important; }
           .receipt-content, .receipt-content * { visibility: visible !important; }
           .receipt-content { 
-            position: fixed !important; 
+            position: absolute !important; 
             left: 0 !important; 
             top: 0 !important; 
-            width: 100vw !important; 
-            height: 100vh !important;
+            width: 100% !important; 
             margin: 0 !important; 
             padding: 20px !important; 
             z-index: 999999 !important; 

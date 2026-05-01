@@ -83,12 +83,12 @@ export default function OptiCalc() {
     const fp = a + b, dec = (fp - pd) / 2
     addReceipt(`Decentration: (A:${a} + DBL:${b} - PD:${pd}) / 2 = ${dec.toFixed(2)}mm`)
     setDecentration(Math.abs(dec).toFixed(2))
-    setEdPd(fp.toFixed(1))
+    setEd(fp.toFixed(1))
     setPatPd(pd.toFixed(1))
   }
 
   const calcMBS = () => {
-    const e = parseFloat(ed), fp = parseFloat(edPd), pp = parseFloat(patPd)
+    const e = parseFloat(ed), fp = parseFloat(decPd), pp = parseFloat(patPd)
     if (isNaN(e) || isNaN(fp) || isNaN(pp)) { alert('Fill all MBS fields.'); return }
     const mbs = e + (fp - pp) + 2
     addReceipt(`MBS: ED(${e}) + F.PD(${fp}) - P.PD(${pp}) + 2 = ${mbs.toFixed(1)}mm`)
@@ -138,9 +138,14 @@ export default function OptiCalc() {
 
   useEffect(() => {
     if (power && diameter) {
-      calcThickness();
+      // Defer state update (receipt) to avoid synchronous state update in effect during render phase.
+      const timer = setTimeout(() => {
+        calcThickness();
+      }, 0);
+      return () => clearTimeout(timer);
     }
-  }, [power, diameter, theme, index, frameType, minThick, frameA, bridge, decPd, ed, patPd, calcThickness]); // Removed edPd which is not a dependency
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [power, diameter, index, frameType, minThick, frameA, bridge, decPd, ed, patPd]);
 
   const bgCls = theme === 'dark' ? 'bg-black text-green-400' : theme === 'rainbow' ? 'bg-gradient-to-br from-pink-200 via-purple-200 to-blue-200 text-gray-800' : 'bg-white text-black'
   const cardCls = theme === 'dark' ? 'bg-gray-950 border-green-700' : theme === 'rainbow' ? 'bg-white/60 backdrop-blur border-white/80' : 'bg-gray-100 border-gray-300'
@@ -203,7 +208,7 @@ export default function OptiCalc() {
             <h4 className="font-semibold text-sm mb-2">Minimum Blank Size (MBS)</h4>
             <div className="grid grid-cols-3 gap-2 mb-2">
               <div><label className="text-xs block mb-1">ED (mm)</label><input className={inp} value={ed} onChange={e => setEd(e.target.value)} /></div>
-              <div><label className="text-xs block mb-1">Frame PD (mm)</label><input className={inp} value={edPd} onChange={e => setEdPd(e.target.value)} /></div>
+              <div><label className="text-xs block mb-1">Frame PD (mm)</label><input className={inp} value={setDecPd} onChange={e => setDecPd(e.target.value)} /></div>
               <div><label className="text-xs block mb-1">Patient PD (mm)</label><input className={inp} value={patPd} onChange={e => setPatPd(e.target.value)} /></div>
             </div>
             <button onClick={calcMBS} className={`w-full py-2 rounded font-bold text-sm ${btnCls}`}>Calculate MBS</button>
