@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { Plus, Trash2, Info } from 'lucide-react';
-import { CMS1500Data, CMS1500Step } from '../types';
+import type { CMS1500Data, CMS1500Step } from '../types';
 
 interface WizardProps {
   step: CMS1500Step;

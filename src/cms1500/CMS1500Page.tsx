@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { FileText, Printer, ChevronRight, ChevronLeft, Save, CheckCircle2 } from 'lucide-react';
 import BackButton from '../components/BackButton';
-import { CMS1500Data, CMS1500Step } from './types';
+import type { CMS1500Data, CMS1500Step } from './types';
 import { INITIAL_CMS_DATA } from './constants';
 import CMSFormWizard from './components/CMSFormWizard';
 import CMSPrintView from './components/CMSPrintView';

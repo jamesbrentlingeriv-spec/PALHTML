@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { CMS1500Data } from '../types';
+import type { CMS1500Data } from '../types';
 
 interface PrintViewProps {
   data: CMS1500Data;

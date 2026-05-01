@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { CMS1500Data } from './types';
+import type { CMS1500Data } from './types';
 
 export const INITIAL_CMS_DATA: CMS1500Data = {
   programType: '',
