@@ -180,45 +180,20 @@ export default function CMS1500Page() {
               exit={{ opacity: 0, scale: 0.95 }}
               className="flex flex-col items-center"
             >
-              <div className="w-full max-w-4xl mb-8 flex items-center justify-between bg-white p-6 rounded-2xl border border-slate-200">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center text-red-600 border border-red-100">
-                    <Printer size={24} />
-                  </div>
-                  <div>
-                    <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Alignment Preview</h2>
-                    <h3 className="text-xl font-bold text-slate-900">Calibration Grid</h3>
-                  </div>
-                </div>
-                <div className="flex items-center gap-6">
-                  <div className="text-right">
-                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Target Paper</p>
-                    <p className="text-xs font-bold text-slate-700">CMS-1500 (02-12)</p>
-                  </div>
-                  <button
-                    onClick={() => window.print()}
-                    className="px-6 py-3 bg-red-600 text-white rounded-xl text-xs font-black uppercase tracking-[0.2em] shadow-lg shadow-red-100 hover:bg-red-700 transition-all flex items-center gap-2"
-                  >
-                    <Printer size={16} />
-                    Execute Print
-                  </button>
-                </div>
-              </div>
-
               {/* Print Sheet Container */}
               <div className="relative bg-white shadow-2xl rounded-sm overflow-hidden border border-slate-200 group">
-                <div className="absolute top-4 left-4 text-[8px] font-black text-red-500/20 uppercase tracking-widest pointer-events-none">Top-Left Origin (0,0)</div>
-                <div className="absolute bottom-4 right-4 text-[8px] font-black text-red-500/20 uppercase tracking-widest pointer-events-none transform rotate-180">Bottom-Right Limit</div>
+                <div className="absolute top-4 left-4 text-[8px] font-black text-red-500/20 uppercase tracking-widest pointer-events-none no-print">Top-Left Origin (0,0)</div>
+                <div className="absolute bottom-4 right-4 text-[8px] font-black text-red-500/20 uppercase tracking-widest pointer-events-none transform rotate-180 no-print">Bottom-Right Limit</div>
                 
                 <div className="print:shadow-none print:border-none">
                   <CMSPrintView data={data} />
                 </div>
                 
                 {/* Technical Overlay - visible on screen only */}
-                <div className="absolute inset-0 border-[20px] border-red-500/5 pointer-events-none print:hidden group-hover:border-red-500/10 transition-all"></div>
+                <div className="absolute inset-0 border-[20px] border-red-500/5 pointer-events-none print:hidden group-hover:border-red-500/10 transition-all no-print"></div>
               </div>
 
-              <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl pb-12">
+              <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-4xl pb-12 no-print">
                 <div className="bg-slate-100 p-4 rounded-xl text-[10px] font-bold text-slate-500 uppercase tracking-widest text-center border border-slate-200">
                   Step 1: Check Tray
                 </div>
