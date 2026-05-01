@@ -6,6 +6,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { FileText, Printer, ChevronRight, ChevronLeft, Save, CheckCircle2 } from 'lucide-react';
+import BackButton from '../components/BackButton';
 import { CMS1500Data, CMS1500Step } from './types';
 import { INITIAL_CMS_DATA } from './constants';
 import CMSFormWizard from './components/CMSFormWizard';
@@ -50,6 +51,7 @@ export default function CMS1500Page() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-800 font-sans">
+      <BackButton />
       {/* Header */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
