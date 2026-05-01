@@ -16,6 +16,18 @@ interface PrintViewProps {
  * No background is rendered as per user request to print ONTO red forms.
  */
 export default function CMSPrintView({ data }: PrintViewProps) {
+  // Official CMS-1500 Grid Offsets (Inches)
+  // Box 1 Program Types
+  const programTypeMap = {
+    'MEDICARE': 0.71,
+    'MEDICAID': 1.46,
+    'TRICARE': 2.26,
+    'CHAMPVA': 3.03,
+    'GROUP': 3.70,
+    'FECA': 4.46,
+    'OTHER': 5.10
+  };
+
   const formatDate = (dateStr: string) => {
     if (!dateStr) return '';
     const date = new Date(dateStr);
@@ -57,24 +69,17 @@ export default function CMSPrintView({ data }: PrintViewProps) {
       }}
     >
       {/* Box 1 - Program Type */}
-      {data.programType === 'MEDICARE' && <Field top={0.53} left={0.71}>X</Field>}
-      {data.programType === 'MEDICAID' && <Field top={0.53} left={1.46}>X</Field>}
-      {data.programType === 'TRICARE' && <Field top={0.53} left={2.26}>X</Field>}
-      {data.programType === 'CHAMPVA' && <Field top={0.53} left={3.03}>X</Field>}
-      {data.programType === 'GROUP' && <Field top={0.53} left={3.7}>X</Field>}
-      {data.programType === 'FECA' && <Field top={0.53} left={4.46}>X</Field>}
-      {data.programType === 'OTHER' && <Field top={0.53} left={5.1}>X</Field>}
-
+      {data.programType && <Field top={0.42} left={programTypeMap[data.programType]}>X</Field>}
       {/* 1a. Insured's ID */}
-      <Field top={0.55} left={5.6} width={2.7}>{data.insuredId}</Field>
+      <Field top={0.42} left={5.75} width={2.5}>{data.insuredId}</Field>
 
       {/* 2. Patient's Name */}
-      <Field top={0.92} left={0.15} width={3.3}>{data.patientName}</Field>
+      <Field top={0.78} left={0.25} width={3.3}>{data.patientName}</Field>
 
       {/* 3. Patient Birth Date */}
-      <Field top={0.92} left={4.45}>{getMonth(data.patientBirthDate)}</Field>
-      <Field top={0.92} left={4.75}>{getDay(data.patientBirthDate)}</Field>
-      <Field top={0.92} left={5.04}>{getYear(data.patientBirthDate)}</Field>
+      <Field top={0.78} left={4.48}>{getMonth(data.patientBirthDate)}</Field>
+      <Field top={0.78} left={4.82}>{getDay(data.patientBirthDate)}</Field>
+      <Field top={0.78} left={5.15}>{getYear(data.patientBirthDate)}</Field>
       
       {/* 3. Sex */}
       {data.patientSex === 'M' && <Field top={0.92} left={5.45}>X</Field>}
@@ -220,3 +225,4 @@ export default function CMSPrintView({ data }: PrintViewProps) {
     </div>
   );
 }
+
