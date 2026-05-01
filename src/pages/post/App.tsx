@@ -2375,18 +2375,47 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
     price: number;
   };
 
+    const getVCode = (label: string) => {
+    const l = label.toUpperCase();
+    if (l.includes("FRAME")) return "V2020";
+    if (l.includes("SINGLE VISION") || l.includes("SV ") || l.includes("PLANO")) return "V2100";
+    if (l.includes("BIFOCAL") || l.includes("FT-28") || l.includes("FT-35") || l.includes("RD-22") || l.includes("BIF")) return "V2200";
+    if (l.includes("TRIFOCAL") || l.includes("7X28") || l.includes("TRIF")) return "V2300";
+    if (l.includes("PROGRESSIVE") || l.includes("PROG") || l.includes("VARILUX") || l.includes("OVATION") || l.includes("COMFORT") || l.includes("PHYSIO") || l.includes("SHAMIR") || l.includes("UNITY") || l.includes("IMAGE") || l.includes("OFFICELENS") || l.includes("FREEFOCUS") || l.includes("NATURAL")) return "V2410";
+    if (l.includes("CONTACT")) return "V2500";
+    if (l.includes("LOW VISION") || l.includes("NEAR VISION")) return "V2600";
+    if (l.includes("PROSTHETIC")) return "V2623";
+    if (l.includes("INTRAOCULAR")) return "V2630";
+    if (l.includes("A/R") || l.includes("COATING") || l.includes("TINT") || l.includes("UV") || l.includes("SCRATCH") || l.includes("MIRROR") || l.includes("BLUE LIGHT") || l.includes("PRISM") || l.includes("TRANS") || l.includes("POLAR") || l.includes("MISC") || l.includes("FEE") || l.includes("SLAB OFF") || l.includes("DRILL") || l.includes("ROLL") || l.includes("POLISH") || l.includes("SAFETY") || l.includes("SHIELD") || l.includes("EDGE") || l.includes("OAKLEY") || l.includes("PRESS-ON")) return "V2700";
+    return "";
+  };
+
   // Map billing rows to line items for the receipt
   const initialItems = Object.values(patientData.billing)
     .filter((b) => b.retail && parseFloat(b.retail) > 0)
     .map((b, idx: number) => ({
       id: idx,
-      code: "",
+      code: getVCode(b.label),
       desc: b.label,
       qty: 1,
       price: parseFloat(b.retail)
     }));
 
-  const [items] = useState<ReceiptItem[]>(initialItems);
+  const [items, setItems] = useState<ReceiptItem[]>(initialItems);
+
+  const handleItemChange = (id: number, field: keyof ReceiptItem, value: string | number) => {
+    setItems(prev => prev.map(item => item.id === id ? { ...item, [field]: value } : item));
+  };
+
+  const addItem = () => {
+    const newId = items.length > 0 ? Math.max(...items.map(i => i.id)) + 1 : 0;
+    setItems([...items, { id: newId, code: "", desc: "NEW ITEM", qty: 1, price: 0 }]);
+  };
+
+  const removeItem = (id: number) => {
+    setItems(items.filter(i => i.id !== id));
+  };
+
   const [patName] = useState<string>(patientData.name);
   const [patPhone] = useState<string>(patientData.phone);
   const [patAddress, setPatAddress] = useState<string>(patientData.address || "");
@@ -2463,26 +2492,67 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
           </div>
         </div>
 
-        <table className="w-full text-sm mb-6">
+                <table className="w-full text-sm mb-6">
           <thead>
             <tr className="border-b-2 border-black">
+              <th className="text-left py-2 font-black uppercase">Code</th>
               <th className="text-left py-2 font-black uppercase">Description</th>
-              <th className="text-right py-2 font-black uppercase">Qty</th>
-              <th className="text-right py-2 font-black uppercase">Price</th>
-              <th className="text-right py-2 font-black uppercase">Total</th>
+              <th className="text-right py-2 font-black uppercase w-16">Qty</th>
+              <th className="text-right py-2 font-black uppercase w-24">Price</th>
+              <th className="text-right py-2 font-black uppercase w-24">Total</th>
+              <th className="print:hidden w-8"></th>
             </tr>
           </thead>
           <tbody>
             {items.map((item: ReceiptItem) => (
               <tr key={item.id} className="border-b border-slate-100">
-                <td className="py-3 font-bold uppercase">{item.desc}</td>
-                <td className="py-3 text-right font-bold">{item.qty}</td>
-                <td className="py-3 text-right font-bold">${item.price.toFixed(2)}</td>
+                <td className="py-3">
+                  <input
+                    className="bg-transparent border-none outline-none font-bold w-20 uppercase"
+                    value={item.code}
+                    onChange={(e) => handleItemChange(item.id, 'code', e.target.value)}
+                  />
+                </td>
+                <td className="py-3">
+                  <input
+                    className="bg-transparent border-none outline-none font-bold w-full uppercase"
+                    value={item.desc}
+                    onChange={(e) => handleItemChange(item.id, 'desc', e.target.value)}
+                  />
+                </td>
+                <td className="py-3 text-right">
+                  <input
+                    type="number"
+                    className="bg-transparent border-none outline-none font-bold w-full text-right"
+                    value={item.qty}
+                    onChange={(e) => handleItemChange(item.id, 'qty', parseInt(e.target.value) || 0)}
+                  />
+                </td>
+                <td className="py-3 text-right">
+                  <input
+                    type="number"
+                    className="bg-transparent border-none outline-none font-bold w-full text-right"
+                    value={item.price}
+                    onChange={(e) => handleItemChange(item.id, 'price', parseFloat(e.target.value) || 0)}
+                  />
+                </td>
                 <td className="py-3 text-right font-black">${(item.qty * item.price).toFixed(2)}</td>
+                <td className="py-3 text-right print:hidden">
+                  <button onClick={() => removeItem(item.id)} className="text-red-500 hover:text-red-700">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
         </table>
+
+        <div className="mb-6 print:hidden">
+          <button onClick={addItem} className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg font-bold text-xs uppercase">
+            <Plus className="w-4 h-4" /> Add Item
+          </button>
+        </div>
+
 
         <div className="ml-auto w-64 space-y-2">
           <div className="flex justify-between font-bold">
