@@ -2471,37 +2471,61 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
   const balance = patientOwes - amtPaid;
 
     return (
-    <div className="receipt-content bg-white">
-      <style>{`
-        @media print {
-          @page { size: portrait; margin: 0.5in; }
-          body { background: white !important; }
-          body * { visibility: hidden !important; }
-          .receipt-content, .receipt-content * { visibility: visible !important; }
-          .receipt-content { 
-            position: absolute !important; 
-            left: 0 !important; 
-            top: 0 !important; 
-            width: 100% !important; 
-            margin: 0 !important; 
-            padding: 0 !important; 
-            z-index: 999999 !important; 
-            background: white !important;
-            height: auto !important;
-            overflow: visible !important;
+      <div className="receipt-content bg-white">
+        <style>{`
+          @media print {
+            @page { size: portrait; margin: 0.5in; }
+          
+            /* Hide everything by default */
+            html, body {
+              height: auto !important;
+              overflow: visible !important;
+              background: white !important;
+            }
+          
+            body * { 
+              visibility: hidden !important; 
+            }
+          
+            /* Show the receipt and its contents */
+            .receipt-content, 
+            .receipt-content * { 
+              visibility: visible !important; 
+            }
+          
+            /* Force receipt to top left and expand */
+            .receipt-content { 
+              position: absolute !important; 
+              left: 0 !important; 
+              top: 0 !important; 
+              width: 100% !important; 
+              margin: 0 !important; 
+              padding: 0 !important; 
+              z-index: 999999 !important; 
+            }
+
+            /* Ensure parent containers don't clip the receipt */
+            .fixed, .absolute, .relative, div {
+              overflow: visible !important;
+              max-height: none !important;
+              height: auto !important;
+            }
+
+            .print\\:hidden { display: none !important; }
+          
+            input, textarea { 
+              border: none !important; 
+              background: transparent !important; 
+              padding: 0 !important;
+              appearance: none !important;
+              outline: none !important;
+            }
+          
+            .no-print-border { border: none !important; }
           }
-          .print\\:hidden { display: none !important; }
-          input, textarea { 
-            border: none !important; 
-            background: transparent !important; 
-            padding: 0 !important;
-            appearance: none !important;
-            -webkit-appearance: none !important;
-          }
-          .no-print-border { border: none !important; }
-        }
-      `}</style>
-      <div className="max-w-3xl mx-auto border-2 border-black p-10 no-print-border">
+        `}</style>
+        <div className="max-w-3xl mx-auto border-2 border-black p-10 no-print-border">
+
 
         <div className="flex justify-between items-start border-b-2 border-black pb-5 mb-5">
           <div className="space-y-1">
