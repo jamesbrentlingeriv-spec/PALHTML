@@ -68,13 +68,20 @@ const internalTools = [
     title: "Opticalc Pro 3D",
     desc: "Advanced 3D lens surfacing simulation.",
   },
-  {
+    {
     path: "/optitrak",
     emoji: "🔄",
     title: "OptiTrak Remake Manager",
     desc: "Professional remake tracking for optical labs.",
   },
+  {
+    path: "/cms1500",
+    emoji: "🏥",
+    title: "CMS-1500 Billing",
+    desc: "Medical billing form generator for clinical systems.",
+  },
 ];
+
 
 const externalTools = [
   {

@@ -14,7 +14,9 @@ import PalDocs from "./pages/PalDocs";
 import PostApp from "./pages/post/App";
 import Opticalc3DPage from "./opticalc3d/App";  // Updated import
 import OptiTrakApp from "./pages/OptiTrakApp";
+import CMS1500Page from "./cms1500/CMS1500Page";
 import SplashScreen from "./components/SplashScreen";
+
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -37,8 +39,10 @@ export default function App() {
         <Route path="/lens-guide" element={<LensGuide />} />
         <Route path="/docs" element={<PalDocs />} />
         <Route path="/opticalc-3d" element={<Opticalc3DPage />} />  // Updated route
-        <Route path="/optitrak" element={<OptiTrakApp />} />
+                <Route path="/optitrak" element={<OptiTrakApp />} />
+        <Route path="/cms1500" element={<CMS1500Page />} />
       </Routes>
+
     </>
   );
 }

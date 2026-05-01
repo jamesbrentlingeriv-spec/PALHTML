@@ -2353,6 +2353,7 @@ export default function App() {
 
 // Wrapper component to inject patient data into a simplified ReceiptPage
 // Wrapper component to inject patient data into a simplified ReceiptPage
+// Wrapper component to inject patient data into a simplified ReceiptPage
 function ReceiptPageWrapper({ patientData }: { 
   patientData: {
     name: string;
@@ -2374,14 +2375,15 @@ function ReceiptPageWrapper({ patientData }: {
     price: number;
   };
 
+  // Helper to auto-assign V-Codes based on item description
   const getVCode = (label: string) => {
     const l = label.toUpperCase();
     if (l.includes("FRAME")) return "V2020";
     if (l.includes("SINGLE VISION") || l.includes("SV ") || l.includes("PLANO")) return "V2100";
-    if (l.includes("BIFOCAL") || l.includes("FT-28") || l.includes("FT-35") || l.includes("RD-22") || l.includes("BIF")) return "V2200";
-    if (l.includes("TRIFOCAL") || l.includes("7X28") || l.includes("TRIF")) return "V2300";
+    if (l.includes("BIFOCAL") || l.includes("FT-28") || l.includes("FT-35") || l.includes("BIF")) return "V2200";
+    if (l.includes("TRIFOCAL") || l.includes("TRIF")) return "V2300";
     if (l.includes("PROGRESSIVE") || l.includes("PROG") || l.includes("VARILUX")) return "V2410";
-    if (l.includes("PHOTOCHROMATIC") || l.includes("TRANSITIONS") || l.includes("TRANS")) return "V2744";
+    if (l.includes("TRANSITIONS") || l.includes("TRANS")) return "V2744";
     if (l.includes("TINT")) return "V2745";
     if (l.includes("ANTI-REFLECTIVE") || l.includes("A/R") || l.includes("AR COAT") || l.includes("GLARE")) return "V2750";
     if (l.includes("POLARIZED") || l.includes("POLAR")) return "V2762";
@@ -2389,6 +2391,7 @@ function ReceiptPageWrapper({ patientData }: {
     return "V2799";
   };
 
+  // Initialize line items from current billing state
   const initialItems = Object.values(patientData.billing)
     .filter((b) => b.retail && parseFloat(b.retail) > 0)
     .map((b, idx: number) => ({
@@ -2415,6 +2418,7 @@ function ReceiptPageWrapper({ patientData }: {
     setItems(items.filter(i => i.id !== id));
   };
 
+  // Calculations
   const subtotal = items.reduce((s: number, i: ReceiptItem) => s + i.qty * i.price, 0);
   const tax = subtotal * 0.06;
   const grandTotal = subtotal + tax;
@@ -2427,50 +2431,67 @@ function ReceiptPageWrapper({ patientData }: {
     <div className="receipt-content-wrapper">
       <style>{`
         @media print {
-          @page { size: portrait; margin: 0; }
-          html, body, #root { 
-            visibility: hidden !important; 
-            height: auto !important;
+          @page { 
+            size: portrait; 
+            margin: 0.5in; 
           }
-          main, section, nav, header, .fixed, .absolute {
+
+          /* Hide UI elements that cause blank pages or clutter */
+          #root > *:not(.receipt-content-wrapper),
+          main, header, nav, section, .fixed, .absolute, .backdrop-blur-md, button {
             display: none !important;
           }
-          .receipt-content-wrapper,
-          .receipt-content-wrapper * { 
-            visibility: visible !important; 
+
+          .receipt-content-wrapper {
             display: block !important;
-          }
-          .receipt-content-wrapper table { display: table !important; }
-          .receipt-content-wrapper tr { display: table-row !important; }
-          .receipt-content-wrapper td, .receipt-content-wrapper th { display: table-cell !important; }
-          .receipt-content-wrapper .flex { display: flex !important; }
-          .receipt-content-wrapper { 
-            position: absolute !important; 
-            left: 0 !important; 
-            top: 0 !important; 
-            width: 100% !important; 
-            padding: 40px !important;
+            visibility: visible !important;
+            position: relative !important;
+            width: 100% !important;
             background: white !important;
+            color: black !important;
           }
+
+          /* Force all text to black for the printer */
+          .receipt-content-wrapper * {
+            color: black !important;
+            border-color: black !important;
+            visibility: visible !important;
+          }
+
           .print\\:hidden { display: none !important; }
-          input, textarea { border: none !important; background: transparent !important; }
+
+          /* Clean up inputs for paper */
+          input, textarea {
+            border: none !important;
+            background: transparent !important;
+            outline: none !important;
+            width: 100% !important;
+          }
+
+          .max-w-3xl {
+            box-shadow: none !important;
+            border: none !important;
+            max-width: 100% !important;
+          }
         }
       `}</style>
 
       <div className="max-w-3xl mx-auto border-2 border-black p-10 bg-white shadow-lg">
+        {/* Header Section */}
         <div className="flex justify-between items-start border-b-2 border-black pb-5 mb-5">
           <div className="space-y-1">
-            <h1 className="text-3xl font-black italic text-black">PAL OPTICAL</h1>
+            <h1 className="text-3xl font-black italic text-black uppercase">Pal Optical</h1>
             <p className="text-sm font-bold text-black">1555 E New Circle Rd, Suite 146</p>
             <p className="text-sm font-bold text-black">Lexington, KY 40509</p>
             <p className="text-sm font-bold text-black">Phone: (859) 266-3003</p>
           </div>
           <div className="text-right">
-            <h2 className="text-3xl font-black text-slate-300 italic">RECEIPT</h2>
+            <h2 className="text-4xl font-black text-slate-300 italic">RECEIPT</h2>
             <p className="font-bold text-black">DATE: {new Date().toLocaleDateString()}</p>
           </div>
         </div>
 
+        {/* Info Grid */}
         <div className="grid grid-cols-2 gap-8 mb-8">
           <div>
             <h3 className="text-[10px] font-black uppercase text-slate-400 border-b border-slate-200 mb-2">Patient Info</h3>
@@ -2490,9 +2511,10 @@ function ReceiptPageWrapper({ patientData }: {
           </div>
         </div>
 
+        {/* Line Items Table */}
         <table className="w-full text-sm mb-6 text-black">
           <thead>
-            <tr className="border-b-2 border-black text-black">
+            <tr className="border-b-2 border-black">
               <th className="text-left py-2 font-black uppercase">Code</th>
               <th className="text-left py-2 font-black uppercase">Description</th>
               <th className="text-right py-2 font-black uppercase w-16">Qty</th>
@@ -2536,7 +2558,7 @@ function ReceiptPageWrapper({ patientData }: {
                 </td>
                 <td className="py-3 text-right font-black text-black">${(item.qty * item.price).toFixed(2)}</td>
                 <td className="py-3 text-right print:hidden">
-                  <button onClick={() => removeItem(item.id)} className="text-red-500">
+                  <button onClick={() => removeItem(item.id)} className="text-red-500 hover:text-red-700">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </td>
@@ -2545,51 +2567,56 @@ function ReceiptPageWrapper({ patientData }: {
           </tbody>
         </table>
 
+        {/* Table Actions */}
         <div className="mb-6 print:hidden">
-          <button onClick={addItem} className="flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-lg font-bold text-xs uppercase text-black">
+          <button onClick={addItem} className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg font-bold text-xs uppercase text-black">
             <Plus className="w-4 h-4" /> Add Item
           </button>
         </div>
 
-        <div className="ml-auto w-64 space-y-2 text-black">
+        {/* Totals Section */}
+        <div className="ml-auto w-72 space-y-2 text-black">
           <div className="flex justify-between font-bold">
-            <span>SUBTOTAL:</span>
+            <span>Subtotal:</span>
             <span>${subtotal.toFixed(2)}</span>
           </div>
           <div className="flex justify-between font-bold">
-            <span>TAX (6%):</span>
+            <span>Tax (6%):</span>
             <span>${tax.toFixed(2)}</span>
           </div>
           <div className="flex justify-between font-black text-xl border-t-2 border-black pt-2">
-            <span>TOTAL:</span>
+            <span>Grand Total:</span>
             <span>${grandTotal.toFixed(2)}</span>
           </div>
+          
           {insuranceDiscount > 0 && (
-            <div className="flex justify-between font-bold text-red-600 pt-2">
-              <span>INSURANCE DISCOUNTS:</span>
+            <div className="flex justify-between font-bold text-red-600 pt-1">
+              <span>Insurance Benefits:</span>
               <span>-${insuranceDiscount.toFixed(2)}</span>
             </div>
           )}
+
           <div className="flex justify-between font-black border-t-2 border-black pt-2 mt-2">
-            <span>PATIENT OWES:</span>
+            <span>Patient Total:</span>
             <span>${patientOwes.toFixed(2)}</span>
           </div>
           <div className="flex justify-between font-black text-green-600 bg-green-50 p-1 px-2 rounded mt-2">
-            <span>PAID ({patientData.payMethod}):</span>
+            <span>Paid ({patientData.payMethod}):</span>
             <span>-${amtPaid.toFixed(2)}</span>
           </div>
           <div className="flex justify-between font-black border-t border-black pt-2 mt-2">
-            <span>BALANCE:</span>
+            <span>Balance:</span>
             <span>${balance.toFixed(2)}</span>
           </div>
         </div>
 
+        {/* Footer */}
         <div className="mt-16 text-center">
-          <p className="text-[10px] font-black uppercase italic tracking-widest text-slate-400">Thank you for trusting us with your vision care!</p>
+          <p className="text-[10px] font-black uppercase italic tracking-widest text-slate-400">Thank you for choosing Pal Optical!</p>
           <button 
             onClick={() => window.print()}
-            className="mt-6 px-8 py-3 bg-black text-white rounded-xl font-black uppercase text-xs tracking-widest print:hidden">
-            Print Receipt
+            className="mt-6 px-8 py-3 bg-black text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-gray-800 transition-all print:hidden">
+            Print Itemized Receipt
           </button>
         </div>
       </div>
