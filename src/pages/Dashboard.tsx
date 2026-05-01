@@ -108,25 +108,25 @@ export default function Dashboard() {
   }, [dark]);
 
   return (
-    <div
-      className={`min-h-screen transition-colors duration-300 ${dark ? "bg-black text-white" : "bg-white text-black"}`}
+        <div
+      className={`min-h-screen transition-colors duration-300 ${dark ? "theme-dark bg-black text-white" : "bg-white text-black"}`}
     >
       <div className="max-w-6xl mx-auto px-5 py-8">
         {/* Header */}
         <div className="relative mb-10 text-center">
           <button
             onClick={() => setDark((d) => !d)}
-            className={`absolute right-0 top-0 w-14 h-7 rounded-full transition-colors duration-300 ${dark ? "bg-blue-500" : "bg-gray-300"}`}
+            className={`absolute right-0 top-0 w-14 h-7 rounded-full transition-colors duration-300 ${dark ? "bg-white/20" : "bg-gray-300"}`}
             aria-label="Toggle theme"
           >
             <span
               className={`block w-5 h-5 bg-white rounded-full shadow transition-transform duration-300 mx-1 ${dark ? "translate-x-7" : "translate-x-0"}`}
             />
           </button>
-          <h1 className="text-3xl font-bold mb-2">
+          <h1 className={`text-3xl font-bold mb-2 ${dark ? "text-white" : ""}`}>
             Pal Optical Master Application
           </h1>
-          <p className={`text-sm ${dark ? "text-gray-400" : "text-gray-500"}`}>
+          <p className={`text-sm ${dark ? "text-theme-muted" : "text-gray-500"}`}>
             Select an application below to get started in the lab or on the
             floor.
           </p>
@@ -135,7 +135,7 @@ export default function Dashboard() {
         {/* P.O.S.T. Flagship Card */}
         <Link
           to="/post"
-          className="block mb-6 rounded-2xl hover:-translate-y-1 transition-transform shadow-lg relative overflow-hidden border-8 border-black h-80 w-full bg-cover bg-center bg-no-repeat"
+          className={`block mb-6 rounded-2xl hover:-translate-y-1 transition-transform shadow-lg relative overflow-hidden h-80 w-full bg-cover bg-center bg-no-repeat ${dark ? "border-8 border-white" : "border-8 border-black"}`}
           style={{
             backgroundImage: "url('/post.png')",
           }}
@@ -150,21 +150,21 @@ export default function Dashboard() {
               to={tool.path}
               className={`p-5 rounded-2xl border transition-all hover:-translate-y-1 hover:shadow-lg ${
                 dark
-                  ? "bg-gray-900 border-gray-700 hover:border-gray-500"
+                  ? "bg-theme-card border-theme-border hover:border-white"
                   : "bg-gray-50 border-gray-200 hover:border-gray-400"
               }`}
             >
               <div className="text-3xl mb-2">{tool.emoji}</div>
               <h3 className="font-bold text-base mb-1">{tool.title}</h3>
               <p
-                className={`text-xs mb-4 ${dark ? "text-gray-400" : "text-gray-500"}`}
+                className={`text-xs mb-4 ${dark ? "text-theme-muted" : "text-gray-500"}`}
               >
                 {tool.desc}
               </p>
               <span
                 className={`inline-block px-4 py-1.5 rounded-full text-xs font-bold transition-colors ${
                   dark
-                    ? "bg-white text-black hover:bg-blue-400 hover:text-white"
+                    ? "bg-white text-black hover:bg-gray-300"
                     : "bg-black text-white hover:bg-blue-500"
                 }`}
               >
@@ -179,21 +179,21 @@ export default function Dashboard() {
               target="_self"
               className={`p-5 rounded-2xl border transition-all hover:-translate-y-1 hover:shadow-lg ${
                 dark
-                  ? "bg-gray-900 border-gray-700 hover:border-gray-500"
+                  ? "bg-theme-card border-theme-border hover:border-white"
                   : "bg-gray-50 border-gray-200 hover:border-gray-400"
               }`}
             >
               <div className="text-3xl mb-2">{tool.emoji}</div>
               <h3 className="font-bold text-base mb-1">{tool.title}</h3>
               <p
-                className={`text-xs mb-4 ${dark ? "text-gray-400" : "text-gray-500"}`}
+                className={`text-xs mb-4 ${dark ? "text-theme-muted" : "text-gray-500"}`}
               >
                 {tool.desc}
               </p>
               <span
                 className={`inline-block px-4 py-1.5 rounded-full text-xs font-bold transition-colors ${
                   dark
-                    ? "bg-white text-black hover:bg-blue-400 hover:text-white"
+                    ? "bg-white text-black hover:bg-gray-300"
                     : "bg-black text-white hover:bg-blue-500"
                 }`}
               >
@@ -204,11 +204,12 @@ export default function Dashboard() {
         </div>
 
         <footer
-          className={`text-center mt-10 text-xs ${dark ? "text-gray-600" : "text-gray-400"}`}
+          className={`text-center mt-10 text-xs ${dark ? "text-theme-muted" : "text-gray-400"}`}
         >
           Pal Optical Master App &mdash; jamesbrentlinger2026™
         </footer>
       </div>
     </div>
+
   );
 }
