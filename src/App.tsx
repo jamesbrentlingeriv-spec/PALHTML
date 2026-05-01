@@ -12,7 +12,7 @@ import FrameInventory from "./pages/FrameInventory";
 import LensGuide from "./pages/LensGuide";
 import PalDocs from "./pages/PalDocs";
 import PostApp from "./pages/post/App";
-import Opticalc3DApp from "./pages/Opticalc3DApp";
+import Opticalc3DPage from "./opticalc3d/App";  // Updated import
 import OptiTrakApp from "./pages/OptiTrakApp";
 import SplashScreen from "./components/SplashScreen";
 
@@ -36,7 +36,7 @@ export default function App() {
         <Route path="/frames" element={<FrameInventory />} />
         <Route path="/lens-guide" element={<LensGuide />} />
         <Route path="/docs" element={<PalDocs />} />
-        <Route path="/opticalc-3d" element={<Opticalc3DApp />} />
+        <Route path="/opticalc-3d" element={<Opticalc3DPage />} />  // Updated route
         <Route path="/optitrak" element={<OptiTrakApp />} />
       </Routes>
     </>
