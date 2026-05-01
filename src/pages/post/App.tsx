@@ -2470,45 +2470,53 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
   const [amtPaid] = useState<number>(patientOwes);
   const balance = patientOwes - amtPaid;
 
-    return (
-      <div className="receipt-content bg-white">
+        return (
+      <div className="receipt-content-wrapper">
         <style>{`
           @media print {
-            @page { size: portrait; margin: 0.5in; }
+            @page { 
+              size: portrait; 
+              margin: 0; 
+            }
           
-            /* Hide everything by default */
-            html, body {
+            /* Hide EVERYTHING including the main app and overlay backgrounds */
+            html, body, #root, [data-framer-generated] {
+              visibility: hidden !important;
               height: auto !important;
               overflow: visible !important;
-              background: white !important;
+              margin: 0 !important;
+              padding: 0 !important;
             }
           
-            body * { 
-              visibility: hidden !important; 
+            /* Specifically target and hide the Post app and its containers */
+            main, section, nav, header, .fixed, .absolute {
+              display: none !important;
             }
-          
-            /* Show the receipt and its contents */
-            .receipt-content, 
-            .receipt-content * { 
+
+            /* Only show the specific receipt container */
+            .receipt-content-wrapper,
+            .receipt-content-wrapper * { 
               visibility: visible !important; 
+              display: block !important;
             }
-          
-            /* Force receipt to top left and expand */
-            .receipt-content { 
+
+            /* Reset display for table elements */
+            .receipt-content-wrapper table { display: table !important; }
+            .receipt-content-wrapper thead { display: table-header-group !important; }
+            .receipt-content-wrapper tbody { display: table-row-group !important; }
+            .receipt-content-wrapper tr { display: table-row !important; }
+            .receipt-content-wrapper td, .receipt-content-wrapper th { display: table-cell !important; }
+            .receipt-content-wrapper .flex { display: flex !important; }
+
+            .receipt-content-wrapper { 
               position: absolute !important; 
               left: 0 !important; 
               top: 0 !important; 
               width: 100% !important; 
               margin: 0 !important; 
-              padding: 0 !important; 
-              z-index: 999999 !important; 
-            }
-
-            /* Ensure parent containers don't clip the receipt */
-            .fixed, .absolute, .relative, div {
-              overflow: visible !important;
-              max-height: none !important;
-              height: auto !important;
+              padding: 40px !important;
+              background: white !important;
+              z-index: 9999999 !important;
             }
 
             .print\\:hidden { display: none !important; }
@@ -2519,12 +2527,14 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
               padding: 0 !important;
               appearance: none !important;
               outline: none !important;
+              width: 100% !important;
             }
           
             .no-print-border { border: none !important; }
           }
         `}</style>
-        <div className="max-w-3xl mx-auto border-2 border-black p-10 no-print-border">
+        <div className="max-w-3xl mx-auto border-2 border-black p-10 no-print-border bg-white">
+
 
 
         <div className="flex justify-between items-start border-b-2 border-black pb-5 mb-5">
@@ -2675,10 +2685,10 @@ function ReceiptPageWrapper({ patientData }: { patientData: {
             Print Receipt
           </button>
         </div>
-      </div>
-    </div>
+          </div>
   );
 }
+
 
 // Wrapper component to inject patient data into a simplified ReceiptPage
 
