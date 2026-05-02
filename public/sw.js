@@ -3,7 +3,7 @@ const STATIC_ASSETS = [
   "/",
   "/index.html",
   "/manifest.json",
-  "/favicon.svg",
+  "/favicon.ico",
   "/icon-192.png",
   "/icon-512.png",
 ];
