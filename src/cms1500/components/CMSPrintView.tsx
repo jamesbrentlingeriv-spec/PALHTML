@@ -115,6 +115,25 @@ export default function CMSPrintView({ data }: PrintViewProps) {
         margin: 0,
       }}
     >
+      {/* CMS Form background — screen only for alignment, hidden when printing */}
+      <iframe
+        src="/cms1500-form.pdf#toolbar=0&navpanes=0&scrollbar=0&view=FitH"
+        className="cms-form-bg"
+        style={{
+          position: "absolute",
+          top: 0,
+          left: 0,
+          width: "8.5in",
+          height: "11in",
+          border: "none",
+          pointerEvents: "none",
+          zIndex: 0,
+          opacity: 1,
+        }}
+        title="CMS-1500 Form Background"
+      />
+      {/* Data fields — positioned above the form background */}
+      <div style={{ position: "relative", zIndex: 1 }}>
       {/* Box 1 - Program Type */}
       {data.programType && (
         <Field top={0.42} left={programTypeMap[data.programType]}>
@@ -481,11 +500,14 @@ export default function CMSPrintView({ data }: PrintViewProps) {
         {data.billingProviderInfo.otherId}
       </Field>
 
+      </div>{/* end fields wrapper */}
+
       {/* Hide overflow indicator for printing */}
       <style>{`
         @media print {
           body { background: white !important; margin: 0; padding: 0; }
           .print-view { margin: 0 !important; box-shadow: none !important; }
+          .cms-form-bg { display: none !important; }
           header, footer, .no-print { display: none !important; }
         }
       `}</style>
