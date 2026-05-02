@@ -208,7 +208,7 @@ export default function OptiCalc() {
             <h4 className="font-semibold text-sm mb-2">Minimum Blank Size (MBS)</h4>
             <div className="grid grid-cols-3 gap-2 mb-2">
               <div><label className="text-xs block mb-1">ED (mm)</label><input className={inp} value={ed} onChange={e => setEd(e.target.value)} /></div>
-              <div><label className="text-xs block mb-1">Frame PD (mm)</label><input className={inp} value={setDecPd} onChange={e => setDecPd(e.target.value)} /></div>
+              <div><label className="text-xs block mb-1">Frame PD (mm)</label><input className={inp} value={decPd} onChange={e => setDecPd(e.target.value)} /></div>
               <div><label className="text-xs block mb-1">Patient PD (mm)</label><input className={inp} value={patPd} onChange={e => setPatPd(e.target.value)} /></div>
             </div>
             <button onClick={calcMBS} className={`w-full py-2 rounded font-bold text-sm ${btnCls}`}>Calculate MBS</button>
