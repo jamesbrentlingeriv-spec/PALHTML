@@ -1880,42 +1880,42 @@ export default function App() {
                   {
                     id: "expired",
                     label: "Expired Rx",
-                    file: "/waivers/waiver-expired-rx.pdf",
+                    file: "/printable-docs/waiver-expired-rx.html",
                   },
                   {
                     id: "pof",
                     label: "Patient Own Frame",
-                    file: "/waivers/waiver-patient-own-frame.pdf",
+                    file: "/printable-docs/waiver-patient-own-frame.html",
                   },
                   {
                     id: "thick",
                     label: "Frame Thickness",
-                    file: "/waivers/waiver-frame-thickness.pdf",
+                    file: "/printable-docs/waiver-frame-thickness.html",
                   },
                   {
                     id: "poly",
                     label: "Child / Poly",
-                    file: "/waivers/waiver-child-poly.pdf",
+                    file: "/printable-docs/waiver-child-poly.html",
                   },
                   {
                     id: "noline",
                     label: "Lined to No-Line",
-                    file: "/waivers/waiver-lined-to-no-line.pdf",
+                    file: "/printable-docs/waiver-lined-to-no-line.html",
                   },
                   {
                     id: "semirim",
                     label: "Semi-Rimless",
-                    file: "/waivers/waiver-semi-rimless.pdf",
+                    file: "/printable-docs/waiver-semi-rimless.html",
                   },
                   {
                     id: "remake",
                     label: "Remake",
-                    file: "/waivers/waiver-remake.pdf",
+                    file: "/printable-docs/waiver-remake.html",
                   },
                 ].map((w) => (
                   <button
                     key={w.id}
-                    onClick={() => window.open(w.file, "_blank")}
+                    onClick={() => window.open(`${w.file}?patientName=${encodeURIComponent(patient)}`, "_blank")}
                     className="flex items-center gap-3 p-3 bg-theme-bg rounded-xl border-theme-border hover:bg-theme-accent hover:text-theme-card transition-all text-left group"
                   >
                     <FileText className="w-4 h-4 text-theme-accent group-hover:text-theme-card transition-colors" />
@@ -1930,9 +1930,7 @@ export default function App() {
               </div>
               <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl">
                 <p className="text-[9px] font-bold text-amber-700 uppercase tracking-wider">
-                  ⚠ Place your form-fillable PDF files in the
-                  "pal-optical-react/public/waivers/" folder with the names
-                  shown above.
+                  ⚠ Opens fillable HTML waiver in a new tab — patient signs on screen then print.
                 </p>
               </div>
             </section>

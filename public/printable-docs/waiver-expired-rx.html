@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>REMAKE WAIVER | Pal Optical</title>
+    <title>EXPIRED Rx WAIVER | Pal Optical</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -35,28 +35,6 @@
             padding: 12px;
             background: #f9f9f9;
             border-left: 5px solid #000;
-        }
-
-        .reason-section {
-            margin: 20px 0;
-            padding: 15px;
-            border: 1px solid #ccc;
-            background: #fff8f0;
-        }
-
-        .reason-label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        .reason-input {
-            width: 100%;
-            min-height: 80px;
-            border: 1px solid #999;
-            padding: 10px;
-            font-size: 1em;
-            font-family: monospace;
         }
 
         .signature-section {
@@ -142,15 +120,13 @@
 <body>
     <div class="waiver-title">PATIENT DISCLOSURE &amp; WAIVER FORM</div>
     <div class="waiver-header">
-        Waiver: <strong>REMAKE WAIVER</strong> | Date: <span id="waiver-date"></span>
-    </div>
-    <div class="reason-section">
-        <div class="reason-label">Why is this a remake?</div>
-        <textarea class="reason-input" placeholder="Enter detailed reason for remake..."></textarea>
+        Waiver: <strong>EXPIRED Rx WAIVER</strong> | Date: <span id="waiver-date"></span>
+        <br>Patient Name: <strong id="patient-name">__________________</strong>
     </div>
     <div class="waiver-text">
-        <p><b>REMAKE WAIVER:</b> Patient acknowledges this is a remake order and has provided reason above. Patient
-            agrees not to hold Pal Optical responsible for additional costs or delays associated with remake.</p>
+        <p><b>EXPIRED Rx WAIVER:</b> I have been cautioned by my Optician that my Eye Exam has expired and it is in my
+            best interest to get a new exam. I will not hold Pal Optical responsible for any issues regarding my vision
+            quality in the new glasses.</p>
     </div>
     <div class="signature-section">
         <div style="font-weight: bold; margin-bottom: 5px;">Patient Signature:</div>
@@ -260,6 +236,12 @@
         // Print document
         function printDocument() {
             window.print();
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const pName = urlParams.get('patientName');
+        if (pName) {
+            document.getElementById('patient-name').textContent = pName;
         }
     </script>
 </body>

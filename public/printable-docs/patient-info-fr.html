@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Patient Information Sheet - English | Pal Optical</title>
+    <title>Information du Patient - Français | Pal Optical</title>
     <style>
         @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap");
 
@@ -176,90 +176,91 @@
 <body>
     <div class="pt-header">
         <div>
-            <h1 class="pt-title">PATIENT INFORMATION</h1>
+            <h1 class="pt-title">INFORMATION DU PATIENT</h1>
         </div>
-        <p class="pt-subtitle">Please print clearly.</p>
+        <p class="pt-subtitle">Veuillez imprimer clairement.</p>
     </div>
 
-    <div class="pt-section-header">Patient Details</div>
+    <div class="pt-section-header">Détails du Patient</div>
     <div class="pt-grid-12">
         <div class="pt-col-6">
-            <label class="pt-label">Patient Name (Last, First, MI)</label>
-            <input type="text" class="pt-input" />
+            <label class="pt-label">Nom du Patient (Nom, Prénom, Initiale)</label>
+            <input id="patient-name" type="text" class="pt-input" />
         </div>
         <div class="pt-col-3">
-            <label class="pt-label">Date of Birth</label>
+            <label class="pt-label">Date de Naissance</label>
             <input type="date" class="pt-input" />
         </div>
         <div class="pt-col-3">
-            <label class="pt-label">Gender</label>
-            <input type="text" class="pt-input" placeholder="M/F/Other" />
+            <label class="pt-label">Genre</label>
+            <input type="text" class="pt-input" placeholder="M/F/Autre" />
         </div>
     </div>
     <div class="pt-grid-12">
         <div class="pt-col-5">
-            <label class="pt-label">Street Address</label>
+            <label class="pt-label">Adresse</label>
             <input type="text" class="pt-input" />
         </div>
         <div class="pt-col-4">
-            <label class="pt-label">City</label>
+            <label class="pt-label">Ville</label>
             <input type="text" class="pt-input" />
         </div>
         <div class="pt-col-1">
-            <label class="pt-label">State</label>
+            <label class="pt-label">État</label>
             <input type="text" class="pt-input" />
         </div>
         <div class="pt-col-2">
-            <label class="pt-label">Zip</label>
+            <label class="pt-label">Code Postal</label>
             <input type="text" class="pt-input" />
         </div>
     </div>
     <div class="pt-grid-12">
         <div class="pt-col-3">
-            <label class="pt-label">SSN</label>
+            <label class="pt-label">Sécurité Sociale</label>
             <input type="text" class="pt-input" />
         </div>
         <div class="pt-col-3">
-            <label class="pt-label">Phone</label>
+            <label class="pt-label">Téléphone</label>
             <input type="text" class="pt-input" placeholder="(XXX) XXX-XXXX" />
         </div>
         <div class="pt-col-6">
-            <label class="pt-label">Email</label>
+            <label class="pt-label">E-mail</label>
             <input type="email" class="pt-input" />
         </div>
     </div>
 
-    <div class="pt-section-header">Insurance Information</div>
+    <div class="pt-section-header">Informations d'Assurance</div>
     <div class="pt-grid-12">
         <div class="pt-col-4">
-            <label class="pt-label">Primary Insurance Name</label>
+            <label class="pt-label">Assurance Principale</label>
             <input type="text" class="pt-input" />
         </div>
         <div class="pt-col-3">
-            <label class="pt-label">Member ID #</label>
+            <label class="pt-label">N° Membre</label>
             <input type="text" class="pt-input" />
         </div>
         <div class="pt-col-5">
-            <label class="pt-label">Policyholder/Employer</label>
+            <label class="pt-label">Titulaire/Employeur</label>
             <input type="text" class="pt-input" />
         </div>
     </div>
 
-    <div class="pt-section-header">HIPAA &amp; Consent</div>
+    <div class="pt-section-header">HIPAA et Consentement</div>
     <p style="font-size: 0.75rem; margin-bottom: 20px">
-        I acknowledge I have received and reviewed the Notice of Privacy Practices (HIPAA) and authorize treatment.
+        Je reconnais avoir reçu et lu l'Avis de Pratiques de Confidentialité (HIPAA) et j'autorise le traitement.
     </p>
 
     <div class="pt-footer">
         <div style="flex: 3">
-            <label class="pt-label" style="margin-bottom: 5px;">Patient / Guardian Signature:</label>
+            <label class="pt-label" style="margin-bottom: 5px;">Signature du Patient / Tuteur:</label>
             <div class="signature-canvas-container">
                 <canvas id="signatureCanvas"></canvas>
             </div>
             <div class="signature-buttons no-print">
-                <button class="sig-btn" onclick="clearSignature()">Clear Signature</button>
-                <button class="sig-btn primary" onclick="printDocument()">Print Document</button>
+                <button class="sig-btn" onclick="clearSignature()">Effacer la Signature</button>
+                <button class="sig-btn primary" onclick="printDocument()">Imprimer le Document</button>
             </div>
+            <label class="pt-label">Signature du Patient / Tuteur</label>
         </div>
         <div style="flex: 1">
             <div style="border-bottom: 2px solid #000; margin-bottom: 5px; min-height: 1.5em;"></div>
@@ -357,6 +358,13 @@
         // Print document
         function printDocument() {
             window.print();
+        }
+
+        // Auto-fill patient name from POST tool URL param
+        const urlParams = new URLSearchParams(window.location.search);
+        const pName = urlParams.get('patientName');
+        if (pName) {
+            document.getElementById('patient-name').value = decodeURIComponent(pName);
         }
     </script>
 </body>

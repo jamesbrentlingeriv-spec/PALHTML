@@ -185,7 +185,7 @@
     <div class="pt-grid-12">
         <div class="pt-col-6">
             <label class="pt-label">Nombre del Paciente (Apellido, Nombre, Inicial)</label>
-            <input type="text" class="pt-input" />
+            <input id="patient-name" type="text" class="pt-input" />
         </div>
         <div class="pt-col-3">
             <label class="pt-label">Fecha de Nacimiento</label>
@@ -358,6 +358,13 @@
         // Print document
         function printDocument() {
             window.print();
+        }
+
+        // Auto-fill patient name from POST tool URL param
+        const urlParams = new URLSearchParams(window.location.search);
+        const pName = urlParams.get('patientName');
+        if (pName) {
+            document.getElementById('patient-name').value = decodeURIComponent(pName);
         }
     </script>
 </body>

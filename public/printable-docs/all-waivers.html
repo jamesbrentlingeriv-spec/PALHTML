@@ -140,6 +140,7 @@
         }
 
         @media print {
+
             .print-btn,
             .signature-buttons {
                 display: none !important;
@@ -164,6 +165,10 @@
 <body>
     <button class="print-btn" onclick="window.print()">🖨️ Print All Selected Waivers</button>
 
+    <div class="waiver-header">
+        Date: <span id="waiver-date"></span>
+        <br>Patient Name: <strong id="patient-name">__________________</strong>
+    </div>
     <div class="waiver-title">PATIENT DISCLOSURE &amp; WAIVER FORM - SELECT ALL THAT APPLY</div>
 
     <div class="waiver-section">
@@ -385,6 +390,15 @@
         // Print document
         function printDocument() {
             window.print();
+        }
+
+        // Auto-fill patient name from POST tool URL param
+        var date = new Date().toLocaleDateString();
+        document.getElementById('waiver-date').textContent = date;
+        const urlParams = new URLSearchParams(window.location.search);
+        const pName = urlParams.get('patientName');
+        if (pName) {
+            document.getElementById('patient-name').textContent = decodeURIComponent(pName);
         }
     </script>
 </body>

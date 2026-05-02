@@ -2,20 +2,12 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
  * CMSPrintView - Refactored with fieldPositions.ts for precise 02/12 alignment
- * Fixed TypeScript import for verbatimModuleSyntax
  */
 
 import React from "react";
 import type { CMS1500Data } from "../types";
-import type { FieldPosition } from "../fieldPositions";
 import { FIELD_POSITIONS } from "../fieldPositions";
-
-function isFieldPosition(position: string | FieldPosition): position is FieldPosition {
-  if (typeof position === 'string') {
-    return position in FIELD_POSITIONS;
-  }
-  return position.top !== undefined && position.left !== undefined;
-}
+import type { FieldPosition } from "../fieldPositions";
 
 interface PrintViewProps {
   data: CMS1500Data;
@@ -43,10 +35,35 @@ function Field({
   width?: number;
   align?: "left" | "center" | "right";
 }) {
-  if (!isFieldPosition(position)) {
-    throw new Error(`Invalid position: ${JSON.stringify(position)}`);
+  // 类型守卫函数
+  function isFieldPosition(pos: string | FieldPosition | number): pos is FieldPosition {
+    return typeof pos === 'object' && pos !== null && 'top' in pos && 'left' in pos;
   }
-  const pos: FieldPosition = position;
+
+  let pos: FieldPosition | undefined;
+
+  if (typeof position === 'string') {
+    // 如果position是字符串，则从FIELD_POSITIONS中获取对应的FieldPosition
+    const fieldPos = FIELD_POSITIONS[position];
+    // 验证 fieldPos 是否为 FieldPosition 对象，而不是 number 类型
+    if (isFieldPosition(fieldPos)) {
+      pos = fieldPos;
+    } else {
+      // 如果 fieldPos 是 number 类型，说明这是一个部分值，不能用作 FieldPosition
+      console.error(`Field position "${position}" refers to a numeric value, not a FieldPosition object`);
+      return null;
+    }
+  } else if (isFieldPosition(position)) {
+    // 如果position已经是FieldPosition对象，则直接使用
+    pos = position;
+  }
+
+  // 确保pos不为undefined
+  if (!pos) {
+    console.error(`Field position "${position}" not found in FIELD_POSITIONS`);
+    return null;
+  }
+  
   return (
     <div
       style={{
@@ -93,14 +110,16 @@ export default function CMSPrintView({ data }: PrintViewProps) {
     return isNaN(d.getTime()) ? "" : d.getFullYear().toString().slice(-2);
   };
 
-  const serviceRowTop = (idx: number) => 6.3 + idx * 0.31;
+  const serviceRowTop = (idx: number) =>
+    Number(FIELD_POSITIONS.serviceRowBaseTop) +
+    idx * Number(FIELD_POSITIONS.serviceRowHeight);
 
   return (
     <div
       className="print-view relative bg-white overflow-hidden shadow-sm"
       style={{ width: "8.5in", height: "11in", padding: 0, margin: 0 }}
     >
-      {/* CMS Form background */}
+      {/* CMS Form background — screen only for alignment, hidden when printing */}
       <iframe
         src="/cms1500-form.pdf#toolbar=0&navpanes=0&scrollbar=0&view=FitH"
         className="cms-form-bg"
@@ -117,8 +136,9 @@ export default function CMSPrintView({ data }: PrintViewProps) {
         title="CMS-1500 Form Background"
       />
 
+      {/* All data fields sit above the background */}
       <div style={{ position: "relative", zIndex: 1 }}>
-        {/* Box 1 */}
+        {/* Box 1 - Program Type */}
         {data.programType === "MEDICARE" && (
           <Field position="box1_medicare">X</Field>
         )}
@@ -135,8 +155,13 @@ export default function CMSPrintView({ data }: PrintViewProps) {
         {data.programType === "FECA" && <Field position="box1_feca">X</Field>}
         {data.programType === "OTHER" && <Field position="box1_other">X</Field>}
 
+        {/* 1a. Insured's ID */}
         <Field position="insuredId">{data.insuredId}</Field>
+
+        {/* 2. Patient's Name */}
         <Field position="patientName">{data.patientName}</Field>
+
+        {/* 3. Patient Birth Date */}
         <Field position="patientDobMonth">
           {getMonth(data.patientBirthDate)}
         </Field>
@@ -144,13 +169,18 @@ export default function CMSPrintView({ data }: PrintViewProps) {
         <Field position="patientDobYear">
           {getYear(data.patientBirthDate)}
         </Field>
+
+        {/* 3. Sex */}
         {data.patientSex === "M" && <Field position="patientSexM">X</Field>}
         {data.patientSex === "F" && <Field position="patientSexF">X</Field>}
+
+        {/* 4. Insured's Name */}
         <Field position="insuredName">
           {data.insuredName ||
             (data.patientRelationship === "SELF" ? data.patientName : "")}
         </Field>
 
+        {/* 5. Patient's Address */}
         <Field position="patientStreet">{data.patientAddress.street}</Field>
         <Field position="patientCity">{data.patientAddress.city}</Field>
         <Field position="patientState">{data.patientAddress.state}</Field>
@@ -159,6 +189,7 @@ export default function CMSPrintView({ data }: PrintViewProps) {
           {formatPhone(data.patientAddress.phone)}
         </Field>
 
+        {/* 6. Relationship */}
         {data.patientRelationship === "SELF" && (
           <Field position="relSelf">X</Field>
         )}
@@ -172,6 +203,7 @@ export default function CMSPrintView({ data }: PrintViewProps) {
           <Field position="relOther">X</Field>
         )}
 
+        {/* 7. Insured's Address */}
         {data.patientRelationship !== "SELF" && (
           <>
             <Field position="insuredStreet">{data.insuredAddress.street}</Field>
@@ -181,6 +213,7 @@ export default function CMSPrintView({ data }: PrintViewProps) {
           </>
         )}
 
+        {/* 10. Condition Related To */}
         {data.conditionRelatedTo.employment ? (
           <Field position="condEmploymentYes">X</Field>
         ) : (
@@ -202,30 +235,36 @@ export default function CMSPrintView({ data }: PrintViewProps) {
           <Field position="condOtherNo">X</Field>
         )}
 
+        {/* 11. Insured's Policy/Group */}
         <Field position="insuredGroupNum">{data.insuredGroupNumber}</Field>
         <Field position="insuredPlanName">{data.insuredPlanName}</Field>
 
+        {/* 12. Patient's Signature */}
         <Field position="patientSig">SIGNATURE ON FILE</Field>
         <Field position="patientSigDate">
           {formatDate(data.patientSignatureDate)}
         </Field>
 
+        {/* 13. Insured's Signature */}
         {data.insuredSignatureAuthorized && (
           <Field position="insuredSig">SIGNATURE ON FILE</Field>
         )}
 
+        {/* 14. Date of Illness */}
         <Field position="dateIllness">
           {getMonth(data.dateOfIllness)} {getDay(data.dateOfIllness)}{" "}
           {getYear(data.dateOfIllness)}
         </Field>
         <Field position="dateIllnessQual">{data.dateOfIllnessQual}</Field>
 
+        {/* 17. Referring Provider */}
         <Field position="referringProv">
           {data.referringProviderQual && `${data.referringProviderQual} `}
           {data.referringProviderName}
         </Field>
         <Field position="referringNpi">{data.referringProviderNpi}</Field>
 
+        {/* 21. Diagnosis Codes */}
         <Field position="diagIcdInd">{data.diagnosisCodeIcd}</Field>
         {data.diagnosisCodes.slice(0, 4).map((code, idx) => (
           <Field
@@ -236,70 +275,108 @@ export default function CMSPrintView({ data }: PrintViewProps) {
           </Field>
         ))}
 
+        {/* 23. Prior Auth */}
         <Field position="priorAuth">{data.priorAuthNumber}</Field>
 
+        {/* 24. Service Lines */}
         {data.serviceLines.slice(0, 6).map((line, idx) => {
           const rowTop = serviceRowTop(idx);
           const charge = splitCharge(line.charges);
           return (
             <React.Fragment key={idx}>
-              <Field position={{ top: rowTop, left: 0.15 }}>
+              <Field
+                position={{ top: rowTop, left: Number(FIELD_POSITIONS.serviceFrom) }}
+              >
                 {line.fromDate}
               </Field>
-              <Field position={{ top: rowTop, left: 1.15 }}>
+              <Field
+                position={{ top: rowTop, left: Number(FIELD_POSITIONS.serviceTo) }}
+              >
                 {line.toDate}
               </Field>
-              <Field position={{ top: rowTop, left: 2.05 }}>
+              <Field
+                position={{ top: rowTop, left: Number(FIELD_POSITIONS.servicePos) }}
+              >
                 {line.placeOfService}
               </Field>
-              <Field position={{ top: rowTop, left: 2.35 }}>
+              <Field
+                position={{ top: rowTop, left: Number(FIELD_POSITIONS.serviceEmerg) }}
+              >
                 {line.emergency ? "X" : ""}
               </Field>
-              <Field position={{ top: rowTop, left: 2.65 }}>
+              <Field
+                position={{ top: rowTop, left: Number(FIELD_POSITIONS.serviceCpt) }}
+              >
                 {line.cptCode}
               </Field>
-              <Field position={{ top: rowTop, left: 3.55 }}>
+              <Field
+                position={{ top: rowTop, left: Number(FIELD_POSITIONS.serviceMod) }}
+              >
                 {line.modifier}
               </Field>
-              <Field position={{ top: rowTop, left: 4.0 }}>
+              <Field
+                position={{ top: rowTop, left: Number(FIELD_POSITIONS.serviceDiag) }}
+              >
                 {line.diagnosisPointer}
               </Field>
               <Field
-                position={{ top: rowTop, left: 4.5 }}
+                position={{
+                  top: rowTop,
+                  left: Number(FIELD_POSITIONS.serviceChargeDol),
+                  align: "right",
+                }}
                 width={0.7}
-                align="right"
               >
                 {charge.dollars}
               </Field>
-              <Field position={{ top: rowTop, left: 5.22 }} width={0.2}>
+              <Field
+                position={{
+                  top: rowTop,
+                  left: Number(FIELD_POSITIONS.serviceChargeCen),
+                }}
+                width={0.2}
+              >
                 {charge.cents}
               </Field>
               <Field
-                position={{ top: rowTop, left: 5.45 }}
+                position={{
+                  top: rowTop,
+                  left: Number(FIELD_POSITIONS.serviceUnits),
+                  align: "center"
+                }}
                 width={0.3}
-                align="center"
               >
                 {line.daysOrUnits}
               </Field>
-              <Field position={{ top: rowTop, left: 7.35 }} width={1.0}>
+              <Field
+                position={{
+                  top: rowTop,
+                  left: Number(FIELD_POSITIONS.serviceRendNpi),
+                }}
+                width={1.0}
+              >
                 {line.renderingProviderNpi}
               </Field>
             </React.Fragment>
           );
         })}
 
+        {/* 25. Federal Tax ID */}
         <Field position="taxId">{data.taxId}</Field>
         {data.taxIdType === "SSN" && <Field position="taxSsn">X</Field>}
         {data.taxIdType === "EIN" && <Field position="taxEin">X</Field>}
 
+        {/* 26. Patient Account No */}
         <Field position="acctNo">{data.patientAccountNo}</Field>
 
+        {/* 27. Accept Assignment */}
         {data.acceptAssignment ? (
           <Field position="acceptYes">X</Field>
         ) : (
           <Field position="acceptNo">X</Field>
         )}
 
+        {/* 28. Total Charge */}
         {(() => {
           const tc = splitCharge(data.totalCharge);
           return (
@@ -310,6 +387,7 @@ export default function CMSPrintView({ data }: PrintViewProps) {
           );
         })()}
 
+        {/* 29. Amount Paid */}
         {(() => {
           const ap = splitCharge(data.amountPaid);
           return (
@@ -320,11 +398,13 @@ export default function CMSPrintView({ data }: PrintViewProps) {
           );
         })()}
 
+        {/* 31. Signature of Physician */}
         <Field position="physSig">SIGNATURE ON FILE</Field>
         <Field position="physSigDate">
           {formatDate(data.physicianSignatureDate)}
         </Field>
 
+        {/* 32. Facility Info */}
         <div
           style={{
             position: "absolute",
@@ -345,6 +425,7 @@ export default function CMSPrintView({ data }: PrintViewProps) {
         </div>
         <Field position="facilityNpi">{data.facilityInfo.npi}</Field>
 
+        {/* 33. Billing Provider */}
         <div
           style={{
             position: "absolute",
