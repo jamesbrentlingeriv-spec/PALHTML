@@ -867,7 +867,7 @@ export default function App() {
           className="flex flex-col items-center gap-6"
         >
           <img
-            src="/android-chrome-512x512.png"
+            src="/post2.png"
             alt="POST"
             className="w-48 h-48 object-contain"
           />

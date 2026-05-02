@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { Camera, X, RefreshCw, Save, MousePointer2 } from 'lucide-react';
 
 interface Point {

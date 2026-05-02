@@ -1,13 +1,6 @@
-import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { useState, useMemo } from 'react';
 import { 
-  Eye, 
-  Glasses, 
-  Layers, 
   Info, 
-  ChevronRight, 
-  Settings2,
-  Trash2,
   Sun,
   Moon,
   RotateCcw
