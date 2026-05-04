@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { database } from "./firebase";
 import {
   ref,
@@ -33,10 +33,11 @@ import {
   MEDICAID_TYPES,
   MEDICAID_CODES,
 } from "./constants";
-import type { InsurancePlan, BillingRow, JobSnapshot } from "./types";
+import type { InsurancePlan, BillingRow, JobSnapshot, RxValue, RxFlags } from "./types";
 import { MeasurementTool } from "./components/MeasurementTool";
 import { PatientForm } from "./components/PatientForm";
 import { Catalog } from "./components/Catalog";
+import { ReceiptPage } from "./components/ReceiptPage";
 
 // Utility for formatting numbers to currency
 const f = (n: number | string) => {
@@ -85,8 +86,16 @@ export default function App() {
   const [colorDetail, setColorDetail] = useState("");
   const [labNotes, setLabNotes] = useState("");
 
+  // Insurance Logic Flags
+  const [isAllowancePlan, setIsAllowancePlan] = useState(false);
+  const [globalAllowance, setGlobalAllowance] = useState(0);
+  const [frameAllowance, setFrameAllowance] = useState(0);
+
   // Rx State
-  const [rx, setRx] = useState({
+  const [rx, setRx] = useState<{
+    od: RxValue;
+    os: RxValue;
+  }>({
     od: {
       sph: "",
       cyl: "",
@@ -111,6 +120,14 @@ export default function App() {
       hasPrism: false,
       hasCompoundPrism: false,
     },
+  });
+
+  // RxFlags State - moved early for proper typing
+  const [rxFlags, setRxFlags] = useState<RxFlags>({
+    dvo: false,
+    nvo: false,
+    ivo: false,
+    diff: false,
   });
 
   // Billing State
@@ -150,7 +167,7 @@ export default function App() {
     }));
   };
 
-  const calcOwe = (retail: string, key: string) => {
+  const calcOwe = useCallback((retail: string, key: string): string => {
     const r = parseFloat(retail) || 0;
     if (plan === "MEDICAID" || plan === "SCHOOL LETTER") return "0.00";
     if (plan === "None") return (r * 1.06).toFixed(2);
@@ -175,7 +192,7 @@ export default function App() {
     }
 
     return (r * 1.06).toFixed(2);
-  };
+  }, [plan, isAllowancePlan, globalAllowance, frameAllowance]);
 
   // Toggle mail fee - use a ref to avoid setState in effect warning
   const prevMailRef = React.useRef<boolean>(false);
@@ -216,7 +233,7 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [promise.mail]);
 
-  const handleRxChange = (eye: "od" | "os", field: string, value: string) => {
+  const handleRxChange = (eye: "od" | "os", field: keyof RxValue, value: string) => {
     // Only numbers and decimals
     if (value !== "" && !/^-?\d*\.?\d*$/.test(value)) return;
 
@@ -230,23 +247,10 @@ export default function App() {
       ...prevRx,
       [eye]: {
         ...prevRx[eye],
-        [field]: value,
+        [field]: value as string,
       },
     }));
   };
-
-  // Waivers / Flags
-  const [rxFlags, setRxFlags] = useState({
-    dvo: false,
-    nvo: false,
-    ivo: false,
-    diff: false,
-  });
-
-  // Insurance Logic Flags
-  const [isAllowancePlan, setIsAllowancePlan] = useState(false);
-  const [globalAllowance, setGlobalAllowance] = useState(0);
-  const [frameAllowance, setFrameAllowance] = useState(0);
 
   // --- AUTO CALCULATE INSURANCE CHARGES ---
   useEffect(() => {
@@ -255,8 +259,8 @@ export default function App() {
     // Calculate new charges based on insurance plan
     const newCharges: Array<{ row: string; data: BillingRow }> = [];
     for (const [row, charge] of [
-      ["l1", { retail: globalAllowance, owe: globalAllowance }],
-      ["f1", { retail: frameAllowance, owe: frameAllowance }],
+      ["lens", { retail: globalAllowance, owe: globalAllowance }],
+      ["frame", { retail: frameAllowance, owe: frameAllowance }],
     ] as const) {
       const b = billing[row];
       if (b.retail === "" || b.label.includes("MISC")) continue;
@@ -810,29 +814,27 @@ export default function App() {
   }, [frameA, rx]);
 
   // --- TOTAL CALCULATIONS ---
-  const totals = (Object.values(billing) as BillingRow[]).reduce(
+  const totals = useMemo(() => (Object.values(billing) as BillingRow[]).reduce(
     (acc, b) => {
       acc.retail += parseFloat(b.retail) || 0;
       acc.owe += parseFloat(b.owe) || 0;
       return acc;
     },
-    { retail: 0, owe: 0 },
-  );
+    { retail: 0, owe: 0 } as { retail: number; owe: number },
+  ), [billing]);
 
-  let finalOwe = totals.owe;
-  if (isAllowancePlan && globalAllowance > 0) {
-    const overage = Math.max(0, totals.retail - globalAllowance);
-    const isEyeMedGroup =
-      plan === "EYE-MED" ||
-      plan === "AETNA EYE-MED" ||
-      plan === "MARCH/EYESYNERGY";
-    if (isEyeMedGroup) {
-      // 20% off the overage
-      finalOwe = overage * 0.8 * 1.06;
-    } else {
-      finalOwe = overage * 1.06;
+  const finalOwe = useMemo(() => {
+    let owe = totals.owe;
+    if (isAllowancePlan && globalAllowance > 0) {
+      const overage = Math.max(0, totals.retail - globalAllowance);
+      const isEyeMedGroup =
+        plan === "EYE-MED" ||
+        plan === "AETNA EYE-MED" ||
+        plan === "MARCH/EYESYNERGY";
+      owe = isEyeMedGroup ? overage * 0.8 * 1.06 : overage * 1.06;
     }
-  }
+    return owe;
+  }, [totals, isAllowancePlan, globalAllowance, plan]);
 
   // --- SUBMISSION ---
   const handlePrint = async () => {
@@ -1631,18 +1633,11 @@ export default function App() {
                         <input
                           placeholder="0.00"
                           className="w-full bg-theme-bg border-b-2 border-theme-border py-2 text-center font-bold text-lg outline-none text-theme-text"
-                          value={
-                            (
-                              rx as Record<
-                                string,
-                                Record<string, string | boolean>
-                              >
-                            )[eye][field] as string
-                          }
+                          value={rx[eye as "od" | "os"][field as keyof RxValue] as string}
                           onChange={(e) =>
                             handleRxChange(
                               eye as "od" | "os",
-                              field,
+                              field as keyof RxValue,
                               e.target.value,
                             )
                           }
@@ -1655,24 +1650,12 @@ export default function App() {
                       </label>
                       <input
                         type="checkbox"
-                        checked={
-                          (
-                            rx as Record<
-                              string,
-                              Record<string, string | boolean>
-                            >
-                          )[eye].hasPrism as boolean
-                        }
+                        checked={rx[eye as "od" | "os"].hasPrism as boolean}
                         onChange={(e) =>
                           setRx({
                             ...rx,
                             [eye]: {
-                              ...(
-                                rx as Record<
-                                  string,
-                                  Record<string, string | boolean>
-                                >
-                              )[eye],
+                              ...rx[eye as "od" | "os"],
                               hasPrism: e.target.checked,
                             },
                           })
@@ -1681,9 +1664,7 @@ export default function App() {
                       />
                     </div>
 
-                    {(rx as Record<string, Record<string, string | boolean>>)[
-                      eye
-                    ].hasPrism && (
+                    {rx[eye as "od" | "os"].hasPrism && (
                       <motion.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: "auto" }}
@@ -1696,26 +1677,16 @@ export default function App() {
                               setRx({
                                 ...rx,
                                 [eye]: {
-                                  ...(
-                                    rx as Record<
-                                      string,
-                                      Record<string, string | boolean>
-                                    >
-                                  )[eye],
-                                  hasCompoundPrism: !((
-                                    rx as Record<
-                                      string,
-                                      Record<string, string | boolean>
-                                    >
-                                  )[eye].hasCompoundPrism as boolean),
+                                  ...rx[eye as "od" | "os"],
+                                  hasCompoundPrism: !(rx[eye as "od" | "os"].hasCompoundPrism as boolean),
                                 },
                               })
                             }
-                            className={`w-8 h-8 mb-1 shrink-0 rounded-full flex items-center justify-center transition-colors ${(rx as Record<string, Record<string, string | boolean>>)[eye].hasCompoundPrism ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"} text-white`}
+                            className={`w-8 h-8 mb-1 shrink-0 rounded-full flex items-center justify-center transition-colors ${rx[eye as "od" | "os"].hasCompoundPrism ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"} text-white`}
                             title="Toggle Compound Prism"
                           >
                             <Plus
-                              className={`w-5 h-5 transition-transform ${(rx as Record<string, Record<string, string | boolean>>)[eye].hasCompoundPrism ? "rotate-45" : ""}`}
+                              className={`w-5 h-5 transition-transform ${rx[eye as "od" | "os"].hasCompoundPrism ? "rotate-45" : ""}`}
                             />
                           </button>
                           <div className="flex-1">
@@ -1725,14 +1696,7 @@ export default function App() {
                             <input
                               placeholder="0.00"
                               className="w-full bg-white border border-theme-border rounded px-3 py-2 text-sm font-bold text-black"
-                              value={
-                                (
-                                  rx as Record<
-                                    string,
-                                    Record<string, string | boolean>
-                                  >
-                                )[eye].prism as string
-                              }
+                              value={rx[eye as "od" | "os"].prism as string}
                               onChange={(e) =>
                                 handleRxChange(
                                   eye as "od" | "os",
@@ -1748,24 +1712,12 @@ export default function App() {
                             </label>
                             <select
                               className="w-full bg-white border border-theme-border rounded px-2 py-2 text-sm font-bold text-black"
-                              value={
-                                (
-                                  rx as Record<
-                                    string,
-                                    Record<string, string | boolean>
-                                  >
-                                )[eye].prismBase as string
-                              }
+                              value={rx[eye as "od" | "os"].prismBase as string}
                               onChange={(e) =>
                                 setRx({
                                   ...rx,
                                   [eye]: {
-                                    ...(
-                                      rx as Record<
-                                        string,
-                                        Record<string, string | boolean>
-                                      >
-                                    )[eye],
+                                    ...rx[eye as "od" | "os"],
                                     prismBase: e.target.value,
                                   },
                                 })
@@ -1779,9 +1731,7 @@ export default function App() {
                           </div>
                         </div>
 
-                        {(
-                          rx as Record<string, Record<string, string | boolean>>
-                        )[eye].hasCompoundPrism && (
+                        {rx[eye as "od" | "os"].hasCompoundPrism && (
                           <div className="flex items-end gap-4 pl-12">
                             <div className="flex-1">
                               <label className="block text-[10px] font-black uppercase text-theme-text mb-1">
@@ -1790,14 +1740,7 @@ export default function App() {
                               <input
                                 placeholder="0.00"
                                 className="w-full bg-white border border-theme-border rounded px-3 py-2 text-sm font-bold text-black"
-                                value={
-                                  (
-                                    rx as Record<
-                                      string,
-                                      Record<string, string | boolean>
-                                    >
-                                  )[eye].prism2 as string
-                                }
+                                value={rx[eye as "od" | "os"].prism2 as string}
                                 onChange={(e) =>
                                   handleRxChange(
                                     eye as "od" | "os",
@@ -1813,24 +1756,12 @@ export default function App() {
                               </label>
                               <select
                                 className="w-full bg-white border border-theme-border rounded px-2 py-2 text-sm font-bold text-black"
-                                value={
-                                  (
-                                    rx as Record<
-                                      string,
-                                      Record<string, string | boolean>
-                                    >
-                                  )[eye].prismBase2 as string
-                                }
+                                value={rx[eye as "od" | "os"].prismBase2 as string}
                                 onChange={(e) =>
                                   setRx({
                                     ...rx,
                                     [eye]: {
-                                      ...(
-                                        rx as Record<
-                                          string,
-                                          Record<string, string | boolean>
-                                        >
-                                      )[eye],
+                                      ...rx[eye as "od" | "os"],
                                       prismBase2: e.target.value,
                                     },
                                   })
@@ -1856,10 +1787,10 @@ export default function App() {
                       onClick={() =>
                         setRxFlags({
                           ...rxFlags,
-                          [flag]: !(rxFlags as Record<string, boolean>)[flag],
+                          [flag]: !(rxFlags[flag as keyof RxFlags]),
                         })
                       }
-                      className={`flex-1 p-3 rounded-xl text-[11px] font-black uppercase transition-all border-theme-border ${(rxFlags as Record<string, boolean>)[flag] ? "bg-theme-text text-theme-card" : "bg-theme-card text-theme-text hover:bg-theme-bg"}`}
+                      className={`flex-1 p-3 rounded-xl text-[11px] font-black uppercase transition-all border-theme-border ${rxFlags[flag as keyof RxFlags] ? "bg-theme-text text-theme-card" : "bg-theme-card text-theme-text hover:bg-theme-bg"}`}
                     >
                       {flag}
                     </button>
@@ -2173,7 +2104,7 @@ export default function App() {
               <div className="print:hidden p-8">
                 Preview (print button below prints actual receipt)
               </div>
-              <ReceiptPageWrapper
+              <ReceiptPage
                 patientData={{
                   name: patient,
                   phone: phone,
@@ -2298,6 +2229,7 @@ export default function App() {
                     <thead>
                       <tr className="bg-slate-100 italic border-b-2 border-black">
                         <th className="text-left p-1">ITEM</th>
+                        <th className="text-left p-1">ITEM</th>
                         <th className="text-center p-1">RETAIL</th>
                         <th className="text-right p-1">OWE</th>
                       </tr>
@@ -2305,6 +2237,7 @@ export default function App() {
                     <tbody>
                       {(Object.values(billing) as BillingRow[]).map((b, i) => (
                         <tr key={i} className="border-t border-black">
+                          <td className="p-1">{b.label}</td>
                           <td className="p-1">{b.label}</td>
                           <td className="p-1 text-center">${f(b.retail)}</td>
                           <td className="p-1 text-right">${f(b.owe)}</td>
@@ -2376,366 +2309,6 @@ export default function App() {
           </div>
         </div>
       )}
-    </div>
-  );
-}
-
-// Wrapper component to inject patient data into a simplified ReceiptPage
-function ReceiptPageWrapper({
-  patientData,
-}: {
-  patientData: {
-    name: string;
-    phone: string;
-    address: string;
-    plan: string;
-    billing: Record<string, BillingRow>;
-    totals: { retail: number; owe: number };
-    finalOwe: number;
-    payMethod: string;
-    checkNum: string;
-  };
-}) {
-  type ReceiptItem = {
-    id: number;
-    code: string;
-    desc: string;
-    qty: number;
-    price: number;
-  };
-
-  // Helper to auto-assign V-Codes based on item description
-  const getVCode = (label: string) => {
-    const l = label.toUpperCase();
-    if (l.includes("FRAME")) return "V2020";
-    if (l.includes("SINGLE VISION") || l.includes("SV ") || l.includes("PLANO"))
-      return "V2100";
-    if (
-      l.includes("BIFOCAL") ||
-      l.includes("FT-28") ||
-      l.includes("FT-35") ||
-      l.includes("BIF")
-    )
-      return "V2200";
-    if (l.includes("TRIFOCAL") || l.includes("TRIF")) return "V2300";
-    if (
-      l.includes("PROGRESSIVE") ||
-      l.includes("PROG") ||
-      l.includes("VARILUX")
-    )
-      return "V2410";
-    if (l.includes("TRANSITIONS") || l.includes("TRANS")) return "V2744";
-    if (l.includes("TINT")) return "V2745";
-    if (
-      l.includes("ANTI-REFLECTIVE") ||
-      l.includes("A/R") ||
-      l.includes("AR COAT") ||
-      l.includes("GLARE")
-    )
-      return "V2750";
-    if (l.includes("POLARIZED") || l.includes("POLAR")) return "V2762";
-    if (l.includes("POLYCARBONATE") || l.includes("POLY")) return "V2784";
-    return "V2799";
-  };
-
-  // Initialize line items from current billing state
-  const initialItems = Object.values(patientData.billing)
-    .filter((b) => b.retail && parseFloat(b.retail) > 0)
-    .map((b, idx: number) => ({
-      id: idx,
-      code: getVCode(b.label),
-      desc: b.label,
-      qty: 1,
-      price: parseFloat(b.retail),
-    }));
-
-  const [items, setItems] = useState<ReceiptItem[]>(initialItems);
-  const [patAddress, setPatAddress] = useState<string>(
-    patientData.address || "",
-  );
-
-  const handleItemChange = (
-    id: number,
-    field: keyof ReceiptItem,
-    value: string | number,
-  ) => {
-    setItems((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
-    );
-  };
-
-  const addItem = () => {
-    const newId =
-      items.length > 0 ? Math.max(...items.map((i) => i.id)) + 1 : 0;
-    setItems([
-      ...items,
-      { id: newId, code: "", desc: "NEW ITEM", qty: 1, price: 0 },
-    ]);
-  };
-
-  const removeItem = (id: number) => {
-    setItems(items.filter((i) => i.id !== id));
-  };
-
-  // Calculations
-  const subtotal = items.reduce(
-    (s: number, i: ReceiptItem) => s + i.qty * i.price,
-    0,
-  );
-  const tax = subtotal * 0.06;
-  const grandTotal = subtotal + tax;
-  const patientOwes = patientData.finalOwe;
-  const insuranceDiscount =
-    grandTotal > patientOwes ? grandTotal - patientOwes : 0;
-  const amtPaid = patientOwes;
-  const balance = patientOwes - amtPaid;
-
-  return (
-    <div className="receipt-content-wrapper">
-      <style>{`
-        @media print {
-          @page { 
-            size: portrait; 
-            margin: 0.5in; 
-          }
-
-          /* Hide UI elements that cause blank pages or clutter */
-          #root > *:not(.receipt-content-wrapper),
-          main, header, nav, section, .fixed, .absolute, .backdrop-blur-md, button {
-            display: none !important;
-          }
-
-          .receipt-content-wrapper {
-            display: block !important;
-            visibility: visible !important;
-            position: relative !important;
-            width: 100% !important;
-            background: white !important;
-            color: black !important;
-          }
-
-          /* Force all text to black for the printer */
-          .receipt-content-wrapper * {
-            color: black !important;
-            border-color: black !important;
-            visibility: visible !important;
-          }
-
-          .print\\:hidden { display: none !important; }
-
-          /* Clean up inputs for paper */
-          input, textarea {
-            border: none !important;
-            background: transparent !important;
-            outline: none !important;
-            width: 100% !important;
-          }
-
-          .max-w-3xl {
-            box-shadow: none !important;
-            border: none !important;
-            max-width: 100% !important;
-          }
-        }
-      `}</style>
-
-      <div className="max-w-3xl mx-auto border-2 border-black p-10 bg-white shadow-lg">
-        {/* Header Section */}
-        <div className="flex justify-between items-start border-b-2 border-black pb-5 mb-5">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-black italic text-black uppercase">
-              Pal Optical
-            </h1>
-            <p className="text-sm font-bold text-black">
-              1555 E New Circle Rd, Suite 146
-            </p>
-            <p className="text-sm font-bold text-black">Lexington, KY 40509</p>
-            <p className="text-sm font-bold text-black">
-              Phone: (859) 266-3003
-            </p>
-          </div>
-          <div className="text-right">
-            <h2 className="text-4xl font-black text-slate-300 italic">
-              RECEIPT
-            </h2>
-            <p className="font-bold text-black">
-              DATE: {new Date().toLocaleDateString()}
-            </p>
-          </div>
-        </div>
-
-        {/* Info Grid */}
-        <div className="grid grid-cols-2 gap-8 mb-8">
-          <div>
-            <h3 className="text-[10px] font-black uppercase text-slate-400 border-b border-slate-200 mb-2">
-              Patient Info
-            </h3>
-            <div className="font-black text-sm uppercase text-black">
-              {patientData.name}
-            </div>
-            <div className="font-bold text-sm text-black">
-              {patientData.phone}
-            </div>
-            <textarea
-              className="w-full mt-2 text-sm font-bold bg-transparent border border-dashed border-slate-300 p-2 resize-none outline-none text-black print:border-none"
-              placeholder="Enter Patient Address..."
-              value={patAddress}
-              onChange={(e) => setPatAddress(e.target.value)}
-              rows={3}
-            />
-          </div>
-          <div>
-            <h3 className="text-[10px] font-black uppercase text-slate-400 border-b border-slate-200 mb-2">
-              Insurance Plan
-            </h3>
-            <p className="font-black text-sm uppercase text-black">
-              {patientData.plan}
-            </p>
-          </div>
-        </div>
-
-        {/* Line Items Table */}
-        <table className="w-full text-sm mb-6 text-black">
-          <thead>
-            <tr className="border-b-2 border-black">
-              <th className="text-left py-2 font-black uppercase">Code</th>
-              <th className="text-left py-2 font-black uppercase">
-                Description
-              </th>
-              <th className="text-right py-2 font-black uppercase w-16">Qty</th>
-              <th className="text-right py-2 font-black uppercase w-24">
-                Price
-              </th>
-              <th className="text-right py-2 font-black uppercase w-24">
-                Total
-              </th>
-              <th className="print:hidden w-8"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr key={item.id} className="border-b border-slate-100">
-                <td className="py-3">
-                  <input
-                    className="bg-transparent border-none outline-none font-bold w-20 uppercase text-black"
-                    value={item.code}
-                    onChange={(e) =>
-                      handleItemChange(item.id, "code", e.target.value)
-                    }
-                  />
-                </td>
-                <td className="py-3">
-                  <input
-                    className="bg-transparent border-none outline-none font-bold w-full uppercase text-black"
-                    value={item.desc}
-                    onChange={(e) =>
-                      handleItemChange(item.id, "desc", e.target.value)
-                    }
-                  />
-                </td>
-                <td className="py-3 text-right">
-                  <input
-                    type="number"
-                    className="bg-transparent border-none outline-none font-bold w-full text-right text-black"
-                    value={item.qty}
-                    onChange={(e) =>
-                      handleItemChange(
-                        item.id,
-                        "qty",
-                        parseInt(e.target.value) || 0,
-                      )
-                    }
-                  />
-                </td>
-                <td className="py-3 text-right">
-                  <input
-                    type="number"
-                    className="bg-transparent border-none outline-none font-bold w-full text-right text-black"
-                    value={item.price}
-                    onChange={(e) =>
-                      handleItemChange(
-                        item.id,
-                        "price",
-                        parseFloat(e.target.value) || 0,
-                      )
-                    }
-                  />
-                </td>
-                <td className="py-3 text-right font-black text-black">
-                  ${(item.qty * item.price).toFixed(2)}
-                </td>
-                <td className="py-3 text-right print:hidden">
-                  <button
-                    onClick={() => removeItem(item.id)}
-                    className="text-red-500 hover:text-red-700"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* Table Actions */}
-        <div className="mb-6 print:hidden">
-          <button
-            onClick={addItem}
-            className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg font-bold text-xs uppercase text-black"
-          >
-            <Plus className="w-4 h-4" /> Add Item
-          </button>
-        </div>
-
-        {/* Totals Section */}
-        <div className="ml-auto w-72 space-y-2 text-black">
-          <div className="flex justify-between font-bold">
-            <span>Subtotal:</span>
-            <span>${subtotal.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between font-bold">
-            <span>Tax (6%):</span>
-            <span>${tax.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between font-black text-xl border-t-2 border-black pt-2">
-            <span>Grand Total:</span>
-            <span>${grandTotal.toFixed(2)}</span>
-          </div>
-
-          {insuranceDiscount > 0 && (
-            <div className="flex justify-between font-bold text-red-600 pt-1">
-              <span>Insurance Benefits:</span>
-              <span>-${insuranceDiscount.toFixed(2)}</span>
-            </div>
-          )}
-
-          <div className="flex justify-between font-black border-t-2 border-black pt-2 mt-2">
-            <span>Patient Total:</span>
-            <span>${patientOwes.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between font-black text-green-600 bg-green-50 p-1 px-2 rounded mt-2">
-            <span>Paid ({patientData.payMethod}):</span>
-            <span>-${amtPaid.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between font-black border-t border-black pt-2 mt-2">
-            <span>Balance:</span>
-            <span>${balance.toFixed(2)}</span>
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="mt-16 text-center">
-          <p className="text-[10px] font-black uppercase italic tracking-widest text-slate-400">
-            Thank you for choosing Pal Optical!
-          </p>
-          <button
-            onClick={() => window.print()}
-            className="mt-6 px-8 py-3 bg-black text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-gray-800 transition-all print:hidden"
-          >
-            Print Itemized Receipt
-          </button>
-        </div>
-      </div>
     </div>
   );
 }

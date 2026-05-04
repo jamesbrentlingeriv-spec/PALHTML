@@ -39,6 +39,13 @@ export interface BillingRow {
   autoChargeKey?: string;
 }
 
+export interface RxFlags {
+  dvo: boolean;
+  nvo: boolean;
+  ivo: boolean;
+  diff: boolean;
+}
+
 export interface JobSnapshot {
   jobNum: number;
   optician: string;
@@ -55,4 +62,16 @@ export interface JobSnapshot {
   };
   billing: Record<string, BillingRow>;
   timestamp: number;
+}
+
+export interface PatientDataProps {
+  name: string;
+  phone: string;
+  address: string;
+  plan: string;
+  billing: Record<string, BillingRow>;
+  totals: { retail: number; owe: number };
+  finalOwe: number;
+  payMethod: string;
+  checkNum: string;
 }

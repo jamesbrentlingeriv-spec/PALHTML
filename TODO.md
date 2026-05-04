@@ -1,21 +1,31 @@
-# TODO: Fix TypeScript/ESLint Errors in src/pages/post/App.tsx
+All you do is make more errors# TODO Plan: Fix TypeScript TDZ Error in App.tsx
 
-## Progress Tracker
+## Information Gathered
 
-- [x] **Step 0**: Analyzed errors and read file contents
-- [x] **Step 1**: Created comprehensive edit plan and got user approval
-- [x] **Step 2**: Apply first batch of edits (syntax fixes: main tag, motion
-      props around lines 975-1330)
-- [x] **Step 3**: Apply second batch (JSX closing tags, AnimatePresence fixes
-      lines 1233-2100)
-- [x] **Step 4**: Fix overlays/print layout/ReceiptPage (lines 2100-end) -
-      Itemized receipt now prints properly
-- [x] **Step 5**: Global fixes (imports, user! non-null, types)
-- [x] **Step 6**: Validate with `npx tsc --noEmit` and `npm run dev` -
-      TypeScript clean, dev server running with HMR
-- [x] **Step 7**: Manual test: Login, forms, billing, Submit Order (landscape
-      slips), Itemized Receipt prints correctly
-- [x] **Step 8**: All issues resolved
+- App.tsx has TypeScript TDZ (Temporal Dead Zone) error TS2448 due to
+  `isAllowancePlan`, `globalAllowance`, `frameAllowance` used in `calcOwe`
+  useCallback before declaration.
+- These states need to be declared earlier, before any code that references
+  them.
+- Current file structure shows labNotes state followed by empty lines then Rx
+  State.
+- Types.ts defines all necessary interfaces correctly.
+- ReceiptPage.tsx is separate component, looks fine.
 
-**Status**: ✅ COMPLETE - TypeScript clean, all functionality working including
-itemized receipt printing fix.
+## Plan
+
+- Insert the 3 insurance state declarations after `labNotes` state and before Rx
+  State section.
+- This ensures they are hoisted early enough for useCallback dependency.
+
+## Dependent Files
+
+- None
+
+## Followup Steps
+
+1. Edit App.tsx to add the states
+2. Verify no TS errors: `npx tsc --noEmit`
+3. Test app login and insurance change functionality
+4. Update TODO.md
+5. Complete task

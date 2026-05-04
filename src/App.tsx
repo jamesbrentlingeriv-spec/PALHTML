@@ -15,7 +15,7 @@ import PostApp from "./pages/post/App";
 import Opticalc3DPage from "./opticalc3d/App";  // Updated import
 import OptiTrakApp from "./pages/OptiTrakApp";
 import CMS1500Page from "./cms1500/CMS1500Page";
-import DrFeeSlip from "./pages/DrFeeSlip";
+// Removed import for DrFeeSlip since it's been deleted
 import SplashScreen from "./components/SplashScreen";
 
 
@@ -42,7 +42,7 @@ export default function App() {
         <Route path="/opticalc-3d" element={<Opticalc3DPage />} />
         <Route path="/optitrak" element={<OptiTrakApp />} />
         <Route path="/cms1500" element={<CMS1500Page />} />
-        <Route path="/dr-fee-slip" element={<DrFeeSlip />} />
+        // Removed route for dr-fee-slip since the component has been deleted
       </Routes>
 
     </>

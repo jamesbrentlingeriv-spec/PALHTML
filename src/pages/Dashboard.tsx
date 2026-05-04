@@ -80,14 +80,8 @@ const internalTools = [
     title: "CMS-1500 Billing",
     desc: "Medical billing form generator for clinical systems.",
   },
-  {
-    path: "/dr-fee-slip",
-    emoji: "📝",
-    title: "Dr. Fee Slip",
-    desc: "Generate and track patient fee slips.",
-  },
+  // Replaced internal route with external link for Dr Fee Slip
 ];
-
 
 const externalTools = [
   {
@@ -107,6 +101,13 @@ const externalTools = [
     emoji: "💵",
     title: "Interactive Price List",
     desc: "Real-time pricing and lens cost estimator.",
+  },
+  // Adding the Dr Fee Slip as an external tool linking to the specified URL
+  {
+    href: "https://doctor-fee-slip-pro-1069426498989.us-west1.run.app/",
+    emoji: "📝",
+    title: "Dr. Fee Slip",
+    desc: "Generate and track patient fee slips.",
   },
 ];
 
