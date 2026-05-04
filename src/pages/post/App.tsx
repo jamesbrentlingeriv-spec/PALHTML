@@ -2200,7 +2200,7 @@ export default function App() {
             <style>{`
               @media print {
                 @page { size: landscape; margin: 0.25in; }
-                body * { visibility: hidden; }
+                body * { visibility: visible; }
                 .print-only, .print-only * { visibility: visible; }
                 .print-only { position: absolute; left: 0; top: 0; width: 100%; }
               }
