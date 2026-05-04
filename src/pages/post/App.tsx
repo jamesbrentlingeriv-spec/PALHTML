@@ -1324,7 +1324,7 @@ export default function App() {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-theme-border space-y-4">
+                <div className="pt-4 space-y-4">
                   <label className="block text-[11px] font-black uppercase text-theme-text italic">
                     Lens Type & Color
                   </label>
@@ -1467,7 +1467,7 @@ export default function App() {
                 </div>
               )}
 
-              <div className="pt-6 border-t border-theme-border space-y-4">
+              <div className="pt-6 space-y-4">
                 <label className="block text-[10px] font-black uppercase text-theme-text tracking-widest italic">
                   Payment Method
                 </label>
@@ -2170,21 +2170,22 @@ export default function App() {
                 </button>
               </div>
 
-              <div className="p-8">
-                <ReceiptPageWrapper
-                  patientData={{
-                    name: patient,
-                    phone: phone,
-                    address: mailAddress,
-                    plan: plan,
-                    billing: billing,
-                    totals: totals,
-                    finalOwe: finalOwe,
-                    payMethod: payMethod,
-                    checkNum: checkNum,
-                  }}
-                />
+              <div className="print:hidden p-8">
+                Preview (print button below prints actual receipt)
               </div>
+              <ReceiptPageWrapper
+                patientData={{
+                  name: patient,
+                  phone: phone,
+                  address: mailAddress,
+                  plan: plan as string,
+                  billing: billing,
+                  totals: totals,
+                  finalOwe: finalOwe,
+                  payMethod: payMethod,
+                  checkNum: checkNum,
+                }}
+              />
             </motion.div>
           </div>
         )}

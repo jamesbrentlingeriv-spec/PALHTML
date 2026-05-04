@@ -40,11 +40,7 @@ const getVCode = (label: string): string => {
   )
     return "V2200";
   if (l.includes("TRIFOCAL") || l.includes("TRIF")) return "V2300";
-  if (
-    l.includes("PROGRESSIVE") ||
-    l.includes("PROG") ||
-    l.includes("VARILUX")
-  )
+  if (l.includes("PROGRESSIVE") || l.includes("PROG") || l.includes("VARILUX"))
     return "V2410";
   if (l.includes("TRANSITIONS") || l.includes("TRANS")) return "V2744";
   if (l.includes("TINT")) return "V2745";
@@ -114,8 +110,8 @@ export function ReceiptPage({ patientData }: ReceiptPageProps) {
         @media print {
           @page { size: portrait; margin: 0.5in; }
           body * { visibility: hidden; }
-          .receipt-content-wrapper, .receipt-content-wrapper * { visibility: visible; }
-          .receipt-content-wrapper { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; background: white !important; color: black !important; }
+          .receipt-content-wrapper, .receipt-content-wrapper * { visibility: visible !important; }
+          .receipt-content-wrapper { position: fixed !important; left: 0 !important; top: 0 !important; width: 100vw !important; height: 100vh !important; background: white !important; color: black !important; }
           .receipt-content-wrapper * { color: black !important; border-color: black !important; }
           input, textarea { border: none !important; background: transparent !important; }
           .print\\:hidden, .print\\:hidden * { display: none !important; }
