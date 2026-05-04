@@ -178,16 +178,22 @@ export default function App() {
   };
 
   // Toggle mail fee - use a ref to avoid setState in effect warning
-  const prevMailRef = React.useRef(promise.mail);
+  const prevMailRef = React.useRef<boolean>(false);
   useEffect(() => {
     if (promise.mail === prevMailRef.current) return;
-    prevMailRef.current = promise.mail;
+    prevMailRef.current = promise.mail as boolean;
 
     if (promise.mail) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setBilling((prev) => ({
         ...prev,
-        m1: { ...prev.m1, label: "MAIL FEE", retail: "9.00", owe: "9.54" },
+        m1: {
+          ...prev.m1,
+          label: "MAIL FEE",
+          retail: "9.00",
+          owe: "9.54",
+          retailWithTax: "9.54",
+        },
       }));
       if (!mailAddress) setShowMailPopup(true);
     } else {
@@ -195,7 +201,13 @@ export default function App() {
         if (prev.m1.label === "MAIL FEE") {
           return {
             ...prev,
-            m1: { ...prev.m1, label: "", retail: "", owe: "" },
+            m1: {
+              ...prev.m1,
+              label: "MISC 1",
+              retail: "",
+              owe: "0.00",
+              retailWithTax: "0.00",
+            },
           };
         }
         return prev;
@@ -566,9 +578,29 @@ export default function App() {
 
     let oweValStr = "0.00";
     if (isCommercial) {
-      if (isAllowancePlan) {
-        oweValStr = (price * 1.06).toFixed(2);
+      // Logic for copays and allowances
+      if (
+        plan === "EYE-MED" ||
+        plan === "AETNA EYE-MED" ||
+        plan === "MARCH/EYESYNERGY"
+      ) {
+        const isAllowance = window.confirm("Is this an ALLOWANCE plan?");
+        if (isAllowance) {
+          setIsAllowancePlan(true);
+          const amt = window.prompt("Enter Allowance Amount:", "150");
+          if (amt) {
+            setGlobalAllowance(parseFloat(amt));
+            oweValStr = (price * 1.06).toFixed(2);
+          }
+        } else {
+          setIsAllowancePlan(false);
+          const cp = window.prompt(`Enter CO-PAY for ${name}:`, "0");
+          if (cp !== null) {
+            oweValStr = (parseFloat(cp) * 1.06).toFixed(2);
+          }
+        }
       } else {
+        // VSP or other commercial
         const cp = window.prompt(`Enter CO-PAY for ${name}:`, "0");
         if (cp !== null) {
           oweValStr = (parseFloat(cp) * 1.06).toFixed(2);
@@ -617,7 +649,7 @@ export default function App() {
   };
 
   // --- AUTOMATIC REASONING (The "If" Functions) ---
-  const autoChargesRef = React.useRef<Set<string>>(new Set());
+  const autoChargesRef = React.useRef(new Set<string>());
   useEffect(() => {
     const newCharges: Array<{ key: string; row: string; data: BillingRow }> =
       [];
@@ -2466,18 +2498,16 @@ function ReceiptPageWrapper({
             margin: 0.5in; 
           }
 
-          body * {
-            visibility: hidden;
-          }
-
-          .receipt-content-wrapper, .receipt-content-wrapper * {
-            visibility: visible;
+          /* Hide UI elements that cause blank pages or clutter */
+          #root > *:not(.receipt-content-wrapper),
+          main, header, nav, section, .fixed, .absolute, .backdrop-blur-md, button {
+            display: none !important;
           }
 
           .receipt-content-wrapper {
-            position: absolute !important;
-            left: 0 !important;
-            top: 0 !important;
+            display: block !important;
+            visibility: visible !important;
+            position: relative !important;
             width: 100% !important;
             background: white !important;
             color: black !important;
@@ -2487,11 +2517,10 @@ function ReceiptPageWrapper({
           .receipt-content-wrapper * {
             color: black !important;
             border-color: black !important;
+            visibility: visible !important;
           }
 
-          .print\\:hidden, .print\\:hidden * { 
-            display: none !important; 
-          }
+          .print\\:hidden { display: none !important; }
 
           /* Clean up inputs for paper */
           input, textarea {
@@ -2499,15 +2528,12 @@ function ReceiptPageWrapper({
             background: transparent !important;
             outline: none !important;
             width: 100% !important;
-            resize: none !important;
           }
 
           .max-w-3xl {
             box-shadow: none !important;
             border: none !important;
             max-width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
           }
         }
       `}</style>

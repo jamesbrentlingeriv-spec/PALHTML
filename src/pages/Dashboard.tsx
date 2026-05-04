@@ -80,6 +80,12 @@ const internalTools = [
     title: "CMS-1500 Billing",
     desc: "Medical billing form generator for clinical systems.",
   },
+  {
+    path: "/dr-fee-slip",
+    emoji: "📝",
+    title: "Dr. Fee Slip",
+    desc: "Generate and track patient fee slips.",
+  },
 ];
 
 

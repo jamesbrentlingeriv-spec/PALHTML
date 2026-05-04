@@ -31,3 +31,37 @@
   .scrollbar-hide::-webkit-scrollbar { display: none; }
   .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
 }
+
+@layer components {
+  .fee-slip-container {
+    @apply bg-white shadow-2xl mx-auto my-4 p-8 max-w-[1000px] min-h-[1000px] border border-neutral-300;
+  }
+
+  .fee-slip-container input:not([type="checkbox"]):not([type="radio"]) {
+    @apply text-[16pt] font-black uppercase;
+  }
+  
+  .section-title {
+    @apply font-extrabold text-lg uppercase tracking-tight border-b-4 border-black mb-1 leading-none;
+  }
+
+  .sub-section-title {
+    @apply font-bold text-[10px] uppercase tracking-wider mb-0.5;
+  }
+
+  .label-text {
+    @apply text-[9px] font-bold uppercase leading-tight;
+  }
+
+  .code-text {
+    @apply text-[9px] font-mono font-medium;
+  }
+
+  .form-input-line {
+    @apply border-b border-black focus:outline-none bg-transparent px-1 text-sm;
+  }
+
+  .checkbox-custom {
+    @apply w-3 h-3 border border-black rounded-none appearance-none checked:bg-black checked:border-black cursor-pointer;
+  }
+}
