@@ -248,13 +248,18 @@ export default function App() {
     ] as const) {
       const b = billing[row];
       if (b.retail === "" || b.label.includes("MISC")) continue;
-      
+
       // Only adjust if retail price is higher than allowance
       if (parseFloat(b.retail) > charge.retail) {
-        const newOwe = parseFloat(b.owe) - (parseFloat(b.retail) - charge.retail);
-        newCharges.push({ 
-          row, 
-          data: { ...b, retail: charge.retail.toFixed(2), owe: Math.max(0, newOwe).toFixed(2) } 
+        const newOwe =
+          parseFloat(b.owe) - (parseFloat(b.retail) - charge.retail);
+        newCharges.push({
+          row,
+          data: {
+            ...b,
+            retail: charge.retail.toFixed(2),
+            owe: Math.max(0, newOwe).toFixed(2),
+          },
         });
       }
     }
@@ -262,7 +267,7 @@ export default function App() {
     // Only update state if there are changes
     if (newCharges.length > 0) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-      setBilling(prev => {
+      setBilling((prev) => {
         const next = { ...prev };
         newCharges.forEach(({ row, data }) => {
           next[row] = data;
@@ -273,7 +278,7 @@ export default function App() {
     // Added dependencies to the dependency array
   }, [billing, isAllowancePlan, globalAllowance, frameAllowance]);
 
-    // UI State
+  // UI State
   const [showMeasureTool, setShowMeasureTool] = useState(false);
   const [showPatientForm, setShowPatientForm] = useState(false);
   const [showCatalog, setShowCatalog] = useState(false);
@@ -368,7 +373,6 @@ export default function App() {
   };
 
   const handleLogin = (e: React.FormEvent) => {
-
     e.preventDefault();
     const u = USERS[loginForm.name.toUpperCase()];
     if (u && u.pass === loginForm.pass) {
@@ -836,7 +840,7 @@ export default function App() {
     };
 
     try {
-            await push(ref(database, "jobHistory"), snapshot);
+      await push(ref(database, "jobHistory"), snapshot);
       await set(ref(database, "lastJobNumber"), jobNum + 1);
 
       // Visual feedback
@@ -849,7 +853,6 @@ export default function App() {
     } catch (err) {
       alert("Database error: " + err);
     }
-
   };
 
   // --- SPLASH SCREEN ---
@@ -969,8 +972,8 @@ export default function App() {
       {/* SIDEBAR REMOVED AS REQUESTED (Consolidated to left stream) */}
 
       {/* CENTER: WORKBENCH */}
-      <main className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-hide">
-        <div className="max-w-2xl mx-auto space-y-8">
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 pl-8 scrollbar-hide">
+        <div className="max-w-2xl mx-auto ml-4 space-y-8">
           {/* HEADER DASHBOARD */}
           <header
             className={`flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b pb-6 transition-colors ${theme === "dark" ? "border-white" : "border-black"}`}
@@ -1053,7 +1056,7 @@ export default function App() {
             </div>
           </header>
 
-                    <div className="flex flex-col gap-8 pb-32">
+          <div className="flex flex-col gap-8 pb-32">
             {/* SINGLE COLUMN: ALL TOGETHER ON LEFT */}
             <section className="bg-theme-card p-6 rounded-3xl border-theme-main space-y-4 transition-all shadow-sm">
               <button
@@ -1315,19 +1318,21 @@ export default function App() {
                   </label>
                   <div className="flex flex-wrap items-center gap-3">
                     <div className="flex flex-wrap gap-2 items-center">
-                                            {["CLEAR", "TINT", "POLAR", "MIRROR", "TRANS"].map((type) => (
-                        <button
-                          key={type}
-                          onClick={() => handleColorChoice(type)}
-                          className={`px-5 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all border-2 ${
-                            colorType === type
-                              ? "bg-theme-text border-theme-border text-theme-card shadow-md scale-105"
-                              : "bg-theme-card border-theme-border text-theme-text hover:bg-theme-bg"
-                          }`}
-                        >
-                          {type}
-                        </button>
-                      ))}
+                      {["CLEAR", "TINT", "POLAR", "MIRROR", "TRANS"].map(
+                        (type) => (
+                          <button
+                            key={type}
+                            onClick={() => handleColorChoice(type)}
+                            className={`px-5 py-3 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all border-2 ${
+                              colorType === type
+                                ? "bg-green-500 border-green-500 text-white shadow-lg shadow-green-500/50 scale-105 hover:bg-green-600"
+                                : "bg-theme-card border-theme-border text-theme-text hover:bg-theme-bg"
+                            }`}
+                          >
+                            {type}
+                          </button>
+                        ),
+                      )}
 
                       {colorType !== "CLEAR" && (
                         <motion.div
@@ -1359,7 +1364,7 @@ export default function App() {
                 Billing Summary
               </h3>
 
-                            <div className="flex text-[8px] font-black uppercase text-theme-text border-b-theme-border pb-1 gap-2">
+              <div className="flex text-[8px] font-black uppercase text-theme-text border-b-theme-border pb-1 gap-2">
                 <span className="flex-[2]">Description</span>
                 <span className="flex-1">Retail</span>
                 <span className="w-16 text-right">+Tax(6%)</span>
@@ -1370,7 +1375,7 @@ export default function App() {
                 {Object.keys(billing).map((key) => (
                   <div
                     key={key}
-                    className="flex items-center justify-between py-2 border-b border-theme-border group/row gap-2"
+                    className="flex items-center justify-between py-2 group/row gap-2"
                   >
                     <div className="flex-[2]">
                       {key.startsWith("m") ? (
@@ -1420,9 +1425,9 @@ export default function App() {
                     <button
                       onClick={() => {
                         const defaultLabels: Record<string, string> = {
-                          frame: "FRAME",
-                          lens: "LENS",
-                          coat: "A/R COATING",
+                          frame: "  FRAME",
+                          lens: "  LENS",
+                          coat: "  A/R COATING",
                         };
                         updateBillingRow(key, {
                           label: defaultLabels[key] || "",
@@ -1538,18 +1543,17 @@ export default function App() {
                 </AnimatePresence>
               </div>
 
-                              <div className="flex flex-col items-center gap-1">
-                  <button
-                    onClick={() => setShowItemizedReceipt(true)}
-                    className="w-full rounded-2xl px-6 py-2 flex items-center justify-center gap-2 font-black uppercase text-xs tracking-widest transition-all border-2 bg-blue-500 border-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30"
-                  >
-                    <FileText className="w-4 h-4" />
-                    Itemized Receipt
-                  </button>
-                </div>
+              <div className="flex flex-col items-center gap-1">
+                <button
+                  onClick={() => setShowItemizedReceipt(true)}
+                  className="w-full rounded-2xl px-6 py-2 flex items-center justify-center gap-2 font-black uppercase text-xs tracking-widest transition-all border-2 bg-blue-500 border-blue-500 text-white hover:bg-blue-600 shadow-lg shadow-blue-500/30"
+                >
+                  <FileText className="w-4 h-4" />
+                  Itemized Receipt
+                </button>
+              </div>
 
-                <div className="pt-4 flex justify-between items-end">
-
+              <div className="pt-4 flex justify-between items-end">
                 <div>
                   <label className="block text-[10px] font-black uppercase text-theme-text mb-1">
                     Patient Total
@@ -1566,7 +1570,7 @@ export default function App() {
               </div>
             </section>
 
-                                    {/* DOCTOR & PRESCRIPTION */}
+            {/* DOCTOR & PRESCRIPTION */}
             <section className="bg-theme-card p-10 rounded-3xl border-theme-main space-y-8 transition-all shadow-lg">
               <div className="flex items-center justify-between">
                 <h3 className="text-sm font-black uppercase tracking-widest text-theme-text font-bold italic">
@@ -1852,9 +1856,7 @@ export default function App() {
               </div>
             </section>
 
-
-
-                        {/* LAB NOTES */}
+            {/* LAB NOTES */}
             <section className="bg-theme-card p-6 rounded-3xl border-theme-main space-y-4 shadow-sm">
               <h3 className="text-xs font-black uppercase tracking-widest text-theme-accent font-bold italic">
                 Lab Notes
@@ -1915,7 +1917,12 @@ export default function App() {
                 ].map((w) => (
                   <button
                     key={w.id}
-                    onClick={() => window.open(`${w.file}?patientName=${encodeURIComponent(patient)}`, "_blank")}
+                    onClick={() =>
+                      window.open(
+                        `${w.file}?patientName=${encodeURIComponent(patient)}`,
+                        "_blank",
+                      )
+                    }
                     className="flex items-center gap-3 p-3 bg-theme-bg rounded-xl border-theme-border hover:bg-theme-accent hover:text-theme-card transition-all text-left group"
                   >
                     <FileText className="w-4 h-4 text-theme-accent group-hover:text-theme-card transition-colors" />
@@ -1930,7 +1937,8 @@ export default function App() {
               </div>
               <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl">
                 <p className="text-[9px] font-bold text-amber-700 uppercase tracking-wider">
-                  ⚠ Opens fillable HTML waiver in a new tab — patient signs on screen then print.
+                  ⚠ Opens fillable HTML waiver in a new tab — patient signs on
+                  screen then print.
                 </p>
               </div>
             </section>
@@ -2036,14 +2044,13 @@ export default function App() {
                   <X className="w-6 h-6" />
                 </button>
               </div>
-                            <div className="flex-1 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto">
                 <Catalog
                   currentPlan={plan}
                   isAllowancePlan={isAllowancePlan}
                   onSelectItem={handleCatalogSelect}
                   selectedItemName={billing.lens.label}
                 />
-
 
                 {/* RECENT ACTIVITY MOVED HERE */}
                 <div className="p-6 border-t-4 border-theme-main bg-theme-card">
@@ -2140,8 +2147,10 @@ export default function App() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="sticky top-0 bg-white p-4 border-b flex justify-between items-center z-10">
-                <h2 className="text-lg font-black uppercase italic">Itemized Receipt Generator</h2>
-                <button 
+                <h2 className="text-lg font-black uppercase italic">
+                  Itemized Receipt Generator
+                </h2>
+                <button
                   onClick={() => setShowItemizedReceipt(false)}
                   className="p-2 hover:bg-slate-100 rounded-full transition-colors"
                 >
@@ -2150,7 +2159,7 @@ export default function App() {
               </div>
 
               <div className="p-8">
-                <ReceiptPageWrapper 
+                <ReceiptPageWrapper
                   patientData={{
                     name: patient,
                     phone: phone,
@@ -2160,7 +2169,7 @@ export default function App() {
                     totals: totals,
                     finalOwe: finalOwe,
                     payMethod: payMethod,
-                    checkNum: checkNum
+                    checkNum: checkNum,
                   }}
                 />
               </div>
@@ -2169,7 +2178,7 @@ export default function App() {
         )}
       </AnimatePresence>
 
-            {/* HIDDEN PRINT LAYOUT — LANDSCAPE, TWO WRITE-UPS, ONE PAGE */}
+      {/* HIDDEN PRINT LAYOUT — LANDSCAPE, TWO WRITE-UPS, ONE PAGE */}
       {!showItemizedReceipt && (
         <div
           className={`fixed inset-0 bg-white z-[99999] pointer-events-none opacity-0 ${isPrinting ? "opacity-100" : "hidden"}`}
@@ -2252,13 +2261,21 @@ export default function App() {
                       <div>PD: {pd || "___"}</div>
                       <div>SEG: {seg || "___"}</div>
                       <div className="col-span-2 pt-1 border-t border-black mt-1">
-                        Color: {colorType} {colorDetail ? `(${colorDetail})` : ""}
+                        Color: {colorType}{" "}
+                        {colorDetail ? `(${colorDetail})` : ""}
                       </div>
                       <div className="col-span-2 flex items-center gap-2">
-                        <div className={`w-4 h-4 border-2 border-black flex items-center justify-center ${billing.coat.retail ? "bg-black" : ""}`}>
-                          {billing.coat.retail && <span className="text-white text-[10px]">✓</span>}
+                        <div
+                          className={`w-4 h-4 border-2 border-black flex items-center justify-center ${billing.coat.retail ? "bg-black" : ""}`}
+                        >
+                          {billing.coat.retail && (
+                            <span className="text-white text-[10px]">✓</span>
+                          )}
                         </div>
-                        <span>A/R Coating {billing.coat.retail ? `(${billing.coat.label})` : ""}</span>
+                        <span>
+                          A/R Coating{" "}
+                          {billing.coat.retail ? `(${billing.coat.label})` : ""}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -2298,7 +2315,9 @@ export default function App() {
                   {/* RX BLOCK */}
                   <div className="border-4 border-black p-3 bg-white my-2">
                     <div className="border-b-2 border-black pb-2 mb-2">
-                      <span className="text-[12px] font-black uppercase">Prescribing Doctor: {dr === "Other" ? drOther : dr}</span>
+                      <span className="text-[12px] font-black uppercase">
+                        Prescribing Doctor: {dr === "Other" ? drOther : dr}
+                      </span>
                     </div>
                     <div className="text-[14px] font-black border-b-2 border-black pb-2 mb-2 grid grid-cols-2 gap-4">
                       <div>
@@ -2344,26 +2363,25 @@ export default function App() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
 
 // Wrapper component to inject patient data into a simplified ReceiptPage
-// Wrapper component to inject patient data into a simplified ReceiptPage
-// Wrapper component to inject patient data into a simplified ReceiptPage
-function ReceiptPageWrapper({ patientData }: { 
+function ReceiptPageWrapper({
+  patientData,
+}: {
   patientData: {
     name: string;
     phone: string;
     address: string;
     plan: string;
     billing: Record<string, BillingRow>;
-    totals: { retail: number; owe: number; };
+    totals: { retail: number; owe: number };
     finalOwe: number;
     payMethod: string;
     checkNum: string;
-  } 
+  };
 }) {
   type ReceiptItem = {
     id: number;
@@ -2377,13 +2395,31 @@ function ReceiptPageWrapper({ patientData }: {
   const getVCode = (label: string) => {
     const l = label.toUpperCase();
     if (l.includes("FRAME")) return "V2020";
-    if (l.includes("SINGLE VISION") || l.includes("SV ") || l.includes("PLANO")) return "V2100";
-    if (l.includes("BIFOCAL") || l.includes("FT-28") || l.includes("FT-35") || l.includes("BIF")) return "V2200";
+    if (l.includes("SINGLE VISION") || l.includes("SV ") || l.includes("PLANO"))
+      return "V2100";
+    if (
+      l.includes("BIFOCAL") ||
+      l.includes("FT-28") ||
+      l.includes("FT-35") ||
+      l.includes("BIF")
+    )
+      return "V2200";
     if (l.includes("TRIFOCAL") || l.includes("TRIF")) return "V2300";
-    if (l.includes("PROGRESSIVE") || l.includes("PROG") || l.includes("VARILUX")) return "V2410";
+    if (
+      l.includes("PROGRESSIVE") ||
+      l.includes("PROG") ||
+      l.includes("VARILUX")
+    )
+      return "V2410";
     if (l.includes("TRANSITIONS") || l.includes("TRANS")) return "V2744";
     if (l.includes("TINT")) return "V2745";
-    if (l.includes("ANTI-REFLECTIVE") || l.includes("A/R") || l.includes("AR COAT") || l.includes("GLARE")) return "V2750";
+    if (
+      l.includes("ANTI-REFLECTIVE") ||
+      l.includes("A/R") ||
+      l.includes("AR COAT") ||
+      l.includes("GLARE")
+    )
+      return "V2750";
     if (l.includes("POLARIZED") || l.includes("POLAR")) return "V2762";
     if (l.includes("POLYCARBONATE") || l.includes("POLY")) return "V2784";
     return "V2799";
@@ -2397,31 +2433,47 @@ function ReceiptPageWrapper({ patientData }: {
       code: getVCode(b.label),
       desc: b.label,
       qty: 1,
-      price: parseFloat(b.retail)
+      price: parseFloat(b.retail),
     }));
 
   const [items, setItems] = useState<ReceiptItem[]>(initialItems);
-  const [patAddress, setPatAddress] = useState<string>(patientData.address || "");
+  const [patAddress, setPatAddress] = useState<string>(
+    patientData.address || "",
+  );
 
-  const handleItemChange = (id: number, field: keyof ReceiptItem, value: string | number) => {
-    setItems(prev => prev.map(item => item.id === id ? { ...item, [field]: value } : item));
+  const handleItemChange = (
+    id: number,
+    field: keyof ReceiptItem,
+    value: string | number,
+  ) => {
+    setItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
+    );
   };
 
   const addItem = () => {
-    const newId = items.length > 0 ? Math.max(...items.map(i => i.id)) + 1 : 0;
-    setItems([...items, { id: newId, code: "", desc: "NEW ITEM", qty: 1, price: 0 }]);
+    const newId =
+      items.length > 0 ? Math.max(...items.map((i) => i.id)) + 1 : 0;
+    setItems([
+      ...items,
+      { id: newId, code: "", desc: "NEW ITEM", qty: 1, price: 0 },
+    ]);
   };
 
   const removeItem = (id: number) => {
-    setItems(items.filter(i => i.id !== id));
+    setItems(items.filter((i) => i.id !== id));
   };
 
   // Calculations
-  const subtotal = items.reduce((s: number, i: ReceiptItem) => s + i.qty * i.price, 0);
+  const subtotal = items.reduce(
+    (s: number, i: ReceiptItem) => s + i.qty * i.price,
+    0,
+  );
   const tax = subtotal * 0.06;
   const grandTotal = subtotal + tax;
   const patientOwes = patientData.finalOwe;
-  const insuranceDiscount = grandTotal > patientOwes ? grandTotal - patientOwes : 0;
+  const insuranceDiscount =
+    grandTotal > patientOwes ? grandTotal - patientOwes : 0;
   const amtPaid = patientOwes;
   const balance = patientOwes - amtPaid;
 
@@ -2478,23 +2530,39 @@ function ReceiptPageWrapper({ patientData }: {
         {/* Header Section */}
         <div className="flex justify-between items-start border-b-2 border-black pb-5 mb-5">
           <div className="space-y-1">
-            <h1 className="text-3xl font-black italic text-black uppercase">Pal Optical</h1>
-            <p className="text-sm font-bold text-black">1555 E New Circle Rd, Suite 146</p>
+            <h1 className="text-3xl font-black italic text-black uppercase">
+              Pal Optical
+            </h1>
+            <p className="text-sm font-bold text-black">
+              1555 E New Circle Rd, Suite 146
+            </p>
             <p className="text-sm font-bold text-black">Lexington, KY 40509</p>
-            <p className="text-sm font-bold text-black">Phone: (859) 266-3003</p>
+            <p className="text-sm font-bold text-black">
+              Phone: (859) 266-3003
+            </p>
           </div>
           <div className="text-right">
-            <h2 className="text-4xl font-black text-slate-300 italic">RECEIPT</h2>
-            <p className="font-bold text-black">DATE: {new Date().toLocaleDateString()}</p>
+            <h2 className="text-4xl font-black text-slate-300 italic">
+              RECEIPT
+            </h2>
+            <p className="font-bold text-black">
+              DATE: {new Date().toLocaleDateString()}
+            </p>
           </div>
         </div>
 
         {/* Info Grid */}
         <div className="grid grid-cols-2 gap-8 mb-8">
           <div>
-            <h3 className="text-[10px] font-black uppercase text-slate-400 border-b border-slate-200 mb-2">Patient Info</h3>
-            <div className="font-black text-sm uppercase text-black">{patientData.name}</div>
-            <div className="font-bold text-sm text-black">{patientData.phone}</div>
+            <h3 className="text-[10px] font-black uppercase text-slate-400 border-b border-slate-200 mb-2">
+              Patient Info
+            </h3>
+            <div className="font-black text-sm uppercase text-black">
+              {patientData.name}
+            </div>
+            <div className="font-bold text-sm text-black">
+              {patientData.phone}
+            </div>
             <textarea
               className="w-full mt-2 text-sm font-bold bg-transparent border border-dashed border-slate-300 p-2 resize-none outline-none text-black print:border-none"
               placeholder="Enter Patient Address..."
@@ -2504,8 +2572,12 @@ function ReceiptPageWrapper({ patientData }: {
             />
           </div>
           <div>
-            <h3 className="text-[10px] font-black uppercase text-slate-400 border-b border-slate-200 mb-2">Insurance Plan</h3>
-            <p className="font-black text-sm uppercase text-black">{patientData.plan}</p>
+            <h3 className="text-[10px] font-black uppercase text-slate-400 border-b border-slate-200 mb-2">
+              Insurance Plan
+            </h3>
+            <p className="font-black text-sm uppercase text-black">
+              {patientData.plan}
+            </p>
           </div>
         </div>
 
@@ -2514,10 +2586,16 @@ function ReceiptPageWrapper({ patientData }: {
           <thead>
             <tr className="border-b-2 border-black">
               <th className="text-left py-2 font-black uppercase">Code</th>
-              <th className="text-left py-2 font-black uppercase">Description</th>
+              <th className="text-left py-2 font-black uppercase">
+                Description
+              </th>
               <th className="text-right py-2 font-black uppercase w-16">Qty</th>
-              <th className="text-right py-2 font-black uppercase w-24">Price</th>
-              <th className="text-right py-2 font-black uppercase w-24">Total</th>
+              <th className="text-right py-2 font-black uppercase w-24">
+                Price
+              </th>
+              <th className="text-right py-2 font-black uppercase w-24">
+                Total
+              </th>
               <th className="print:hidden w-8"></th>
             </tr>
           </thead>
@@ -2528,14 +2606,18 @@ function ReceiptPageWrapper({ patientData }: {
                   <input
                     className="bg-transparent border-none outline-none font-bold w-20 uppercase text-black"
                     value={item.code}
-                    onChange={(e) => handleItemChange(item.id, 'code', e.target.value)}
+                    onChange={(e) =>
+                      handleItemChange(item.id, "code", e.target.value)
+                    }
                   />
                 </td>
                 <td className="py-3">
                   <input
                     className="bg-transparent border-none outline-none font-bold w-full uppercase text-black"
                     value={item.desc}
-                    onChange={(e) => handleItemChange(item.id, 'desc', e.target.value)}
+                    onChange={(e) =>
+                      handleItemChange(item.id, "desc", e.target.value)
+                    }
                   />
                 </td>
                 <td className="py-3 text-right">
@@ -2543,7 +2625,13 @@ function ReceiptPageWrapper({ patientData }: {
                     type="number"
                     className="bg-transparent border-none outline-none font-bold w-full text-right text-black"
                     value={item.qty}
-                    onChange={(e) => handleItemChange(item.id, 'qty', parseInt(e.target.value) || 0)}
+                    onChange={(e) =>
+                      handleItemChange(
+                        item.id,
+                        "qty",
+                        parseInt(e.target.value) || 0,
+                      )
+                    }
                   />
                 </td>
                 <td className="py-3 text-right">
@@ -2551,12 +2639,23 @@ function ReceiptPageWrapper({ patientData }: {
                     type="number"
                     className="bg-transparent border-none outline-none font-bold w-full text-right text-black"
                     value={item.price}
-                    onChange={(e) => handleItemChange(item.id, 'price', parseFloat(e.target.value) || 0)}
+                    onChange={(e) =>
+                      handleItemChange(
+                        item.id,
+                        "price",
+                        parseFloat(e.target.value) || 0,
+                      )
+                    }
                   />
                 </td>
-                <td className="py-3 text-right font-black text-black">${(item.qty * item.price).toFixed(2)}</td>
+                <td className="py-3 text-right font-black text-black">
+                  ${(item.qty * item.price).toFixed(2)}
+                </td>
                 <td className="py-3 text-right print:hidden">
-                  <button onClick={() => removeItem(item.id)} className="text-red-500 hover:text-red-700">
+                  <button
+                    onClick={() => removeItem(item.id)}
+                    className="text-red-500 hover:text-red-700"
+                  >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </td>
@@ -2567,7 +2666,10 @@ function ReceiptPageWrapper({ patientData }: {
 
         {/* Table Actions */}
         <div className="mb-6 print:hidden">
-          <button onClick={addItem} className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg font-bold text-xs uppercase text-black">
+          <button
+            onClick={addItem}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg font-bold text-xs uppercase text-black"
+          >
             <Plus className="w-4 h-4" /> Add Item
           </button>
         </div>
@@ -2586,7 +2688,7 @@ function ReceiptPageWrapper({ patientData }: {
             <span>Grand Total:</span>
             <span>${grandTotal.toFixed(2)}</span>
           </div>
-          
+
           {insuranceDiscount > 0 && (
             <div className="flex justify-between font-bold text-red-600 pt-1">
               <span>Insurance Benefits:</span>
@@ -2610,10 +2712,13 @@ function ReceiptPageWrapper({ patientData }: {
 
         {/* Footer */}
         <div className="mt-16 text-center">
-          <p className="text-[10px] font-black uppercase italic tracking-widest text-slate-400">Thank you for choosing Pal Optical!</p>
-          <button 
+          <p className="text-[10px] font-black uppercase italic tracking-widest text-slate-400">
+            Thank you for choosing Pal Optical!
+          </p>
+          <button
             onClick={() => window.print()}
-            className="mt-6 px-8 py-3 bg-black text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-gray-800 transition-all print:hidden">
+            className="mt-6 px-8 py-3 bg-black text-white rounded-xl font-black uppercase text-xs tracking-widest hover:bg-gray-800 transition-all print:hidden"
+          >
             Print Itemized Receipt
           </button>
         </div>

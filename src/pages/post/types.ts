@@ -3,7 +3,7 @@ export interface LensItem {
   price: number;
 }
 
-export type InsurancePlan = 
+export type InsurancePlan =
   | "None"
   | "MEDICAID"
   | "EYE-MED"
@@ -24,11 +24,11 @@ export interface RxValue {
   axis: string;
   add: string;
   prism: string;
-  prismBase?: string;
-  prism2?: string;
-  prismBase2?: string;
-  hasPrism?: boolean;
-  hasCompoundPrism?: boolean;
+  prismBase: string;
+  prism2: string;
+  prismBase2: string;
+  hasPrism: boolean;
+  hasCompoundPrism: boolean;
 }
 
 export interface BillingRow {

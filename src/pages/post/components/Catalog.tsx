@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Search, Check, Tag } from "lucide-react";
 import { MASTER_PRICE_LIST } from "../constants";
 import type { LensItem } from "../types";
@@ -9,8 +9,6 @@ interface CatalogProps {
   onSelectItem: (name: string, price: number, cat: string) => void;
   selectedItemName?: string;
 }
-
-
 
 const MEDICAID_LENSES: string[] = [
   "Single Vision Plastic",
@@ -28,9 +26,9 @@ export function Catalog({
 }: CatalogProps) {
   const [activeCat, setActiveCat] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   // Drag to scroll state
-  const scrollRef = React.useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
