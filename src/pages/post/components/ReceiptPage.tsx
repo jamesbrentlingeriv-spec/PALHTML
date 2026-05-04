@@ -113,10 +113,12 @@ export function ReceiptPage({ patientData }: ReceiptPageProps) {
       <style>{`
         @media print {
           @page { size: portrait; margin: 0.5in; }
-          #root > *:not(.receipt-content-wrapper), main, header, nav, section, .fixed, .absolute, button { display: none !important; }
-          .receipt-content-wrapper { display: block !important; position: relative !important; width: 100% !important; }
+          body * { visibility: hidden; }
+          .receipt-content-wrapper, .receipt-content-wrapper * { visibility: visible; }
+          .receipt-content-wrapper { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; background: white !important; color: black !important; }
           .receipt-content-wrapper * { color: black !important; border-color: black !important; }
           input, textarea { border: none !important; background: transparent !important; }
+          .print\\:hidden, .print\\:hidden * { display: none !important; }
         }
       `}</style>
       <div className="receipt-content-wrapper max-w-3xl mx-auto border-2 border-black p-10 bg-white shadow-lg">

@@ -566,29 +566,9 @@ export default function App() {
 
     let oweValStr = "0.00";
     if (isCommercial) {
-      // Logic for copays and allowances
-      if (
-        plan === "EYE-MED" ||
-        plan === "AETNA EYE-MED" ||
-        plan === "MARCH/EYESYNERGY"
-      ) {
-        const isAllowance = window.confirm("Is this an ALLOWANCE plan?");
-        if (isAllowance) {
-          setIsAllowancePlan(true);
-          const amt = window.prompt("Enter Allowance Amount:", "150");
-          if (amt) {
-            setGlobalAllowance(parseFloat(amt));
-            oweValStr = (price * 1.06).toFixed(2);
-          }
-        } else {
-          setIsAllowancePlan(false);
-          const cp = window.prompt(`Enter CO-PAY for ${name}:`, "0");
-          if (cp !== null) {
-            oweValStr = (parseFloat(cp) * 1.06).toFixed(2);
-          }
-        }
+      if (isAllowancePlan) {
+        oweValStr = (price * 1.06).toFixed(2);
       } else {
-        // VSP or other commercial
         const cp = window.prompt(`Enter CO-PAY for ${name}:`, "0");
         if (cp !== null) {
           oweValStr = (parseFloat(cp) * 1.06).toFixed(2);
@@ -2486,16 +2466,18 @@ function ReceiptPageWrapper({
             margin: 0.5in; 
           }
 
-          /* Hide UI elements that cause blank pages or clutter */
-          #root > *:not(.receipt-content-wrapper),
-          main, header, nav, section, .fixed, .absolute, .backdrop-blur-md, button {
-            display: none !important;
+          body * {
+            visibility: hidden;
+          }
+
+          .receipt-content-wrapper, .receipt-content-wrapper * {
+            visibility: visible;
           }
 
           .receipt-content-wrapper {
-            display: block !important;
-            visibility: visible !important;
-            position: relative !important;
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
             width: 100% !important;
             background: white !important;
             color: black !important;
@@ -2505,10 +2487,11 @@ function ReceiptPageWrapper({
           .receipt-content-wrapper * {
             color: black !important;
             border-color: black !important;
-            visibility: visible !important;
           }
 
-          .print\\:hidden { display: none !important; }
+          .print\\:hidden, .print\\:hidden * { 
+            display: none !important; 
+          }
 
           /* Clean up inputs for paper */
           input, textarea {
@@ -2516,12 +2499,15 @@ function ReceiptPageWrapper({
             background: transparent !important;
             outline: none !important;
             width: 100% !important;
+            resize: none !important;
           }
 
           .max-w-3xl {
             box-shadow: none !important;
             border: none !important;
             max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
           }
         }
       `}</style>
