@@ -1,381 +1,136 @@
 /**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- * CMSPrintView - Refactored with fieldPositions.ts for precise 02/12 alignment
- * Fixed TypeScript import for verbatimModuleSyntax
+ * CMSPrintView - Fills the actual CMS-1500 fillable PDF with data
+ * and renders it for viewing and printing. No background overlay needed.
  */
 
-import React from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import type { CMS1500Data } from "../types";
-import type { FieldPosition } from "../fieldPositions";
-import { FIELD_POSITIONS } from "../fieldPositions";
-
-function isFieldPosition(position: string | FieldPosition): position is FieldPosition {
-  if (typeof position === 'string') {
-    return position in FIELD_POSITIONS;
-  }
-  return position.top !== undefined && position.left !== undefined;
-}
+import { fillCmsForm } from "../fillCmsForm";
+import { Printer, FileText, Loader2 } from "lucide-react";
 
 interface PrintViewProps {
   data: CMS1500Data;
 }
 
-const formatPhone = (phone: string = "") => {
-  if (!phone || phone.length < 3) return "";
-  return `( ${phone.slice(0, 3)} ) ${phone.slice(3)}`;
-};
-
-const splitCharge = (charge: string = "") => {
-  if (!charge) return { dollars: "0", cents: "00" };
-  const parts = charge.split(".");
-  return { dollars: parts[0] || "0", cents: parts[1]?.padEnd(2, "0") || "00" };
-};
-
-function Field({
-  position,
-  children,
-  width,
-  align = "left",
-}: {
-  position: string | FieldPosition;
-  children: React.ReactNode;
-  width?: number;
-  align?: "left" | "center" | "right";
-}) {
-  if (!isFieldPosition(position)) {
-    throw new Error(`Invalid position: ${JSON.stringify(position)}`);
-  }
-  const pos: FieldPosition = position;
-  return (
-    <div
-      style={{
-        position: "absolute",
-        top: `${pos.top}in`,
-        left: `${pos.left}in`,
-        width: width ? `${width}in` : pos.width ? `${pos.width}in` : "auto",
-        textAlign: pos.align || align,
-        fontFamily: '"Courier New", Courier, monospace',
-        fontSize: "11pt",
-        fontWeight: "bold",
-        lineHeight: 1,
-        whiteSpace: "nowrap",
-      }}
-    >
-      {children}
-    </div>
-  );
-}
-
 export default function CMSPrintView({ data }: PrintViewProps) {
-  const formatDate = (dateStr: string) => {
-    if (!dateStr) return "";
-    const date = new Date(dateStr);
-    if (isNaN(date.getTime())) return "";
-    return `${(date.getMonth() + 1).toString().padStart(2, "0")}${date.getDate().toString().padStart(2, "0")}${date.getFullYear().toString().slice(-2)}`;
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const printFrameRef = useRef<HTMLIFrameElement>(null);
+
+  const generatePdf = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const pdfBytes = await fillCmsForm(data);
+      const blob = new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      setPdfUrl(url);
+    } catch (err) {
+      setError(`Failed to fill CMS form: ${(err as Error).message}`);
+    } finally {
+      setLoading(false);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    generatePdf();
+  }, [generatePdf]);
+
+  // Cleanup blob URL on unmount
+  useEffect(() => {
+    return () => {
+      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
+    };
+  }, [pdfUrl]);
+
+  const handlePrint = () => {
+    if (printFrameRef.current) {
+      printFrameRef.current.contentWindow?.print();
+    }
   };
 
-  const getDay = (dateStr: string) => {
-    if (!dateStr) return "";
-    const d = new Date(dateStr);
-    return isNaN(d.getTime()) ? "" : d.getDate().toString().padStart(2, "0");
-  };
-  const getMonth = (dateStr: string) => {
-    if (!dateStr) return "";
-    const d = new Date(dateStr);
-    return isNaN(d.getTime())
-      ? ""
-      : (d.getMonth() + 1).toString().padStart(2, "0");
-  };
-  const getYear = (dateStr: string) => {
-    if (!dateStr) return "";
-    const d = new Date(dateStr);
-    return isNaN(d.getTime()) ? "" : d.getFullYear().toString().slice(-2);
-  };
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-4 text-slate-500">
+        <Loader2 className="w-10 h-10 animate-spin text-slate-400" />
+        <p className="text-sm font-bold uppercase tracking-widest">
+          Filling CMS-1500 Form...
+        </p>
+      </div>
+    );
+  }
 
-  const serviceRowTop = (idx: number) => 6.3 + idx * 0.31;
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-4">
+        <div className="bg-red-50 border border-red-200 rounded-xl p-6 max-w-md text-center">
+          <p className="text-sm font-bold text-red-700 uppercase tracking-widest mb-2">
+            Form Fill Error
+          </p>
+          <p className="text-xs text-red-500 font-mono">{error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div
-      className="print-view relative bg-white overflow-hidden shadow-sm"
-      style={{ width: "8.5in", height: "11in", padding: 0, margin: 0 }}
-    >
-      {/* CMS Form background */}
-      <iframe
-        src="/cms1500-form.pdf#toolbar=0&navpanes=0&scrollbar=0&view=FitH"
-        className="cms-form-bg"
-        style={{
-          position: "absolute",
-          top: 0,
-          left: 0,
-          width: "8.5in",
-          height: "11in",
-          border: "none",
-          pointerEvents: "none",
-          zIndex: 0,
-        }}
-        title="CMS-1500 Form Background"
-      />
-
-      <div style={{ position: "relative", zIndex: 1 }}>
-        {/* Box 1 */}
-        {data.programType === "MEDICARE" && (
-          <Field position="box1_medicare">X</Field>
-        )}
-        {data.programType === "MEDICAID" && (
-          <Field position="box1_medicaid">X</Field>
-        )}
-        {data.programType === "TRICARE" && (
-          <Field position="box1_tricare">X</Field>
-        )}
-        {data.programType === "CHAMPVA" && (
-          <Field position="box1_champva">X</Field>
-        )}
-        {data.programType === "GROUP" && <Field position="box1_group">X</Field>}
-        {data.programType === "FECA" && <Field position="box1_feca">X</Field>}
-        {data.programType === "OTHER" && <Field position="box1_other">X</Field>}
-
-        <Field position="insuredId">{data.insuredId}</Field>
-        <Field position="patientName">{data.patientName}</Field>
-        <Field position="patientDobMonth">
-          {getMonth(data.patientBirthDate)}
-        </Field>
-        <Field position="patientDobDay">{getDay(data.patientBirthDate)}</Field>
-        <Field position="patientDobYear">
-          {getYear(data.patientBirthDate)}
-        </Field>
-        {data.patientSex === "M" && <Field position="patientSexM">X</Field>}
-        {data.patientSex === "F" && <Field position="patientSexF">X</Field>}
-        <Field position="insuredName">
-          {data.insuredName ||
-            (data.patientRelationship === "SELF" ? data.patientName : "")}
-        </Field>
-
-        <Field position="patientStreet">{data.patientAddress.street}</Field>
-        <Field position="patientCity">{data.patientAddress.city}</Field>
-        <Field position="patientState">{data.patientAddress.state}</Field>
-        <Field position="patientZip">{data.patientAddress.zipCode}</Field>
-        <Field position="patientPhone">
-          {formatPhone(data.patientAddress.phone)}
-        </Field>
-
-        {data.patientRelationship === "SELF" && (
-          <Field position="relSelf">X</Field>
-        )}
-        {data.patientRelationship === "SPOUSE" && (
-          <Field position="relSpouse">X</Field>
-        )}
-        {data.patientRelationship === "CHILD" && (
-          <Field position="relChild">X</Field>
-        )}
-        {data.patientRelationship === "OTHER" && (
-          <Field position="relOther">X</Field>
-        )}
-
-        {data.patientRelationship !== "SELF" && (
-          <>
-            <Field position="insuredStreet">{data.insuredAddress.street}</Field>
-            <Field position="insuredCity">{data.insuredAddress.city}</Field>
-            <Field position="insuredState">{data.insuredAddress.state}</Field>
-            <Field position="insuredZip">{data.insuredAddress.zipCode}</Field>
-          </>
-        )}
-
-        {data.conditionRelatedTo.employment ? (
-          <Field position="condEmploymentYes">X</Field>
-        ) : (
-          <Field position="condEmploymentNo">X</Field>
-        )}
-        {data.conditionRelatedTo.autoAccident ? (
-          <Field position="condAutoYes">X</Field>
-        ) : (
-          <Field position="condAutoNo">X</Field>
-        )}
-        {data.conditionRelatedTo.autoAccident && (
-          <Field position="condAutoPlace">
-            {data.conditionRelatedTo.place}
-          </Field>
-        )}
-        {data.conditionRelatedTo.otherAccident ? (
-          <Field position="condOtherYes">X</Field>
-        ) : (
-          <Field position="condOtherNo">X</Field>
-        )}
-
-        <Field position="insuredGroupNum">{data.insuredGroupNumber}</Field>
-        <Field position="insuredPlanName">{data.insuredPlanName}</Field>
-
-        <Field position="patientSig">SIGNATURE ON FILE</Field>
-        <Field position="patientSigDate">
-          {formatDate(data.patientSignatureDate)}
-        </Field>
-
-        {data.insuredSignatureAuthorized && (
-          <Field position="insuredSig">SIGNATURE ON FILE</Field>
-        )}
-
-        <Field position="dateIllness">
-          {getMonth(data.dateOfIllness)} {getDay(data.dateOfIllness)}{" "}
-          {getYear(data.dateOfIllness)}
-        </Field>
-        <Field position="dateIllnessQual">{data.dateOfIllnessQual}</Field>
-
-        <Field position="referringProv">
-          {data.referringProviderQual && `${data.referringProviderQual} `}
-          {data.referringProviderName}
-        </Field>
-        <Field position="referringNpi">{data.referringProviderNpi}</Field>
-
-        <Field position="diagIcdInd">{data.diagnosisCodeIcd}</Field>
-        {data.diagnosisCodes.slice(0, 4).map((code, idx) => (
-          <Field
-            key={idx}
-            position={["diagA", "diagB", "diagC", "diagD"][idx] as string}
-          >
-            {code}
-          </Field>
-        ))}
-
-        <Field position="priorAuth">{data.priorAuthNumber}</Field>
-
-        {data.serviceLines.slice(0, 6).map((line, idx) => {
-          const rowTop = serviceRowTop(idx);
-          const charge = splitCharge(line.charges);
-          return (
-            <React.Fragment key={idx}>
-              <Field position={{ top: rowTop, left: 0.15 }}>
-                {line.fromDate}
-              </Field>
-              <Field position={{ top: rowTop, left: 1.15 }}>
-                {line.toDate}
-              </Field>
-              <Field position={{ top: rowTop, left: 2.05 }}>
-                {line.placeOfService}
-              </Field>
-              <Field position={{ top: rowTop, left: 2.35 }}>
-                {line.emergency ? "X" : ""}
-              </Field>
-              <Field position={{ top: rowTop, left: 2.65 }}>
-                {line.cptCode}
-              </Field>
-              <Field position={{ top: rowTop, left: 3.55 }}>
-                {line.modifier}
-              </Field>
-              <Field position={{ top: rowTop, left: 4.0 }}>
-                {line.diagnosisPointer}
-              </Field>
-              <Field
-                position={{ top: rowTop, left: 4.5 }}
-                width={0.7}
-                align="right"
-              >
-                {charge.dollars}
-              </Field>
-              <Field position={{ top: rowTop, left: 5.22 }} width={0.2}>
-                {charge.cents}
-              </Field>
-              <Field
-                position={{ top: rowTop, left: 5.45 }}
-                width={0.3}
-                align="center"
-              >
-                {line.daysOrUnits}
-              </Field>
-              <Field position={{ top: rowTop, left: 7.35 }} width={1.0}>
-                {line.renderingProviderNpi}
-              </Field>
-            </React.Fragment>
-          );
-        })}
-
-        <Field position="taxId">{data.taxId}</Field>
-        {data.taxIdType === "SSN" && <Field position="taxSsn">X</Field>}
-        {data.taxIdType === "EIN" && <Field position="taxEin">X</Field>}
-
-        <Field position="acctNo">{data.patientAccountNo}</Field>
-
-        {data.acceptAssignment ? (
-          <Field position="acceptYes">X</Field>
-        ) : (
-          <Field position="acceptNo">X</Field>
-        )}
-
-        {(() => {
-          const tc = splitCharge(data.totalCharge);
-          return (
-            <>
-              <Field position="totalDol">{tc.dollars}</Field>
-              <Field position="totalCen">{tc.cents}</Field>
-            </>
-          );
-        })()}
-
-        {(() => {
-          const ap = splitCharge(data.amountPaid);
-          return (
-            <>
-              <Field position="paidDol">{ap.dollars}</Field>
-              <Field position="paidCen">{ap.cents}</Field>
-            </>
-          );
-        })()}
-
-        <Field position="physSig">SIGNATURE ON FILE</Field>
-        <Field position="physSigDate">
-          {formatDate(data.physicianSignatureDate)}
-        </Field>
-
-        <div
-          style={{
-            position: "absolute",
-            top: "8.80in",
-            left: "3.50in",
-            width: "2.8in",
-            fontFamily: '"Courier New", Courier, monospace',
-            fontSize: "9pt",
-            lineHeight: 1.1,
-          }}
+    <div className="flex flex-col items-center gap-6">
+      {/* Print button bar */}
+      <div className="flex items-center gap-4 no-print">
+        <button
+          onClick={handlePrint}
+          className="px-6 py-3 bg-slate-900 text-white rounded-lg text-xs font-black uppercase tracking-widest shadow-lg hover:bg-black transition-all flex items-center gap-2"
         >
-          <div>{data.facilityInfo.name}</div>
-          <div>{data.facilityInfo.street}</div>
-          <div>
-            {data.facilityInfo.city} {data.facilityInfo.state}{" "}
-            {data.facilityInfo.zipCode}
-          </div>
-        </div>
-        <Field position="facilityNpi">{data.facilityInfo.npi}</Field>
-
-        <div
-          style={{
-            position: "absolute",
-            top: "8.80in",
-            left: "6.50in",
-            width: "2.0in",
-            fontFamily: '"Courier New", Courier, monospace',
-            fontSize: "9pt",
-            lineHeight: 1.1,
-          }}
-        >
-          <div>{data.billingProviderInfo.name}</div>
-          <div>{data.billingProviderInfo.street}</div>
-          <div>
-            {data.billingProviderInfo.city} {data.billingProviderInfo.state}{" "}
-            {data.billingProviderInfo.zipCode}
-          </div>
-          <div style={{ marginTop: "0.1in" }}>
-            {formatPhone(data.billingProviderInfo.phone)}
-          </div>
-        </div>
-        <Field position="billingNpi">{data.billingProviderInfo.npi}</Field>
-        <Field position="billingId">{data.billingProviderInfo.otherId}</Field>
+          <Printer className="w-4 h-4" />
+          Print Filled CMS-1500
+        </button>
+        <span className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">
+          <FileText className="w-3 h-3 inline mr-1" />
+          Filled PDF — ready for printing
+        </span>
       </div>
 
+      {/* Embedded filled PDF for viewing */}
+      <div className="bg-white border border-slate-200 rounded-lg overflow-hidden shadow-lg">
+        <iframe
+          ref={printFrameRef}
+          src={pdfUrl || ""}
+          className="block"
+          style={{
+            width: "8.5in",
+            height: "11in",
+            border: "none",
+          }}
+          title="CMS-1500 Filled Form"
+        />
+      </div>
+
+      {/* Print-only copy hidden from screen */}
+      <iframe
+        src={pdfUrl || ""}
+        className="hidden print:block print:fixed print:inset-0 print:w-full print:h-full print:border-none print:z-[99999]"
+        style={{
+          display: "none",
+        }}
+        title="CMS-1500 Print Frame"
+      />
+
       <style>{`
+        @page {
+          size: 8.5in 11in;
+          margin: 0;
+        }
         @media print {
-          body { background: white !important; margin: 0; padding: 0; }
-          .print-view { margin: 0 !important; box-shadow: none !important; }
-          .cms-form-bg { display: none !important; }
-          header, footer, .no-print { display: none !important; }
+          html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: white !important;
+          }
+          .no-print {
+            display: none !important;
+          }
         }
       `}</style>
     </div>
