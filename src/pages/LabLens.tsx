@@ -92,7 +92,7 @@ export default function LabLens() {
 
   const bg = dark ? "bg-black text-white" : "bg-white text-black";
   const cardBg = dark
-    ? "bg-black border-gray-300"
+    ? "bg-black border-gray-500"
     : "bg-white border-gray-300";
   const cellHas = dark ? "bg-white text-black" : "bg-black text-white";
 
@@ -176,14 +176,14 @@ export default function LabLens() {
             <thead>
               <tr>
                 <th
-                  className={`border px-2 py-2 sticky left-0 ${dark ? "bg-gray-300" : "bg-gray-200"}`}
+                  className={`border px-2 py-2 sticky left-0 ${dark ? "bg-gray-500" : "bg-gray-200"}`}
                 >
                   Sph \ Cyl
                 </th>
                 {cyls.map((c) => (
                   <th
                     key={c}
-                    className={`border px-2 py-2 ${dark ? "bg-gray-300" : "bg-gray-200"}`}
+                    className={`border px-2 py-2 ${dark ? "bg-gray-500" : "bg-gray-200"}`}
                   >
                     {fmt(c)}
                   </th>
@@ -194,7 +194,7 @@ export default function LabLens() {
               {sphs.map((s) => (
                 <tr key={s}>
                   <th
-                    className={`border px-2 py-2 sticky left-0 font-bold ${dark ? "bg-gray-300" : "bg-gray-200"}`}
+                    className={`border px-2 py-2 sticky left-0 font-bold ${dark ? "bg-gray-500" : "bg-gray-200"}`}
                   >
                     {fmt(s)}
                   </th>
