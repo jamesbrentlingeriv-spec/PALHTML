@@ -92,7 +92,7 @@ export default function LabLens() {
 
   const bg = dark ? "bg-black text-white" : "bg-white text-black";
   const cardBg = dark
-    ? "bg-black border-gray-700"
+    ? "bg-black border-gray-300"
     : "bg-white border-gray-300";
   const cellHas = dark ? "bg-white text-black" : "bg-black text-white";
 
