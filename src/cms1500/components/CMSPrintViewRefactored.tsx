@@ -452,6 +452,10 @@ export default function CMSPrintView({ data }: PrintViewProps) {
       </div>
 
       <style>{`
+        @page {
+          size: 8.5in 11in;
+          margin: 0;
+        }
         @media print {
           body { background: white !important; margin: 0; padding: 0; }
           .print-view { margin: 0 !important; box-shadow: none !important; }

@@ -10,7 +10,7 @@ import BackButton from '../components/BackButton';
 import type { CMS1500Data, CMS1500Step } from './types';
 import { INITIAL_CMS_DATA } from './constants';
 import CMSFormWizard from './components/CMSFormWizard';
-import CMSPrintView from './components/CMSPrintView';
+import CMSPrintView from './components/CMSPrintViewRefactored';
 
 export default function CMS1500Page() {
   const [data, setData] = useState<CMS1500Data>(() => {
@@ -50,10 +50,10 @@ export default function CMS1500Page() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 font-sans">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-800 font-sans print:min-h-0 print:bg-white">
       <BackButton />
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-50 print:hidden">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 bg-red-600 rounded flex items-center justify-center text-white shadow-sm shadow-red-200">
@@ -89,7 +89,7 @@ export default function CMS1500Page() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
+      <main className="max-w-7xl mx-auto px-4 py-8 print:p-0 print:m-0 print:max-w-none print:w-full print:block">
         <AnimatePresence mode="wait">
           {view === 'EDIT' ? (
             <motion.div
@@ -178,10 +178,10 @@ export default function CMS1500Page() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="flex flex-col items-center"
+              className="flex flex-col items-center print:block print:w-full print:transform-none print:m-0 print:p-0"
             >
               {/* Print Sheet Container */}
-              <div className="relative bg-white shadow-2xl rounded-sm overflow-hidden border border-slate-200 group">
+              <div className="relative bg-white shadow-2xl rounded-sm overflow-hidden border border-slate-200 group print:shadow-none print:border-none print:rounded-none print:overflow-visible print:m-0 print:p-0">
                 <div className="absolute top-4 left-4 text-[8px] font-black text-red-500/20 uppercase tracking-widest pointer-events-none no-print">Top-Left Origin (0,0)</div>
                 <div className="absolute bottom-4 right-4 text-[8px] font-black text-red-500/20 uppercase tracking-widest pointer-events-none transform rotate-180 no-print">Bottom-Right Limit</div>
                 
