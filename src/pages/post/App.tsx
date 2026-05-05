@@ -2172,7 +2172,13 @@ export default function App() {
         confirmLabel={dialog.confirmLabel || "OK"}
         cancelLabel={dialog.cancelLabel || "Cancel"}
         onConfirm={(value?: string) => {
-          dialog.callback?.(value ?? "");
+          if (dialog.type === "confirm") {
+            dialog.callback?.("true");
+          } else if (dialog.type === "prompt") {
+            dialog.callback?.(value ?? "");
+          } else {
+            dialog.callback?.("");
+          }
         }}
         onCancel={() => {
           if (dialog.type === "confirm") {
