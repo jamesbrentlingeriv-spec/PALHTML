@@ -38,7 +38,7 @@ import { MeasurementTool } from "./components/MeasurementTool";
 import { PatientForm } from "./components/PatientForm";
 import { Catalog } from "./components/Catalog";
 import { ReceiptPage } from "./components/ReceiptPage";
-
+import ThemedDialog from "./components/ThemedDialog";
 // Utility for formatting numbers to currency
 const f = (n: number | string) => {
   const val = typeof n === "string" ? parseFloat(n) : n;
@@ -294,6 +294,48 @@ export default function App() {
     // Added dependencies to the dependency array
   }, [billing, isAllowancePlan, globalAllowance, frameAllowance]);
 
+  // Dialog State
+  const [dialog, setDialog] = useState<{
+    open: boolean;
+    type: "confirm" | "prompt" | "alert";
+    title: string;
+    message: string;
+    defaultValue?: string;
+    placeholder?: string;
+    confirmLabel?: string;
+    cancelLabel?: string;
+    callback?: (value?: string) => void;
+  }>({ open: false, type: "alert", title: "", message: "" });
+
+  const showDialog = (params: {
+    type: "confirm" | "prompt" | "alert";
+    title: string;
+    message: string;
+    defaultValue?: string;
+    placeholder?: string;
+    confirmLabel?: string;
+    cancelLabel?: string;
+  }) => {
+    return new Promise<string | null>((resolve) => {
+      setDialog({
+        ...params,
+        open: true,
+        callback: (value?: string) => {
+          closeDialog();
+          if (params.type === "confirm") {
+            resolve(value === "true" ? "true" : "false");
+          } else if (params.type === "prompt") {
+            resolve(value ?? null);
+          } else {
+            resolve(null);
+          }
+        },
+      });
+    });
+  };
+
+  const closeDialog = () => setDialog(prev => ({ ...prev, open: false }));
+
   // UI State
   const [showMeasureTool, setShowMeasureTool] = useState(false);
   const [showPatientForm, setShowPatientForm] = useState(false);
@@ -399,7 +441,7 @@ export default function App() {
     }
   };
 
-  const handleColorChoice = (type: string) => {
+  const handleColorChoice = async (type: string) => {
     setColorType(type);
     if (type === "CLEAR") {
       setColorDetail("");
@@ -412,7 +454,7 @@ export default function App() {
     if (type === "MIRROR") q = "mirror coating color";
     if (type === "TRANS") q = "transitions color (Grey/Brown etc)";
 
-    const resp = prompt(`Selection: ${type}. Enter ${q}:`, "");
+    const resp = await showDialog({ type: "prompt", title: `Selection: ${type}`, message: `Enter ${q}:`, defaultValue: "" });
     if (!resp) return;
     setColorDetail(resp);
 
@@ -430,16 +472,13 @@ export default function App() {
 
       if (!isAllowancePlan) {
         // STANDARD COMMERCIAL: Prompt for Copay
-        const copayStr = prompt(`What is the copay for ${type}?`, "0");
+        const copayStr = await showDialog({ type: "prompt", title: "Copay", message: `What is the copay for ${type}?`, defaultValue: "0" });
         if (copayStr === null) return;
         const copay = parseFloat(copayStr) || 0;
         oweAmount = copay * 1.06;
       } else {
         // ALLOWANCE PLAN: Prompt for allowance
-        const allowanceStr = prompt(
-          `What is the insurance allowance for ${type}?`,
-          "0",
-        );
+        const allowanceStr = await showDialog({ type: "prompt", title: "Allowance", message: `What is the insurance allowance for ${type}?`, defaultValue: "0" });
         if (allowanceStr === null) return;
         const allowance = parseFloat(allowanceStr) || 0;
         oweAmount = Math.max(0, taxedAmount - allowance);
@@ -465,7 +504,7 @@ export default function App() {
     }
   };
 
-  const handleInsuranceChange = (newPlan: InsurancePlan) => {
+  const handleInsuranceChange = async (newPlan: InsurancePlan) => {
     setPlan(newPlan);
     setIsAllowancePlan(false);
     setGlobalAllowance(0);
@@ -477,34 +516,49 @@ export default function App() {
     if (newPlan === "WELLCARE MEDICARE") {
       localIsAllowance = true;
       setIsAllowancePlan(true);
-      const input = prompt(
-        "Enter WELLCARE MEDICARE Total Allowance Amount (e.g. 350):",
-        "0",
-      );
+      const input = await showDialog({
+        type: "prompt",
+        title: "WELLCARE MEDICARE Allowance",
+        message: "Enter WELLCARE MEDICARE Total Allowance Amount (e.g. 350):",
+        defaultValue: "0",
+      });
       const localGlobalAllowance = parseFloat(input || "0") || 0;
       setGlobalAllowance(localGlobalAllowance);
-      alert(
-        `Allowance Plan Active. $${localGlobalAllowance} will be deducted from the Retail cost of the glasses.`,
-      );
+      await showDialog({
+        type: "alert",
+        title: "Allowance Plan Active",
+        message: `Allowance Plan Active. $${localGlobalAllowance} will be deducted from the Retail cost of the glasses.`,
+      });
     } else if (
       newPlan !== "MEDICAID" &&
       newPlan !== "SCHOOL LETTER" &&
       newPlan !== "None"
     ) {
       // 1. ASK IF ALLOWANCE PLAN
-      if (
-        confirm(
-          "Is this an ALLOWANCE PLAN? (e.g. $350 total allowance to use freely)\nClick OK for YES.\nClick Cancel for NO.",
-        )
-      ) {
+      const isAllowance = await showDialog({
+        type: "confirm",
+        title: "Allowance Plan?",
+        message: "Is this an ALLOWANCE PLAN? (e.g. $350 total allowance to use freely)",
+        confirmLabel: "YES",
+        cancelLabel: "NO",
+      });
+
+      if (isAllowance === "true") {
         localIsAllowance = true;
         setIsAllowancePlan(true);
-        const input = prompt("Enter Total Allowance Amount (e.g. 350):", "0");
+        const input = await showDialog({
+          type: "prompt",
+          title: "Allowance Amount",
+          message: "Enter Total Allowance Amount (e.g. 350):",
+          defaultValue: "0",
+        });
         const localGlobalAllowance = parseFloat(input || "0") || 0;
         setGlobalAllowance(localGlobalAllowance);
-        alert(
-          `Allowance Plan Active. $${localGlobalAllowance} will be deducted from the Retail cost of the glasses.`,
-        );
+        await showDialog({
+          type: "alert",
+          title: "Allowance Plan Active",
+          message: `Allowance Plan Active. $${localGlobalAllowance} will be deducted from the Retail cost of the glasses.`,
+        });
       } else {
         // CHECK FOR FRAME ALLOWANCE CONDITION
         const isEyeMedGroup =
@@ -513,10 +567,12 @@ export default function App() {
           newPlan === "MARCH/EYESYNERGY";
 
         if (newPlan === "VSP" || isEyeMedGroup) {
-          const amt = prompt(
-            `Enter ${newPlan} FRAME allowance amount (e.g. 150):`,
-            "150",
-          );
+          const amt = await showDialog({
+            type: "prompt",
+            title: "Frame Allowance",
+            message: `Enter ${newPlan} FRAME allowance amount (e.g. 150):`,
+            defaultValue: "150",
+          });
           localFrameAllowance = parseFloat(amt || "0") || 0;
           setFrameAllowance(localFrameAllowance);
         }
@@ -553,7 +609,7 @@ export default function App() {
     });
   };
 
-  const handleCatalogSelect = (name: string, price: number, cat: string) => {
+  const handleCatalogSelect = async (name: string, price: number, cat: string) => {
     const isMiscCat =
       cat === "Coatings and Tint" ||
       cat === "Overpower/Oversize" ||
@@ -575,42 +631,25 @@ export default function App() {
       else if (billing.m2.retail === "") targetRow = "m2";
       else if (billing.m3.retail === "") targetRow = "m3";
       else {
-        alert("Misc fields full - please clear one to add more.");
+        await showDialog({ type: "alert", title: "Misc Fields Full", message: "Misc fields full - please clear one to add more." });
         return;
       }
     }
 
     let oweValStr = "0.00";
-    if (isCommercial) {
-      // Logic for copays and allowances
-      if (
-        plan === "EYE-MED" ||
-        plan === "AETNA EYE-MED" ||
-        plan === "MARCH/EYESYNERGY"
-      ) {
-        const isAllowance = window.confirm("Is this an ALLOWANCE plan?");
-        if (isAllowance) {
-          setIsAllowancePlan(true);
-          const amt = window.prompt("Enter Allowance Amount:", "150");
-          if (amt) {
-            setGlobalAllowance(parseFloat(amt));
-            oweValStr = (price * 1.06).toFixed(2);
-          }
-        } else {
-          setIsAllowancePlan(false);
-          const cp = window.prompt(`Enter CO-PAY for ${name}:`, "0");
-          if (cp !== null) {
-            oweValStr = (parseFloat(cp) * 1.06).toFixed(2);
-          }
-        }
-      } else {
-        // VSP or other commercial
-        const cp = window.prompt(`Enter CO-PAY for ${name}:`, "0");
-        if (cp !== null) {
-          oweValStr = (parseFloat(cp) * 1.06).toFixed(2);
-        }
+    if (isCommercial && !isAllowancePlan) {
+      // Non-allowance commercial plan: prompt for the copay
+      const cp = await showDialog({
+        type: "prompt",
+        title: "Copay",
+        message: `Enter CO-PAY for ${name}:`,
+        defaultValue: "0",
+      });
+      if (cp !== null) {
+        oweValStr = (parseFloat(cp) * 1.06).toFixed(2);
       }
     } else {
+      // Allowance plan or no insurance: use full price with tax
       oweValStr = (price * 1.06).toFixed(2);
     }
 
@@ -630,7 +669,7 @@ export default function App() {
       promptMsg = "What mirror coating color?";
 
     if (promptMsg) {
-      const resp = window.prompt(promptMsg, "");
+      const resp = await showDialog({ type: "prompt", title: "Color Selection", message: promptMsg, defaultValue: "" });
       if (resp) {
         updateBillingRow(targetRow, {
           label: `${isMiscCat || isAntiGlare ? name : `LENS: ${name}`} (${resp})`,
@@ -865,7 +904,7 @@ export default function App() {
         resetForm();
       }, 500);
     } catch (err) {
-      alert("Database error: " + err);
+      await showDialog({ type: "alert", title: "Database Error", message: "Database error: " + err });
     }
   };
 
@@ -1510,10 +1549,10 @@ export default function App() {
                   </button>
 
                   <button
-                    onClick={() => {
+                    onClick={async () => {
                       setPayMethod("Check");
                       setShowCardMenu(false);
-                      const num = prompt("Enter Check Number:");
+                      const num = await showDialog({ type: "prompt", title: "Check Number", message: "Enter Check Number:", defaultValue: "" });
                       setCheckNum(num || "");
                     }}
                     className={`px-4 py-2 rounded-xl border-theme-border text-[10px] font-black uppercase transition-all ${
@@ -2123,6 +2162,29 @@ export default function App() {
       </AnimatePresence>
 
       {/* HIDDEN PRINT LAYOUT — LANDSCAPE, TWO WRITE-UPS, ONE PAGE */}
+      <ThemedDialog
+        open={dialog.open}
+        type={dialog.type}
+        title={dialog.title}
+        message={dialog.message}
+        defaultValue={dialog.defaultValue || ""}
+        placeholder={dialog.placeholder || ""}
+        confirmLabel={dialog.confirmLabel || "OK"}
+        cancelLabel={dialog.cancelLabel || "Cancel"}
+        onConfirm={(value?: string) => {
+          dialog.callback?.(value ?? "");
+        }}
+        onCancel={() => {
+          if (dialog.type === "confirm") {
+            dialog.callback?.("false");
+          } else if (dialog.type === "prompt") {
+            dialog.callback?.("");
+          } else {
+            dialog.callback?.("");
+          }
+        }}
+      />
+
       {!showItemizedReceipt && (
         <div
           className={`fixed inset-0 bg-white z-[99999] pointer-events-none opacity-0 ${isPrinting ? "opacity-100" : "hidden"}`}
