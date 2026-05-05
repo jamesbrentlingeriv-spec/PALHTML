@@ -176,14 +176,14 @@ export default function LabLens() {
             <thead>
               <tr>
                 <th
-                  className={`border px-2 py-2 sticky left-0 ${dark ? "bg-gray-800" : "bg-gray-200"}`}
+                  className={`border px-2 py-2 sticky left-0 ${dark ? "bg-gray-300" : "bg-gray-200"}`}
                 >
                   Sph \ Cyl
                 </th>
                 {cyls.map((c) => (
                   <th
                     key={c}
-                    className={`border px-2 py-2 ${dark ? "bg-gray-800" : "bg-gray-200"}`}
+                    className={`border px-2 py-2 ${dark ? "bg-gray-300" : "bg-gray-200"}`}
                   >
                     {fmt(c)}
                   </th>
