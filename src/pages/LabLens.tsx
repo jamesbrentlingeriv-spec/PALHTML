@@ -3,7 +3,7 @@ import BackButton from "../components/BackButton";
 
 const SPH_MAX = 4.0,
   SPH_MIN = -8.0,
-  CYL_MAX = 4.0,
+  CYL_MAX = 0.0,
   CYL_MIN = -4.0,
   STEP = 0.25;
 
