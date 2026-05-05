@@ -2,6 +2,7 @@ import { useState } from "react";
 import { X, Save } from "lucide-react";
 import { motion } from "framer-motion";
 import { TRANSLATIONS } from "../constants";
+import HipaaModal from "./HipaaModal";
 
 interface PatientFormData {
   name: string;
@@ -36,6 +37,7 @@ export function PatientForm({
   initialName,
 }: PatientFormProps) {
   const [lang, setLang] = useState<keyof typeof TRANSLATIONS>("en");
+  const [showHipaaModal, setShowHipaaModal] = useState(false);
   const [formData, setFormData] = useState({
     name: initialName || "",
     dob: "",
@@ -356,17 +358,25 @@ export function PatientForm({
                 id="hipaa"
                 name="hipaa"
                 checked={formData.hipaa}
-                onChange={handleChange}
-                className="mt-1 w-5 h-5 rounded border-black text-red-600 focus:ring-red-600 accent-red-600"
+                readOnly
+                className="mt-1 w-5 h-5 rounded border-black text-red-600 focus:ring-red-600 accent-red-600 cursor-pointer"
+                onClick={() => setShowHipaaModal(true)}
               />
               <label
                 htmlFor="hipaa"
-                className="text-sm text-black leading-relaxed font-bold uppercase"
+                className="text-sm text-black leading-relaxed font-bold uppercase cursor-pointer"
+                onClick={() => setShowHipaaModal(true)}
               >
                 {t.hipaaText}
               </label>
             </div>
           </section>
+
+          <HipaaModal
+            open={showHipaaModal}
+            onAgree={() => setFormData(prev => ({ ...prev, hipaa: true }))}
+            onClose={() => setShowHipaaModal(false)}
+          />
 
           <div className="flex gap-4 pt-6 pb-4">
             <button

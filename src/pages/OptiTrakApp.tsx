@@ -16,7 +16,7 @@ export default function OptiTrakApp() {
         </span>
       </div>
       <iframe
-        src="/optitrack/index.html"
+        src="https://jamesbrentlingeriv-spec.github.io/OPTITRAK/"
         className="flex-1 w-full border-none"
         title="OptiTrak Remake Manager"
         allow="fullscreen"

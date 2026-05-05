@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import SplashScreen from "../components/SplashScreen";
 
 // Define types for our tools
 type InternalTool = {
@@ -146,7 +145,7 @@ type ExpandedSections = {
   [key: string]: boolean;
 }
 
-function Dashboard() {
+export default function Dashboard() {
   const [dark, setDark] = useState(
     () => localStorage.getItem("theme") === "dark",
   );
@@ -609,20 +608,3 @@ function Dashboard() {
     </div>
   );
 }
-
-// We'll render Dashboard conditionally based on splash screen completion
-function DashboardWithSplashScreen() {
-  const [showDashboard, setShowDashboard] = useState(false);
-
-  const handleSplashDone = () => {
-    setShowDashboard(true);
-  };
-
-  if (!showDashboard) {
-    return <SplashScreen onDone={handleSplashDone} />;
-  }
-
-  return <Dashboard />;
-}
-
-export default DashboardWithSplashScreen;
