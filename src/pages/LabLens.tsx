@@ -168,7 +168,7 @@ export default function LabLens() {
           autoFocus
         />
 
-        <div className={`overflow-auto border rounded ${cardBg}`}>
+        <div className={`overflow-auto border rounded ${cardBg}`} style={{ maxHeight: 'calc(100vh - 300px)' }}>
           <table
             className="border-collapse text-xs font-mono"
             style={{ minWidth: 800 }}
@@ -176,14 +176,14 @@ export default function LabLens() {
             <thead>
               <tr>
                 <th
-                  className={`border px-2 py-2 sticky left-0 ${dark ? "bg-gray-500" : "bg-gray-200"}`}
+                  className={`border px-2 py-2 sticky top-0 left-0 z-20 ${dark ? "bg-white text-black" : "bg-black text-white"}`}
                 >
                   Sph \ Cyl
                 </th>
                 {cyls.map((c) => (
                   <th
                     key={c}
-                    className={`border px-2 py-2 ${dark ? "bg-gray-500" : "bg-gray-200"}`}
+                    className={`border px-2 py-2 sticky top-0 z-10 ${dark ? "bg-white text-black" : "bg-black text-white"}`}
                   >
                     {fmt(c)}
                   </th>
@@ -194,7 +194,7 @@ export default function LabLens() {
               {sphs.map((s) => (
                 <tr key={s}>
                   <th
-                    className={`border px-2 py-2 sticky left-0 font-bold ${dark ? "bg-gray-500" : "bg-gray-200"}`}
+                    className={`border px-2 py-2 sticky left-0 font-bold ${dark ? "bg-white text-black" : "bg-black text-white"}`}
                   >
                     {fmt(s)}
                   </th>
