@@ -194,7 +194,7 @@ export default function LabLens() {
               {sphs.map((s) => (
                 <tr key={s}>
                   <th
-                    className={`border px-2 py-2 sticky left-0 font-bold ${dark ? "bg-gray-800" : "bg-gray-200"}`}
+                    className={`border px-2 py-2 sticky left-0 font-bold ${dark ? "bg-gray-300" : "bg-gray-200"}`}
                   >
                     {fmt(s)}
                   </th>
