@@ -8,6 +8,7 @@ export default function PalReceipt() {
       defaultCity="Lexington, KY 40509"
       defaultPhone="Phone: (859) 266-3003"
       defaultFax="Fax: (859) 266-9504"
+      showTax={true}
     />
   )
 }

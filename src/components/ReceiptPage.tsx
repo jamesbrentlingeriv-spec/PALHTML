@@ -9,9 +9,17 @@ interface ReceiptProps {
   defaultCity: string
   defaultPhone: string
   defaultFax?: string
+  showTax?: boolean
 }
 
-export default function ReceiptPage({ defaultName, defaultAddress, defaultCity, defaultPhone, defaultFax }: ReceiptProps) {
+export default function ReceiptPage({
+  defaultName,
+  defaultAddress,
+  defaultCity,
+  defaultPhone,
+  defaultFax,
+  showTax,
+}: ReceiptProps) {
   const receiptRef = useRef<HTMLDivElement>(null)
   const [clinicName, setClinicName] = useState(defaultName)
   const [address, setAddress] = useState(defaultAddress)
@@ -35,8 +43,10 @@ export default function ReceiptPage({ defaultName, defaultAddress, defaultCity, 
   const [payments, setPayments] = useState<string[]>([])
   const [showConfirm, setShowConfirm] = useState(false)
 
+  const hasTax = showTax !== undefined ? showTax : defaultName.toLowerCase().includes('pal optical')
   const subtotal = items.reduce((s, i) => s + i.qty * i.price, 0)
-  const balance = subtotal - insAdj - amtPaid
+  const tax = hasTax ? Math.max(0, Math.round(subtotal * 6) / 100) : 0
+  const balance = subtotal + tax - insAdj - amtPaid
 
   const addRow = () => setItems(it => [...it, { id: Date.now(), code: '', desc: '', qty: 1, price: 0 }])
   const removeRow = (id: number) => setItems(it => it.filter(i => i.id !== id))
@@ -150,6 +160,9 @@ export default function ReceiptPage({ defaultName, defaultAddress, defaultCity, 
         {/* Totals */}
         <div className="ml-auto w-80 space-y-2">
           <div className="flex justify-between text-sm"><span>Subtotal:</span><span>${subtotal.toFixed(2)}</span></div>
+          {hasTax && (
+            <div className="flex justify-between text-sm"><span>6% KY Sales Tax:</span><span>${tax.toFixed(2)}</span></div>
+          )}
           <div className="flex justify-between items-center text-sm text-red-600">
             <span>Insurance Adj (-):</span>
             <input type="number" className="w-24 border border-gray-300 rounded px-2 py-1 text-right text-sm" value={insAdj} step={0.01} onChange={e => setInsAdj(+e.target.value)} />

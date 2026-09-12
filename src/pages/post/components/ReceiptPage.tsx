@@ -272,7 +272,7 @@ export function ReceiptPage({ patientData }: ReceiptPageProps) {
             <span>${subtotal.toFixed(2)}</span>
           </div>
           <div className="flex justify-between font-bold">
-            <span>Tax (6%):</span>
+            <span>6% KY Sales Tax:</span>
             <span>${tax.toFixed(2)}</span>
           </div>
           <div className="flex justify-between font-black text-xl border-t-2 border-black pt-2">
